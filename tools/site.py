@@ -66,6 +66,10 @@ SITE = "https://1bit.gg/"
 # the old 1bit.MONSTER site, kept on GitHub Pages under its repository's own address
 OLD_SITE = "https://1bit-monster.github.io/1bit-MONSTER/"
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+# The engine's README.md and docs/ live in 1bit-MONSTER/engine; the site workflow checks it out and
+# points ONEBIT_ENGINE_DIR at it. Unset, the engine is this checkout (the old single-repo layout).
+ENGINE = pathlib.Path(os.environ.get("ONEBIT_ENGINE_DIR") or ROOT).resolve()
+SITE_REPO = "https://github.com/1bit-MONSTER/site"
 
 TAGLINE = ("One engine behind an OpenAI-compatible API, running inside Lemonade: HRX on the Radeon "
            "iGPU with our Loom kernels, the XDNA 2 NPU, ZINC for NVIDIA and Apple GPUs, MLX on Apple Silicon.")
@@ -92,7 +96,7 @@ NAV = [
 
 
 def docs_sources():
-    return {p.stem: p for p in sorted((ROOT / "docs").glob("*.md"))}
+    return {p.stem: p for p in sorted((ENGINE / "docs").glob("*.md"))}
 
 
 def posts():
@@ -130,7 +134,7 @@ def rewrite_links(text, src, docs, labels):
         frag = "#" + frag if frag else ""
         resolved = (here / path).resolve()
         try:
-            rel = resolved.relative_to(ROOT).as_posix()
+            rel = resolved.relative_to(ENGINE if resolved.is_relative_to(ENGINE) else ROOT).as_posix()
         except ValueError:
             return m.group(0)
         if rel == "README.md":
@@ -201,10 +205,18 @@ def chat_widget():
 OG_IMAGE = SITE + "assets/og-card.png"
 
 
+def source_url(src):
+    """The page source's GitHub URL: engine files in the engine repo, the rest in the site repo."""
+    src = pathlib.Path(src).resolve()
+    if src.is_relative_to(ENGINE):
+        return f"{REPO}/blob/main/{src.relative_to(ENGINE).as_posix()}"
+    return f"{SITE_REPO}/blob/main/{src.relative_to(ROOT).as_posix()}"
+
+
 def last_commit_date(path):
     """The source file's last commit date (YYYY-MM-DD); today when git cannot say."""
     try:
-        d = subprocess.run(["git", "-C", str(ROOT), "log", "-1", "--format=%cs", "--", str(path)],
+        d = subprocess.run(["git", "-C", str(pathlib.Path(path).resolve().parent), "log", "-1", "--format=%cs", "--", str(path)],
                            capture_output=True, text=True, timeout=30).stdout.strip()
     except (OSError, subprocess.SubprocessError):
         d = ""
@@ -396,7 +408,7 @@ class Site:
             text = re.sub(r"^\*\*Documentation:\*\*.*\n+", "", text, count=1, flags=re.M)
         main = (f'<div class="container docs">\n{self.sidebar(name)}\n<article class="docs-page prose">\n'
                 f'{self.md(text, src)}\n{self.pager(name)}\n'
-                f'<p class="source meta"><a href="{REPO}/blob/main/{src.relative_to(ROOT).as_posix()}">View this page\'s source on GitHub ↗</a></p>\n'
+                f'<p class="source meta"><a href="{source_url(src)}">View this page\'s source on GitHub ↗</a></p>\n'
                 "</article>\n</div>")
         title = title_of(text)
         page_title = "Meet the engine" if title == "1bit engine" else title  # the README, not the home page
@@ -553,7 +565,7 @@ class Site:
         self.write("404", "Page not found · 1bit engine", main, "doc", "", extra_head=f'<base href="{SITE}">', noindex=True)
 
     def build(self):
-        readme = ROOT / "README.md"
+        readme = ENGINE / "README.md"
         for name, src in self.docs.items():
             self.doc_page(name, src)
         self.doc_page("overview", readme, section="overview")
