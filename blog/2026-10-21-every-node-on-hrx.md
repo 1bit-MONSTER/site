@@ -56,7 +56,7 @@ Qwen3.8-27B (UD-Q4_K_XL) with MTP speculative decoding, greedy 256-token chats:
 
 The verify step checks four tokens at once. New kernels for 2 to 8 tokens took it from 121 ms to
 88 ms ([#487](https://github.com/1bit-MONSTER/engine/pull/487)). Decode without MTP is unchanged
-at 12.2 tok/s. The same model reads a 4,096-token prompt at about 575 tok/s. How to run it:
+at 12.2 tok/s. The same model reads a 4,096-token prompt at 560 to 585 tok/s, depending on the batch size (llama-bench). How to run it:
 [1bit serve](../docs/serve.md).
 
 ## Strict GPU placement by default
