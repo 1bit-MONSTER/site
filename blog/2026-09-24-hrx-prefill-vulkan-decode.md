@@ -21,6 +21,8 @@ summary: HRX prefills, Vulkan decodes, one KV cache and no copies: an 8,192-toke
 
 On Strix Halo's Radeon iGPU, AMD's HRX runtime prefills a prompt faster than Vulkan, and Vulkan decodes faster than HRX. `1bit serve --device vulkan --prefill-device hrx` now uses both on the same request, and the key-value cache never gets copied between them.
 
+> **Since 21 October 2026:** Vulkan is no longer a route of the engine (engine #306), and `--prefill-device` is refused; HRX runs the whole request. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## The idea
 
 A request has two phases. **Prefill** reads the whole prompt at once and is compute-bound; **decode** makes one token at a time and is bound by memory bandwidth. Our one llama.cpp build carries both GPU backends, `HRX0` and `Vulkan0`, so the engine loads the model on each, runs the prompt prefix on HRX, and hands the rest of the request to Vulkan.

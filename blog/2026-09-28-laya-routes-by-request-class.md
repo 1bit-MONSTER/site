@@ -26,6 +26,8 @@ request. Step 4 of the port gave that job to
 questions about a piece of text in one forward pass, with a calibrated confidence. This week we
 wired it into `1bit serve`, and the first thing we learned was which question to ask it.
 
+> **Since 21 October 2026:** Vulkan, ROCm and ZINC are no longer routes of the engine (engine #306); the route policy sends every class to HRX. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## Asking for a device
 
 The first version asked Laya directly: "which device should run this request?", with the

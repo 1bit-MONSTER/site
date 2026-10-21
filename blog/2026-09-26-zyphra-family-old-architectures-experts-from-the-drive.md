@@ -25,6 +25,8 @@ run a MoE model whose experts do not fit in memory. And the HRX decode path beca
 Every number below was measured on Strix Halo (Ryzen AI Max+ 395, Radeon 8060S), with the
 method in the linked docs.
 
+> **Since 21 October 2026:** Vulkan is no longer a route of the engine (engine #306): Zamba, Zamba2 and BlackMamba wait for an HRX port, and `--moe-slots` is not in the current build. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## Zyphra, all of it
 
 ZAYA1-8B already ran on Vulkan, HRX and ROCm. The rest of the family followed:
