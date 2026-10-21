@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 tags: milestones, npu, hrx, vulkan, zinc
-summary: Three days in: the engine runs on the NPU, HRX, Vulkan and ZINC inside Lemonade; Qwen3-0.6B decodes at 91 tok/s on the NPU, 87 through Lemonade.
+summary: Three days in: the engine runs on the NPU, HRX, Vulkan and ZINC inside Lemonade, each step verified on Strix Halo.
 
 # The first week of 1bit engine
 
@@ -23,13 +23,9 @@ The clean repository started on 2026-09-22. In its first three days, the engine 
 
 > **Since 21 October 2026:** Vulkan and ZINC are no longer routes of the engine (engine #306); it is HRX with our HIP kernels plus the NPU engine, inside Lemonade. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
 
-## The NPU, on full ELFs generated in C++
+## The NPU
 
-The XDNA 2 NPU now runs without an xclbin and without per-context kernel files. The engine generates each kernel's full ELF (the design plus its control code) in C++ when the model loads, and XRT opens it directly; for each token, the host submits every layer and the lm head as one runlist ([#8](https://github.com/1bit-MONSTER/engine/pull/8), [#9](https://github.com/1bit-MONSTER/engine/pull/9)).
-
-- Qwen3-0.6B decodes at **91 tok/s** (11.0 ms per token), and **87 tok/s** served through Lemonade.
-- The XDNA driver and its XRT are pinned to upstream and built privately ([#12](https://github.com/1bit-MONSTER/engine/pull/12)).
-- The layer kernel itself is being rebuilt from scratch as our own open kernel ("dx", on IRON and Peano). RMSNorm, RoPE and attention pass their tests so far, correctly rounded to bf16.
+The XDNA 2 NPU runs Qwen3-0.6B end to end through the engine, served inside Lemonade ([#8](https://github.com/1bit-MONSTER/engine/pull/8), [#9](https://github.com/1bit-MONSTER/engine/pull/9)). The XDNA driver is pinned to upstream ([#12](https://github.com/1bit-MONSTER/engine/pull/12)). The [NPU status page](../docs/npu.md) tracks where it stands.
 
 ## HRX and Vulkan in one build, then both at once
 
