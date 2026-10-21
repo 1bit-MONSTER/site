@@ -23,7 +23,7 @@ Speculative decoding makes a large model faster by letting a small one guess ahe
 
 ## How it works
 
-The NPU runs Qwen3-0.6B on the engine's fast lane (91 tokens per second on its own). The GPU runs the target, a Qwen3 model from 14B to 32B, through llama.cpp on Vulkan. Each round:
+The NPU runs Qwen3-0.6B through the engine. The GPU runs the target, a Qwen3 model from 14B to 32B, through llama.cpp on Vulkan. Each round:
 
 1. The NPU proposes k tokens, one after another.
 2. The GPU scores all k in a single batch and predicts the token after each.
@@ -60,5 +60,3 @@ The same 0.6B drafter can also run on the GPU next to the target, which llama.cp
 | Qwen3-14B | 22.5 | 43.5 | 31.6 |
 
 Drafting on the GPU is still a little faster: a 0.6B model costs the GPU very little, and in this first version the NPU and the GPU take turns. What the NPU gives is the drafting done on silicon that was otherwise idle, with the GPU never running the small model at all. Making each NPU draft step cheaper is the next piece of work.
-
-The benchmark is [`tests/npu_spec_bench.cpp`](https://github.com/1bit-MONSTER/engine/blob/npu-draft/tests/npu_spec_bench.cpp) on the `npu-draft` branch.

@@ -29,13 +29,13 @@ summary: The inference engine from 1bit.MONSTER is now its own Apache-2.0 projec
 
 **Inside Lemonade, not around it.** The old engine vendored its own copy of Lemonade. Now [Lemonade](../docs/lemonade.md) is the server you talk to (its catalog, downloads, router and UI), and it runs the engine as one of its backends, through `1bit serve`, the same way it runs `llama-server`.
 
-**Upstream, pinned and kept current.** The XDNA driver and XRT, AMD's HRX pair, llama.cpp for Vulkan, ZINC, the Linux kernel, Hugging Face tokenizers and the Laya router are each pinned to upstream, and the pins are bumped automatically, so new models and fixes arrive soon after upstream ships them.
+**Upstream, pinned and kept current.** The XDNA driver, AMD's HRX pair, llama.cpp for Vulkan, ZINC, the Linux kernel, Hugging Face tokenizers and the Laya router are each pinned to upstream, and the pins are bumped automatically, so new models and fixes arrive soon after upstream ships them.
 
 ## What it runs on
 
 One `1bit serve` drives:
 
-- the [XDNA 2 NPU](../docs/npu.md), on full ELFs generated in C++;
+- the [XDNA 2 NPU](../docs/npu.md);
 - [HRX and Vulkan](../docs/hrx.md) on the Radeon iGPU, one llama.cpp build with both;
 - [ZINC](../docs/zinc.md), which also reaches NVIDIA GPUs through CUDA;
 - [MLX](../docs/apple.md) on Apple Silicon.
