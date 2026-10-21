@@ -75,11 +75,12 @@ TAGLINE = ("One engine behind an OpenAI-compatible API, running inside Lemonade:
            "iGPU with our Loom kernels, the XDNA 2 NPU, ZINC for NVIDIA and Apple GPUs, MLX on Apple Silicon.")
 # The home page's search and social description: the headline milestones, measured on Strix Halo
 # (docs/serve.md, docs/lean.md). Keep it <= 160 characters and update it with each milestone.
-HOME_DESCRIPTION = ("Local LLM inference for AMD Strix Halo inside Lemonade: HRX reads Qwen3.8-27B prompts "
-                    "at 335 tok/s and runs ZAYA1-8B at 90 tok/s. First release 4 Oct 2026.")
+HOME_DESCRIPTION = ("Local LLM inference for AMD Strix Halo inside Lemonade: every model on the GPU via HRX "
+                    "and our HIP kernels; Qwen3.8-27B decodes at 36 tok/s with MTP.")
 HOME_KEYWORDS = ("LLM inference, AMD Ryzen AI, Strix Halo, Radeon 8060S, HRX, ggml-hrx, Loom kernels, XDNA 2 NPU, "
                  "Lemonade, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, Unsloth dynamic GGUF, MTP, "
-                 "Hadamard Q4, Laya router, local AI, first release")
+                 "Hadamard Q4, Laya router, HIP kernels, speculative decoding, strict GPU placement, Ubuntu 26.04, "
+                 "1bit OS, local AI")
 
 # top bar: (label, page name or absolute URL)
 TOP = [("Engine", "overview"), ("Docs", "docs"), ("Blog", "blog"), ("Benchmarks", WIKI)]
