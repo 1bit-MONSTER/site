@@ -72,10 +72,10 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 ENGINE = pathlib.Path(os.environ.get("ONEBIT_ENGINE_DIR") or ROOT).resolve()
 SITE_REPO = "https://github.com/1bit-MONSTER/site"
 
-TAGLINE = ("One engine behind an OpenAI-compatible API, running inside Lemonade: HRX on the Radeon "
-           "iGPU with our Loom kernels, the XDNA 2 NPU, ZINC for NVIDIA and Apple GPUs, MLX on Apple Silicon.")
+TAGLINE = ("One engine behind an OpenAI-compatible API, inside Lemonade: AMD's HRX runtime with our own HIP "
+           "kernels on the Strix Halo GPU, and our NPU engine.")
 # The home page's search and social description: the headline milestones, measured on Strix Halo
-# (docs/serve.md, docs/lean.md). Keep it <= 160 characters and update it with each milestone.
+# (README.md, docs/hrx.md, docs/serve.md). Keep it <= 160 characters and update it with each milestone.
 HOME_DESCRIPTION = ("Local LLM inference for AMD Strix Halo inside Lemonade: every model on the GPU via HRX "
                     "and our HIP kernels; Qwen3.8-27B decodes at 36 tok/s with MTP.")
 HOME_KEYWORDS = ("LLM inference, AMD Ryzen AI, Strix Halo, Radeon 8060S, HRX, ggml-hrx, Loom kernels, XDNA 2 NPU, "
@@ -88,11 +88,11 @@ TOP = [("Engine", "overview"), ("Docs", "docs"), ("Blog", "blog"), ("Benchmarks"
 
 # docs sidebar groups: (title, [(doc name, label)])
 NAV = [
-    ("Start", [("serve", "1bit serve"), ("lemonade", "Lemonade"), ("releases", "Weekly releases"),
-               ("bench", "How we measure"), ("recipes", "Recipes")]),
-    ("Devices", [("npu", "NPU"), ("hrx", "HRX"), ("vulkan", "Vulkan (upstream)"), ("lean", "Lean (ROCmFP4, ROCmI4)"),
-                 ("zinc", "ZINC"), ("apple", "Apple Silicon")]),
-    ("Components", [("moe-streaming", "MoE streaming"), ("laya", "Laya router"), ("registry", "Model registry"), ("arch-gaps", "Architecture gaps"), ("windows", "Windows"), ("onnx", "ONNX Runtime"), ("comfyui", "ComfyUI.cpp"), ("tokenizers", "Tokenizers"), ("kernel", "Linux kernel")]),
+    ("Start", [("serve", "1bit serve"), ("lemonade", "Lemonade"), ("releases", "Releases"),
+               ("bench", "How we measure"), ("recipes", "Recipes"), ("hw-gate", "Hardware gate")]),
+    ("Devices", [("hrx", "HRX"), ("npu", "NPU engine"), ("onnx", "ONNX Runtime"), ("dwarfstar", "DwarfStar")]),
+    ("Components", [("laya", "Laya router"), ("pm", "Project Manager"), ("registry", "Model registry"),
+                    ("arch-gaps", "Architecture gaps"), ("moe-streaming", "MoE streaming"), ("tokenizers", "Tokenizers")]),
     ("Project", [("PORTING", "Porting map")]),
 ]
 
@@ -130,10 +130,14 @@ def rewrite_links(text, src, docs, labels):
         label, target = m.group(1), m.group(2)
         # a label that is just the file name reads better as the page's name
         path_label = re.fullmatch(r"(?:docs/)?([A-Za-z0-9_-]+)\.md", label.strip("`"))
-        if re.match(r"^[a-z]+:|^#|^/", target):
+        # GitHub keeps "--" where a heading had "(`--x`)"; python-markdown's toc collapses it to "-"
+        if target.startswith("#"):
+            return f"[{label}]({re.sub(r'-{2,}', '-', target)})"
+        if re.match(r"^[a-z]+:|^/", target):
             return m.group(0)
         path, _, frag = target.partition("#")
-        frag = "#" + frag if frag else ""
+        raw_frag = "#" + frag if frag else ""
+        frag = "#" + re.sub(r"-{2,}", "-", frag) if frag else ""
         resolved = (here / path).resolve()
         try:
             rel = resolved.relative_to(ENGINE if resolved.is_relative_to(ENGINE) else ROOT).as_posix()
@@ -149,7 +153,7 @@ def rewrite_links(text, src, docs, labels):
                 label = labels.get(resolved.stem) or title_of(docs[resolved.stem].read_text())
             return f"[{label}]({resolved.stem}.html{frag})"
         kind = "tree" if resolved.is_dir() else "blob"
-        return f"[{label}]({REPO}/{kind}/main/{rel}{frag})"
+        return f"[{label}]({REPO}/{kind}/main/{rel}{raw_frag})"
 
     return re.sub(r"\[([^\]]*)\]\(([^)\s]+)\)", fix, text)
 
@@ -200,7 +204,7 @@ def chat_widget():
     return (f'<script src="https://context7.com/widget.js" data-library="{library}" '
             'data-color="#1779e1" data-position="bottom-right" '
             'data-placeholder="Ask about the 1bit engine docs..." '
-            'data-welcome-message="Ask anything about the 1bit engine: install, serving, NPU, HRX, Vulkan, quantization." '
+            'data-welcome-message="Ask anything about the 1bit engine: install, serving, HRX, HIP kernels, the NPU, Lemonade." '
             'async></script>')
 
 
@@ -416,6 +420,7 @@ class Site:
         if name == "overview":
             # the README's link to this site is redundant on the site itself
             text = re.sub(r"^\*\*Documentation:\*\*.*\n+", "", text, count=1, flags=re.M)
+            text = re.sub(r"^\*\*Site:\*\*.*\n+", "", text, count=1, flags=re.M)
         main = (f'<div class="container docs">\n{self.sidebar(name)}\n<article class="docs-page prose">\n'
                 f'{self.md(text, src)}\n{self.pager(name)}\n'
                 f'<p class="source meta"><a href="{source_url(src)}">View this page\'s source on GitHub ↗</a></p>\n'
@@ -490,8 +495,8 @@ class Site:
                 f'<div class="links"><a class="btn btn-ghost" href="feed.xml">Atom feed&nbsp;→</a>'
                 f'<a class="btn btn-ghost" href="{OLD_SITE}1bit-blog.html">1bit.MONSTER archive&nbsp;→</a></div></div>\n'
                 f"{log}\n</div></section>\n{self.archive()}")
-        self.write("blog", "Blog · 1bit engine", main, "blog", "blog", "Notes from building the 1bit engine: measured results on the NPU, HRX and Vulkan, "
-                   "speculative decoding, quantization and what ships each week.")
+        self.write("blog", "Blog · 1bit engine", main, "blog", "blog", "Notes from building the 1bit engine: measured results on HRX and our HIP kernels, the NPU "
+                   "engine, speculative decoding, quantization and Lemonade.")
 
         def stamp(d):
             return d + "T00:00:00Z"

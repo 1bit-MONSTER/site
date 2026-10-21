@@ -21,6 +21,8 @@ summary: MTP takes Qwen3.8-27B to 42.0 tok/s on code; on Qwen3-Coder-30B-A3B, al
 
 Speculative decoding lets a cheap drafter guess the next few tokens and the model check them all in one pass. When the guesses are right, several tokens come out of one pass instead of one. We measured it on the two most popular Unsloth models on Strix Halo, and the answer depends entirely on the model.
 
+> **Since 21 October 2026:** these MTP numbers were taken on the removed Vulkan build; on HRX, Qwen3.8-27B with MTP now decodes at 36.0 / 26.8 / 29.9 tok/s (engine #487). See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## Dense Qwen3.8-27B: up to 3.4x
 
 Qwen3.8-27B ships its own multi-token-prediction (MTP) head, a small extra layer trained to draft. `1bit serve --mtp` switches it on. Decode speed on three chat prompts (code, prose, short), UD-Q4_K_XL on Vulkan:

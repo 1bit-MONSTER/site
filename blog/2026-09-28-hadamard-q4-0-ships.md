@@ -26,6 +26,8 @@ recognises the file and runs it on the right build by itself, and the Qwen3.8-27
 Hugging Face as
 [1bit-MONSTER/Qwen3.8-27B-Q4_0-H32-GGUF](https://huggingface.co/1bit-MONSTER/Qwen3.8-27B-Q4_0-H32-GGUF).
 
+> **Since 21 October 2026:** the Hadamard Q4_0 (H32) format and the lean ROCm route are dropped, and `1bit serve` refuses H32 files; use the model's UD-Q4_K_XL on HRX. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## Why prompts are a matrix-unit problem
 
 Decoding reads the whole model once per token, so memory bandwidth sets its speed. Reading a

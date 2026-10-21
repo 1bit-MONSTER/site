@@ -21,6 +21,8 @@ summary: What smaller files cost: Unsloth UD-Q4_K_XL stays at KLD 0.008 (95.3% s
 
 A smaller model file decodes faster, because decode is limited by how many bytes the GPU reads per token. The question is what each format costs in accuracy. We measured three families of small files on Strix Halo against their full-precision originals: KL divergence (how far the model's predictions move) and how often the top predicted token stays the same.
 
+> **Since 21 October 2026:** the lean ROCm route these ROCmFPX files ran on is gone from the engine (engine #306); the GGUF measurements stand as measured. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## Qwen3.8-27B: Unsloth against ROCmFPX
 
 Every file below is quantized from the same BF16 checkpoint, the ROCmFPX ones with Unsloth's own importance matrix so the comparison is fair.

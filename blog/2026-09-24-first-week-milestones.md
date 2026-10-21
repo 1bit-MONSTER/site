@@ -21,6 +21,8 @@ summary: Three days in: the engine runs on the NPU, HRX, Vulkan and ZINC inside 
 
 The clean repository started on 2026-09-22. In its first three days, the engine came up on every device it targets, inside Lemonade, with each step verified on real hardware before it merged. These are the milestones, with the numbers and where they come from.
 
+> **Since 21 October 2026:** Vulkan and ZINC are no longer routes of the engine (engine #306); it is HRX with our HIP kernels plus the NPU engine, inside Lemonade. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## The NPU, on full ELFs generated in C++
 
 The XDNA 2 NPU now runs without an xclbin and without per-context kernel files. The engine generates each kernel's full ELF (the design plus its control code) in C++ when the model loads, and XRT opens it directly; for each token, the host submits every layer and the lm head as one runlist ([#8](https://github.com/1bit-MONSTER/engine/pull/8), [#9](https://github.com/1bit-MONSTER/engine/pull/9)).

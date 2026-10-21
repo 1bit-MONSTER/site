@@ -21,6 +21,8 @@ summary: Qwen3.8-27B from 1 to 24 simultaneous requests: Vulkan peaks at 50.9 to
 
 A chat with one person and a server for many want different things from the same GPU. We measured Qwen3.8-27B (UD-Q4_K_XL) on Strix Halo from 1 to 24 simultaneous requests, and the engine now grows with the load.
 
+> **Since 21 October 2026:** the Vulkan and ROCm builds and `--adaptive` are gone from the engine (engine #306); `--parallel` runs on HRX. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## Batching is the multi-user lever
 
 Decode reads every weight once per step. With one request, one token comes out of that read; with eight batched together, eight do. `1bit serve --parallel N` gives the model N slots that decode together:

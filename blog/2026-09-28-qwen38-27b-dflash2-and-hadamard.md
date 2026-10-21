@@ -25,6 +25,8 @@ Prompt processing is set by the GPU's matrix units instead. This week we pushed 
 Every number below was measured on Strix Halo (Ryzen AI Max+ 395, Radeon 8060S), with the
 method in the linked docs.
 
+> **Since 21 October 2026:** the DFlash2 one-server ROCm route and the H32 format are gone from the engine; `--dflash` stays, on HRX, and Qwen3.8-27B with MTP now decodes at 36.0 / 26.8 / 29.9 tok/s (engine #487). See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
+
 ## Decode: DFlash2 drafts a whole block
 
 Speculative decoding breaks the bandwidth limit by guessing several tokens and checking them
