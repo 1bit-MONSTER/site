@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 tags: milestone, hrx, lemonade, release
+image: og-every-node-on-hrx.png
 summary: Every graph node of 43 model and mode configurations now runs on the Strix Halo GPU through HRX and our HIP kernels; Qwen3.8-27B decodes at 36 tok/s with MTP.
 
 # Every node on the GPU: the engine ahead of its first release

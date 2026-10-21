@@ -28,7 +28,8 @@
 #                  blog-<slug>.html, and feed.xml carries them as an Atom feed
 #   404.html       sends old 1bit.MONSTER addresses to the archived old site
 #
-# A post may start with "tags: a, b" lines and a "summary: one line" before its "# Title"; its
+# A post may start with "tags: a, b" lines, a "summary: one line" and an "image: card.png" (its own
+# 1200x630 link-preview card in site/assets) before its "# Title"; its
 # first paragraph is its lead. The summary (the lead when there is none) is the post's meta
 # description and its feed.xml summary, which the Discord blog mirror posts. Links to other docs become page links; links to other files in the repository go
 # to them on GitHub.
@@ -228,22 +229,24 @@ def page_url(name):
     return SITE if name == "index" else f"{SITE}{name}.html"
 
 
-def seo_head(name, title, description, og_type, jsonld, noindex):
+def seo_head(name, title, description, og_type, jsonld, noindex, image=None, image_alt=None):
     esc = lambda s: html.escape(s, quote=True)
     if noindex:
         return '<meta name="robots" content="noindex">'
     url = page_url(name)
+    image = image or OG_IMAGE
+    image_alt = image_alt or "1bit engine: local LLM inference on AMD Strix Halo inside Lemonade"
     tags = [f'<link rel="canonical" href="{url}">',
             f'<meta property="og:url" content="{url}">',
             f'<meta property="og:type" content="{og_type}">',
-            f'<meta property="og:image" content="{OG_IMAGE}">',
+            f'<meta property="og:image" content="{image}">',
             '<meta property="og:image:width" content="1200">',
             '<meta property="og:image:height" content="630">',
-            '<meta property="og:image:alt" content="1bit engine: one engine behind an OpenAI-compatible API">',
+            f'<meta property="og:image:alt" content="{esc(image_alt)}">',
             '<meta name="twitter:card" content="summary_large_image">',
             f'<meta name="twitter:title" content="{esc(title)}">',
             f'<meta name="twitter:description" content="{esc(description)}">',
-            f'<meta name="twitter:image" content="{OG_IMAGE}">']
+            f'<meta name="twitter:image" content="{image}">']
     if jsonld:
         # "</" cannot appear inside a script element
         tags.append('<script type="application/ld+json">' + json.dumps(jsonld, ensure_ascii=False).replace("</", "<\\/") + "</script>")
@@ -257,17 +260,23 @@ def plain(markdown_text):
     return re.sub(r"[`*_]", "", " ".join(text.split()))
 
 
+def post_image(text):
+    """A post's own link-preview card: an optional "image: file.png" line (site/assets, 1200x630)."""
+    m = re.search(r"^image:\s*(\S+)\s*$", strip_notice(text).split("\n# ", 1)[0], re.M)
+    return SITE + "assets/" + m.group(1) if m else None
+
+
 def split_post(text):
     """-> (tags, title, lead paragraph, the rest, one-line summary or "") of a post."""
     text = strip_notice(text)
     tags, summary = [], ""
     while True:
-        m = re.match(r"\s*(tags|summary):\s*(.+)\n", text)
+        m = re.match(r"\s*(tags|summary|image):\s*(.+)\n", text)
         if not m:
             break
         if m.group(1) == "tags":
             tags += [t.strip() for t in m.group(2).split(",") if t.strip()]
-        else:
+        elif m.group(1) == "summary":
             summary = m.group(2).strip()
         text = text[m.end():]
     m = re.match(r"\s*# (.+)\n", text)
@@ -355,12 +364,12 @@ class Site:
         return "\n".join(out)
 
     def write(self, name, title, main, kind, section, description=TAGLINE, extra_head="",
-              og_type="website", jsonld=None, lastmod=None, noindex=False):
+              og_type="website", jsonld=None, lastmod=None, noindex=False, image=None, image_alt=None):
         if not noindex:
             self.pages.append((page_url(name), lastmod or datetime.date.today().isoformat()))
         title, description = meta_title(title), meta_description(description)
         page = (self.template
-                .replace("{{seo}}", seo_head(name, title, description, og_type, jsonld, noindex))
+                .replace("{{seo}}", seo_head(name, title, description, og_type, jsonld, noindex, image, image_alt))
                 .replace("{{title}}", html.escape(title))
                 .replace("{{description}}", html.escape(description, quote=True))
                 .replace("{{kind}}", kind)
@@ -439,6 +448,7 @@ class Site:
         for i, (date, slug, src) in enumerate(self.posts):
             tags, title, lead, body, summary = split_post(src.read_text())
             summary = summary or plain(lead)
+            image = post_image(src.read_text())
             name = f"blog-{slug}"
             tag_html = "".join(f'<span class="tag">{html.escape(t)}</span>' for t in tags)
             newer = self.posts[i - 1] if i > 0 else None
@@ -457,10 +467,10 @@ class Site:
                     f'<nav class="pager">{link(newer, "prev", "Newer")}{link(older, "next", "Older")}</nav>\n'
                     "</div></article>")
             self.write(name, f"{title} · 1bit engine", main, "post", "blog", summary, og_type="article",
-                       lastmod=max(date, last_commit_date(src)),
+                       lastmod=max(date, last_commit_date(src)), image=image, image_alt=title,
                        jsonld={"@context": "https://schema.org", "@type": "BlogPosting", "headline": title,
                                "description": summary, "datePublished": date,
-                               "dateModified": max(date, last_commit_date(src)), "image": OG_IMAGE,
+                               "dateModified": max(date, last_commit_date(src)), "image": image or OG_IMAGE,
                                "url": page_url(name), "mainEntityOfPage": page_url(name),
                                "author": {"@type": "Person", "name": "bong-water-water-bong"},
                                "publisher": {"@type": "Organization", "name": "1bit engine", "url": SITE},
