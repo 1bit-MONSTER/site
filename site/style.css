@@ -289,8 +289,6 @@ html[data-theme="dark"]  .theme-switch [data-choice="dark"] {
 .prose hr { border: 0; border-top: 1px solid var(--border); margin: var(--gap-xl) 0; }
 .prose img { max-width: 100%; }
 .prose p img { display: inline-block; vertical-align: middle; }   /* README badges sit on one line */
-.home-what { max-width: 760px; }
-.home-what p { margin: 0 0 var(--gap-md); }
 .prose .table { overflow-x: auto; margin: 0 0 var(--gap-lg); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .prose table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .prose th, .prose td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--border); }
