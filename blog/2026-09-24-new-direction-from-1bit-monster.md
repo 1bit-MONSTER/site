@@ -17,6 +17,7 @@ limitations under the License.
 tags: announcement, engine
 summary: The inference engine from 1bit.MONSTER is now its own Apache-2.0 project, 1bit engine, running as a backend inside Lemonade.
 
+title: 1bit.MONSTER becomes 1bit engine
 # 1bit.MONSTER is now 1bit engine
 
 1bit.MONSTER grew fast: an inference engine, a model zoo, benchmarks, a store, a voice assistant and a lot of experiments, all in one repository with all of its history. The engine that came out of it is now its own project, **1bit engine**, and this site is its home.

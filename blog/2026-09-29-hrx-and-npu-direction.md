@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 tags: milestone, hrx, npu, laya, rocm
-summary: The engine is heading to HRX plus the NPU. Laya's scorer already runs on HRX at 15-16 ms a decision, W4A4 reaches MoE experts, six GGUF architectures answer on the NPU, and DwarfStar reads 1BP packages.
+summary: Heading to HRX plus the NPU: Laya's scorer runs on HRX at 15-16 ms a decision, W4A4 reaches MoE experts, and six GGUF architectures answer on the NPU.
 
 # Where the engine is going: HRX and the NPU
 

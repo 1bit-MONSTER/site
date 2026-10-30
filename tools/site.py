@@ -28,11 +28,17 @@
 #                  blog-<slug>.html, and feed.xml carries them as an Atom feed
 #   404.html       sends old 1bit.MONSTER addresses to the archived old site
 #
-# A post may start with "tags: a, b" lines, a "summary: one line" and an "image: card.png" (its own
-# 1200x630 link-preview card in site/assets) before its "# Title"; its
-# first paragraph is its lead. The summary (the lead when there is none) is the post's meta
-# description and its feed.xml summary, which the Discord blog mirror posts. Links to other docs become page links; links to other files in the repository go
-# to them on GitHub.
+# A post may start with "tags: a, b" lines, a "summary: one line", an "image: card.png" (its own
+# 1200x630 link-preview card in site/assets) and a "title: short search title" (its <title> without
+# the " · 1bit engine" suffix, 46 characters at most; unset, the heading is cut to fit) before its
+# "# Title"; its first paragraph is its lead. The summary (the lead when there is none) is the
+# post's meta description and its feed.xml summary, which the Discord blog mirror posts. Links to
+# other docs become page links; links to other files in the repository go to them on GitHub.
+#
+# Doc pages take their <title> and meta description from PAGE_META below (the docs live in the
+# engine repository, so the page's search text is kept here); a doc PAGE_META does not name gets
+# its heading and its first paragraph. The build stops on a title over TITLE_MAX or a description
+# over DESCRIPTION_MAX in PAGE_META, and on a page with other than one <h1>.
 #
 # Visitor counts: with GOATCOUNTER set to a GoatCounter site code (pages.yml passes the
 # repository variable of that name), every page loads GoatCounter's counter, which sets
@@ -44,9 +50,12 @@
 # library is claimed and 1bit.gg is on the widget's allowed domains; unset, no widget.
 #
 # Search engines and link previews: every page carries its canonical 1bit.gg address, Open
-# Graph and Twitter card tags with site/assets/og-card.png, and JSON-LD (the home page describes
-# the project, each post is a BlogPosting). robots.txt and sitemap.xml list every page; a page's
-# lastmod is its source file's last commit (pages.yml checks out the full history for that).
+# Graph and Twitter card tags with site/assets/og-card.png, and JSON-LD: the home page carries
+# the Organization, the WebSite and the engine as a SoftwareApplication; each doc page is a
+# TechArticle, each post a BlogPosting (published = the date in its file name, modified = its last
+# commit), and the two indexes are a CollectionPage and a Blog. robots.txt and sitemap.xml list
+# every page; a page's lastmod is its source file's last commit (pages.yml checks out the full
+# history for that).
 #
 # Needs python-markdown (pip install markdown).
 import datetime
@@ -72,16 +81,102 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 ENGINE = pathlib.Path(os.environ.get("ONEBIT_ENGINE_DIR") or ROOT).resolve()
 SITE_REPO = "https://github.com/1bit-MONSTER/site"
 
-TAGLINE = ("One engine behind an OpenAI-compatible API, inside Lemonade: AMD's HRX runtime with our own HIP "
-           "kernels on the Strix Halo GPU, and our NPU engine.")
-# The home page's search and social description: the headline milestones, measured on Strix Halo
-# (README.md, docs/hrx.md, docs/serve.md). Keep it <= 160 characters and update it with each milestone.
-HOME_DESCRIPTION = ("Local LLM inference for AMD Strix Halo inside Lemonade: every model on the GPU via HRX "
-                    "and our HIP kernels; Qwen3.8-27B decodes at 36 tok/s with MTP.")
-HOME_KEYWORDS = ("LLM inference, AMD Ryzen AI, Strix Halo, Radeon 8060S, HRX, ggml-hrx, Loom kernels, XDNA 2 NPU, "
-                 "Lemonade, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, Unsloth dynamic GGUF, MTP, "
-                 "Hadamard Q4, Laya router, HIP kernels, speculative decoding, strict GPU placement, Ubuntu 26.04, "
-                 "1bit OS, local AI")
+RELEASES = REPO + "/releases"
+LEMONADE = "https://github.com/lemonade-sdk/lemonade"
+LEMONADE_PIN = "v2026.44.1"   # the Lemonade Server release the engine is pinned to (engine docs/lemonade.md)
+DISCORD = "https://discord.gg/fa5m4Vawpa"
+
+TAGLINE = ("Local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo), inside AMD's Lemonade Server: "
+           "HRX with our own HIP kernels on the Radeon 8060S iGPU, and our own NPU runtime on the XDNA 2 NPU, "
+           "behind an OpenAI-compatible API.")
+# The home page's search title (without the " · 1bit engine" suffix) and description. Keep the
+# description <= DESCRIPTION_MAX characters and update it with each milestone (README.md, docs/hrx.md).
+HOME_TITLE = "Local LLM inference on AMD Ryzen AI MAX+ 395"
+HOME_DESCRIPTION = ("1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, "
+                    "on the Radeon 8060S iGPU through HRX and on the XDNA 2 NPU.")
+HOME_KEYWORDS = ("LLM inference, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, HIP kernels, XDNA 2 NPU, "
+                 "Lemonade Server, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, BitNet b1.58, ternary, "
+                 "Ternary-Bonsai, gpt-oss-20b, MXFP4, NVFP4, MTP, speculative decoding, 1bit OS, local AI")
+
+# The home page's facts (plain, measured on a Ryzen AI MAX+ 395; README.md and the docs). Every
+# number here was measured on that box and is quoted as is.
+HOME_FACTS = [
+    f"The 1bit engine runs inside AMD's <a href=\"{LEMONADE}\">Lemonade Server</a> as its <code>onebit</code> "
+    f"backend; the engine is pinned to Lemonade {LEMONADE_PIN}.",
+    "It targets the AMD Ryzen AI MAX+ 395 (Strix Halo, gfx1151): the Radeon 8060S iGPU through HRX with our own "
+    "HIP kernels, and the XDNA 2 NPU through our own NPU runtime, which runs full-ELF kernel sets.",
+    "Every model is served behind an OpenAI-compatible API.",
+    "Every ggml weight type runs on HRX, including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ formats.",
+]
+HOME_PACKAGES = [
+    ("Linux tarball", "the engine and its HRX llama-server, unpacked and run"),
+    ("Lemonade + onebit package", "Lemonade Server with the onebit backend and the engine"),
+    ("1bit OS live image", "a bootable Lemonade appliance, Secure Boot signed"),
+]
+# (model, file and route, what was measured)
+HOME_MODELS = [
+    ("Qwen3.8-27B", "UD-Q4_K_XL, HRX", "decode 36.0 tok/s with MTP on code prompts; 56.6 tok/s with the DFlash2 drafter"),
+    ("Qwen3.8-Flash-Next (MoE)", "HRX", "prefill 287 tok/s, decode 24.0 tok/s"),
+    ("Zyphra ZAYA1-8B", "Q4_K_M, HRX", "decode 157 tok/s"),
+    ("PrismML Ternary-Bonsai-2-27B", "PQ2_0, 6.7 GiB, HRX", "decode 43.3 tok/s with MTP"),
+    ("Microsoft BitNet b1.58 2B-4T", "TQ2_0 ternary GGUF, 1.11 GiB (2.06 bits per weight), HRX",
+     "end to end on the Radeon 8060S with no CPU fallback; decode tg128 123.4 tok/s after the TQ2_0 load-time repack "
+     "onto the packed-ternary decode kernel (101.6 before it, same binary); perplexity 102.42 on HRX vs 102.56 on the CPU "
+     "for the same file"),
+    ("Qwen3-0.6B", "NPU route", "decode 88.6 tok/s in the release gate"),
+    ("gpt-oss-20b", "MXFP4, HRX", "runs on HRX"),
+]
+
+# Doc pages: name -> (search title without the " · 1bit engine" suffix, meta description).
+# The docs themselves live in the engine repository; this is where their search text is kept.
+PAGE_META = {
+    'overview': ('What the 1bit engine is and what runs where',
+     "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade."),
+    'docs': ('Documentation: serve, HRX, NPU, Lemonade',
+     'Documentation for the 1bit engine: 1bit serve and its OpenAI-compatible API, Lemonade, releases, HRX, the NPU engine, DwarfStar, Laya and the model registry.'),
+    'blog': ('Blog: build notes and measured results',
+     'Notes from building the 1bit engine on AMD Strix Halo: measured results on HRX and our HIP kernels, the NPU engine, speculative decoding and quantization.'),
+    'serve': ('1bit serve: the OpenAI-compatible API',
+     '1bit serve runs the engine behind one OpenAI-compatible API inside Lemonade: devices, model loading, strict GPU placement, --parallel, --mtp, --dflash, --laya.'),
+    'lemonade': ('Lemonade: the onebit backend',
+     "How the 1bit engine runs inside AMD's Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA."),
+    'releases': ('Releases: packages, 1bit OS, checklist',
+     "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist."),
+    'bench': ('How the numbers are measured',
+     "How the engine's serve numbers are taken: tools/bench.py A/B-measures 1bit serve configurations in the same run, and a recipe earns its place by that measure."),
+    'recipes': ('Recipes: tuned backend settings',
+     'Recipes are tuned backend settings kept as data in config/recipes.json: which flags each model and route gets, why, and how a recipe is measured before landing.'),
+    'hw-gate': ('HRX hardware gate on Strix Halo',
+     'The hardware gate runs every HRX pin change and hw-gate PR on a Strix Halo box before merge: kernel tests, known answers, KLD against the release pin.'),
+    'hrx': ('HRX on the Radeon 8060S iGPU',
+     "HRX, AMD's HIP Runtime Extended, with our own HIP kernels on the Radeon 8060S iGPU: pinned sources, quant coverage, MTP and DFlash2, ternary Bonsai, BitNet."),
+    'npu': ('NPU engine on the XDNA 2 NPU',
+     "The engine's NPU route on the Ryzen AI MAX+ 395's XDNA 2 NPU: our own runtime with full-ELF kernel sets, what matches the reference today, and measured numbers."),
+    'hybrid': ('Hybrid: NPU prefill, HRX decode',
+     '1bit serve --device hybrid processes the prompt on one device and generates on another: a prefill provider fills the KV cache, the HRX llama-server decodes.'),
+    'kernel': ('Linux kernel for the Strix Halo box',
+     'The kernel the Strix Halo box runs: Linux v7.3-rc4 with the IOMMU PerfOpt backports, built from our config, MOK-signed for Secure Boot, and the next-tag steps.'),
+    'onnx': ('ONNX Runtime GenAI models',
+     '1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.'),
+    'dwarfstar': ('DwarfStar: large MoE models with SSD experts',
+     'DwarfStar (antirez/ds4) in the 1bit engine: DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next in their own GGUFs, with expert streaming from the SSD.'),
+    'laya': ('Laya router: where each request runs',
+     'Laya, opt-in with 1bit serve --laya, sorts each conversation into code, prose, short answer or long document (95.5% right) and picks the backend and settings.'),
+    'pm': ('Project Manager: ZAYA1-8B delegates',
+     "1bit serve --pm makes the served model the engine's Project Manager: ZAYA1-8B routes every request and delegates to expert models over the same OpenAI API."),
+    'registry': ('Model registry and Hugging Face census',
+     "Which Hugging Face model architectures the 1bit engine runs: a registry built from the pinned backends' own code, and a daily census of the models people use."),
+    'arch-gaps': ('Architecture gaps in the registry',
+     'Model architectures the registry does not map yet, with the upstream commits that add them and what each needs before the engine serves it.'),
+    'moe-streaming': ('MoE expert streaming from NVMe',
+     "Running mixture-of-experts models larger than Strix Halo's 128 GB: only the experts a token routes to are read, through an expert cache and --moe-slots."),
+    'tokenizers': ('Hugging Face tokenizers in the engine',
+     "The engine reads any model's tokenizer.json through Hugging Face tokenizers, the Rust library, behind a C ABI: byte-exact tokens for every model it serves."),
+    'PORTING': ('Porting map: private tree to public engine',
+     'How the working 1bit-MONSTER engine is ported into this public repository without its history: the steps, what is done, and what stays private.'),
+    'npu-leaderboard': ('NPU engine leaderboard: measured runs',
+     "One row per measured run of the engine's NPU and HRX routes on the Strix Halo box, each with its instrument, repeat count and timestamp."),
+}
 
 # top bar: (label, page name or absolute URL)
 TOP = [("Engine", "overview"), ("Docs", "docs"), ("Blog", "blog"), ("Benchmarks", WIKI)]
@@ -169,8 +264,19 @@ def nest_lists(text):
     return "\n".join(out)
 
 
+def escape_issue_numbers(text):
+    """python-markdown makes any line that starts with "#" a heading, even "#572 reads ..." in the
+    middle of a paragraph (GitHub does not): escape the "#" of such lines outside code blocks."""
+    out, fenced = [], False
+    for line in text.split("\n"):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+        out.append(re.sub(r"^#(?=\d)", r"\\#", line) if not fenced else line)
+    return "\n".join(out)
+
+
 def render(text):
-    text = nest_lists(text)
+    text = escape_issue_numbers(nest_lists(text))
     md = markdown.Markdown(extensions=["tables", "fenced_code", "toc", "sane_lists", "footnotes"],
                            extension_configs={"toc": {"permalink": "#", "permalink_class": "anchor"}})
     body = md.convert(text)
@@ -209,6 +315,42 @@ def chat_widget():
 
 
 OG_IMAGE = SITE + "assets/og-card.png"
+AUTHOR = {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}
+ORG_ID, WEBSITE_ID, SOFTWARE_ID = SITE + "#organization", SITE + "#website", SITE + "#software"
+ORG = {"@type": "Organization", "@id": ORG_ID, "name": "1bit engine", "url": SITE,
+       "logo": {"@type": "ImageObject", "url": SITE + "assets/apple-touch-icon.png", "width": 180, "height": 180},
+       "sameAs": [REPO, "https://github.com/1bit-MONSTER", DISCORD]}
+
+
+def jsonld_graph(*nodes):
+    return {"@context": "https://schema.org", "@graph": list(nodes)}
+
+
+def website_node():
+    return {"@type": "WebSite", "@id": WEBSITE_ID, "name": "1bit engine", "url": SITE,
+            "description": HOME_DESCRIPTION, "inLanguage": "en", "publisher": {"@id": ORG_ID}}
+
+
+def software_node():
+    return {"@type": "SoftwareApplication", "@id": SOFTWARE_ID, "name": "1bit engine", "url": SITE,
+            "description": TAGLINE, "applicationCategory": "DeveloperApplication",
+            "applicationSubCategory": "LLM inference engine", "operatingSystem": "Linux",
+            "downloadUrl": RELEASES, "installUrl": SITE + "lemonade.html",
+            "softwareRequirements": f"AMD Ryzen AI MAX+ 395 (Strix Halo); Lemonade Server {LEMONADE_PIN}",
+            "license": "https://www.apache.org/licenses/LICENSE-2.0",
+            "isAccessibleForFree": True,
+            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"},
+            "author": {"@id": ORG_ID}, "publisher": {"@id": ORG_ID}, "sameAs": [REPO], "keywords": HOME_KEYWORDS}
+
+
+def article_node(kind, name, title, description, published, modified, image=None, keywords=None):
+    node = {"@type": kind, "@id": page_url(name) + "#article", "headline": title, "description": description,
+            "url": page_url(name), "mainEntityOfPage": page_url(name), "image": image or OG_IMAGE,
+            "datePublished": published, "dateModified": modified, "inLanguage": "en",
+            "author": AUTHOR, "publisher": {"@id": ORG_ID}, "isPartOf": {"@id": WEBSITE_ID}}
+    if keywords:
+        node["keywords"] = keywords
+    return node
 
 
 def source_url(src):
@@ -229,20 +371,33 @@ def last_commit_date(path):
     return d or datetime.date.today().isoformat()
 
 
+def first_commit_date(path):
+    """The source file's first commit date (YYYY-MM-DD); its last commit date when git cannot say."""
+    try:
+        d = subprocess.run(["git", "-C", str(pathlib.Path(path).resolve().parent), "log", "--format=%cs",
+                            "--diff-filter=A", "--follow", "--", str(path)],
+                           capture_output=True, text=True, timeout=30).stdout.split()
+    except (OSError, subprocess.SubprocessError):
+        d = []
+    return d[-1] if d else last_commit_date(path)
+
+
 def page_url(name):
     return SITE if name == "index" else f"{SITE}{name}.html"
 
 
-def seo_head(name, title, description, og_type, jsonld, noindex, image=None, image_alt=None):
+def seo_head(name, title, description, og_type, jsonld, noindex, image=None, image_alt=None, dates=None):
+    """dates: (published, modified) for an article page; they become article:*_time tags."""
     esc = lambda s: html.escape(s, quote=True)
     if noindex:
         return '<meta name="robots" content="noindex">'
     url = page_url(name)
     image = image or OG_IMAGE
-    image_alt = image_alt or "1bit engine: local LLM inference on AMD Strix Halo inside Lemonade"
+    image_alt = image_alt or "1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server"
     tags = [f'<link rel="canonical" href="{url}">',
             f'<meta property="og:url" content="{url}">',
             f'<meta property="og:type" content="{og_type}">',
+            '<meta property="og:locale" content="en_US">',
             f'<meta property="og:image" content="{image}">',
             '<meta property="og:image:width" content="1200">',
             '<meta property="og:image:height" content="630">',
@@ -250,7 +405,12 @@ def seo_head(name, title, description, og_type, jsonld, noindex, image=None, ima
             '<meta name="twitter:card" content="summary_large_image">',
             f'<meta name="twitter:title" content="{esc(title)}">',
             f'<meta name="twitter:description" content="{esc(description)}">',
-            f'<meta name="twitter:image" content="{image}">']
+            f'<meta name="twitter:image" content="{image}">',
+            f'<meta name="twitter:image:alt" content="{esc(image_alt)}">']
+    if dates:
+        tags += [f'<meta property="article:published_time" content="{dates[0]}">',
+                 f'<meta property="article:modified_time" content="{dates[1]}">',
+                 '<meta property="article:author" content="bong-water-water-bong">']
     if jsonld:
         # "</" cannot appear inside a script element
         tags.append('<script type="application/ld+json">' + json.dumps(jsonld, ensure_ascii=False).replace("</", "<\\/") + "</script>")
@@ -271,42 +431,46 @@ def post_image(text):
 
 
 def split_post(text):
-    """-> (tags, title, lead paragraph, the rest, one-line summary or "") of a post."""
+    """-> (tags, title, lead paragraph, the rest, one-line summary or "", search title or "") of a post."""
     text = strip_notice(text)
-    tags, summary = [], ""
+    tags, summary, seo_title = [], "", ""
     while True:
-        m = re.match(r"\s*(tags|summary|image):\s*(.+)\n", text)
+        m = re.match(r"\s*(tags|summary|image|title):\s*(.+)\n", text)
         if not m:
             break
         if m.group(1) == "tags":
             tags += [t.strip() for t in m.group(2).split(",") if t.strip()]
         elif m.group(1) == "summary":
             summary = m.group(2).strip()
+        elif m.group(1) == "title":
+            seo_title = m.group(2).strip()
         text = text[m.end():]
     m = re.match(r"\s*# (.+)\n", text)
     if not m:
         sys.exit("a post starts with its '# Title'")
     rest = text[m.end():].strip()
     lead, _, body = rest.partition("\n\n")
-    return tags, re.sub(r"[`*]", "", m.group(1)).strip(), lead.strip(), body, summary
+    return tags, re.sub(r"[`*]", "", m.group(1)).strip(), lead.strip(), body, summary, seo_title
 
 
 def first_paragraph(text):
     for para in re.split(r"\n\s*\n", strip_notice(text)):
         para = para.strip()
-        if para and not para.startswith(("#", ">", "|", "-", "```", "<")):
+        if para and not para.startswith(("#", ">", "|", "-", "```", "<", "[")):  # "[" = a badge line
             return plain(para)
     return ""
 
 
-# what search results show: about 160 characters of description and 65 of title
-DESCRIPTION_MAX, TITLE_MAX, SUFFIX = 160, 65, " · 1bit engine"
+# what search results show: about 160 characters of description and 60 of title
+DESCRIPTION_MAX, TITLE_MAX, SUFFIX = 160, 60, " · 1bit engine"
 
 
 def meta_description(text):
     """Whole sentences up to DESCRIPTION_MAX; else (too long, or too short to say much) the
     text cut at a clause."""
     text = " ".join(text.split())
+    if len(text) <= DESCRIPTION_MAX:
+        return text
     out = ""
     for sentence in re.split(r"(?<=[.!?])\s+(?=[A-Z0-9`\"(])", text):
         if len(out) + len(sentence) + 1 > DESCRIPTION_MAX:
@@ -323,14 +487,18 @@ def meta_description(text):
 
 
 def meta_title(title):
-    """"<title> · 1bit engine", else the title alone, else what comes before its colon."""
-    if len(title) <= TITLE_MAX:
-        return title
-    base = title.removesuffix(SUFFIX)
-    if len(base) <= TITLE_MAX:
-        return base
-    head = base.split(":")[0].strip()
-    return head + SUFFIX if len(head + SUFFIX) <= TITLE_MAX else clip(base, TITLE_MAX - 1)
+    """"<title> · 1bit engine", at most TITLE_MAX characters with the brand always last: a long
+    title is cut at the longest clause that fits, else at a word."""
+    base = title.removesuffix(SUFFIX).strip()
+    room = TITLE_MAX - len(SUFFIX)
+    if len(base) <= room:
+        return base + SUFFIX
+    best = ""
+    for mark in (": ", " — ", " - ", ", ", "; "):
+        i = base.rfind(mark, 0, room + 1)
+        if i > len(best):
+            best = base[:i]
+    return (best if len(best) >= 20 else clip(base, room - 1)) + SUFFIX
 
 
 def clip(text, n=150):
@@ -359,6 +527,10 @@ class Site:
         # rewrite_links resolves README.md to the overview page and docs to their pages
         self.link_docs = dict(self.docs)
 
+    def posts_modified(self):
+        """The newest post date or post commit: the lastmod of the pages that list the posts."""
+        return max((max(d, last_commit_date(p)) for d, _, p in self.posts), default=datetime.date.today().isoformat())
+
     def top_nav(self, current):
         out = []
         for label, target in TOP:
@@ -368,12 +540,14 @@ class Site:
         return "\n".join(out)
 
     def write(self, name, title, main, kind, section, description=TAGLINE, extra_head="",
-              og_type="website", jsonld=None, lastmod=None, noindex=False, image=None, image_alt=None):
+              og_type="website", jsonld=None, lastmod=None, noindex=False, image=None, image_alt=None, dates=None):
         if not noindex:
             self.pages.append((page_url(name), lastmod or datetime.date.today().isoformat()))
         title, description = meta_title(title), meta_description(description)
+        if len(title) > TITLE_MAX or len(description) > DESCRIPTION_MAX:
+            sys.exit(f"{name}.html: title {len(title)} > {TITLE_MAX} or description {len(description)} > {DESCRIPTION_MAX} characters")
         page = (self.template
-                .replace("{{seo}}", seo_head(name, title, description, og_type, jsonld, noindex, image, image_alt))
+                .replace("{{seo}}", seo_head(name, title, description, og_type, jsonld, noindex, image, image_alt, dates))
                 .replace("{{title}}", html.escape(title))
                 .replace("{{description}}", html.escape(description, quote=True))
                 .replace("{{kind}}", kind)
@@ -425,10 +599,16 @@ class Site:
                 f'{self.md(text, src)}\n{self.pager(name)}\n'
                 f'<p class="source meta"><a href="{source_url(src)}">View this page\'s source on GitHub ↗</a></p>\n'
                 "</article>\n</div>")
-        title = title_of(text)
-        page_title = "Meet the engine" if title == "1bit engine" else title  # the README, not the home page
-        self.write(name, f"{page_title} · 1bit engine", main, "doc", section, first_paragraph(text) or TAGLINE,
-                   og_type="article", lastmod=last_commit_date(src))
+        heading = title_of(text)
+        page_title, description = PAGE_META.get(name) or (heading, first_paragraph(text) or TAGLINE)
+        if name in PAGE_META and (len(page_title) + len(SUFFIX) > TITLE_MAX or len(description) > DESCRIPTION_MAX):
+            sys.exit(f"PAGE_META[{name!r}]: title over {TITLE_MAX - len(SUFFIX)} or description over {DESCRIPTION_MAX} characters")
+        published, modified = first_commit_date(src), last_commit_date(src)
+        article = article_node("TechArticle", name, heading, meta_description(description), published, modified)
+        if name == "overview":
+            article["about"] = {"@id": SOFTWARE_ID}
+        self.write(name, page_title + SUFFIX, main, "doc", section, description, og_type="article",
+                   lastmod=modified, dates=(published, modified), jsonld=jsonld_graph(article))
 
     def docs_index(self):
         rows = []
@@ -443,7 +623,13 @@ class Site:
                 f'<p class="lead">How to run the engine, what each device does, and how the pieces fit. '
                 f'Measured numbers are on the <a href="{WIKI}">wiki</a>.</p>\n' + "\n".join(rows) +
                 "\n</article>\n</div>")
-        self.write("docs", "Documentation · 1bit engine", main, "doc", "docs")
+        title, description = PAGE_META["docs"]
+        self.write("docs", title + SUFFIX, main, "doc", "docs", description,
+                   lastmod=max(last_commit_date(p) for p in self.docs.values()), jsonld=jsonld_graph(
+            {"@type": "CollectionPage", "@id": page_url("docs") + "#page", "name": "1bit engine documentation",
+             "url": page_url("docs"), "description": description, "inLanguage": "en",
+             "isPartOf": {"@id": WEBSITE_ID}, "about": {"@id": SOFTWARE_ID},
+             "hasPart": [{"@type": "TechArticle", "name": l, "url": page_url(n)} for _, items in self.groups for n, l in items]}))
 
     # ── blog ──────────────────────────────────────────────────────────
     def blog(self):
@@ -451,8 +637,10 @@ class Site:
             return []
         rows = []
         for i, (date, slug, src) in enumerate(self.posts):
-            tags, title, lead, body, summary = split_post(src.read_text())
+            tags, title, lead, body, summary, seo_title = split_post(src.read_text())
             summary = summary or plain(lead)
+            if seo_title and len(seo_title) + len(SUFFIX) > TITLE_MAX:
+                sys.exit(f"{src.name}: title: line over {TITLE_MAX - len(SUFFIX)} characters")
             image = post_image(src.read_text())
             name = f"blog-{slug}"
             tag_html = "".join(f'<span class="tag">{html.escape(t)}</span>' for t in tags)
@@ -471,15 +659,11 @@ class Site:
                     f'<div class="prose">\n{self.md(body, src)}\n</div>\n'
                     f'<nav class="pager">{link(newer, "prev", "Newer")}{link(older, "next", "Older")}</nav>\n'
                     "</div></article>")
-            self.write(name, f"{title} · 1bit engine", main, "post", "blog", summary, og_type="article",
-                       lastmod=max(date, last_commit_date(src)), image=image, image_alt=title,
-                       jsonld={"@context": "https://schema.org", "@type": "BlogPosting", "headline": title,
-                               "description": summary, "datePublished": date,
-                               "dateModified": max(date, last_commit_date(src)), "image": image or OG_IMAGE,
-                               "url": page_url(name), "mainEntityOfPage": page_url(name),
-                               "author": {"@type": "Person", "name": "bong-water-water-bong"},
-                               "publisher": {"@type": "Organization", "name": "1bit engine", "url": SITE},
-                               "keywords": ", ".join(tags)})
+            modified = max(date, last_commit_date(src))
+            self.write(name, (seo_title or title) + SUFFIX, main, "post", "blog", summary, og_type="article",
+                       lastmod=modified, image=image, image_alt=title, dates=(date, modified),
+                       jsonld=jsonld_graph(article_node("BlogPosting", name, title, meta_description(summary), date, modified,
+                                                        image, ", ".join(tags))))
             rows.append((date, name, title, plain(lead), tags, self.md(lead + "\n\n" + body, src), summary))
 
         log = "\n".join(
@@ -495,8 +679,12 @@ class Site:
                 f'<div class="links"><a class="btn btn-ghost" href="feed.xml">Atom feed&nbsp;→</a>'
                 f'<a class="btn btn-ghost" href="{OLD_SITE}1bit-blog.html">1bit.MONSTER archive&nbsp;→</a></div></div>\n'
                 f"{log}\n</div></section>\n{self.archive()}")
-        self.write("blog", "Blog · 1bit engine", main, "blog", "blog", "Notes from building the 1bit engine: measured results on HRX and our HIP kernels, the NPU "
-                   "engine, speculative decoding, quantization and Lemonade.")
+        title, description = PAGE_META["blog"]
+        self.write("blog", title + SUFFIX, main, "blog", "blog", description, lastmod=self.posts_modified(), jsonld=jsonld_graph(
+            {"@type": "Blog", "@id": page_url("blog") + "#blog", "name": "1bit engine blog", "url": page_url("blog"),
+             "description": description, "inLanguage": "en", "publisher": {"@id": ORG_ID}, "isPartOf": {"@id": WEBSITE_ID},
+             "blogPost": [{"@type": "BlogPosting", "headline": t, "url": page_url(n), "datePublished": d}
+                          for d, n, t, _, _, _, _ in rows]}))
 
         def stamp(d):
             return d + "T00:00:00Z"
@@ -547,21 +735,38 @@ class Site:
         mark = ('<svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/>'
                 '<rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/>'
                 '<rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>')
+        facts = "\n".join(f"<li>{f}</li>" for f in HOME_FACTS)
+        packages = "\n".join(f"<li><strong>{html.escape(n)}</strong>: {html.escape(d)}.</li>" for n, d in HOME_PACKAGES)
+        models = "\n".join(f"<tr><td>{html.escape(m)}</td><td>{html.escape(f)}</td><td>{html.escape(w)}</td></tr>"
+                           for m, f, w in HOME_MODELS)
         main = ('<section class="section hero-center"><div class="container">\n'
                 f"<h1>{mark}1bit engine</h1>\n"
                 f'<p class="lead">{html.escape(TAGLINE)}</p>\n'
                 '<div class="cta-row"><a class="btn btn-primary" href="serve.html">Get started&nbsp;→</a>'
                 '<a class="btn btn-ghost" href="overview.html">Meet the engine&nbsp;→</a></div>\n'
                 f"{latest}\n</div></section>\n"
+                '<section class="section"><div class="container prose home-facts">\n'
+                '<p class="eyebrow">What it is</p>\n'
+                "<h2>Local LLM inference on the AMD Ryzen AI MAX+ 395, inside Lemonade Server</h2>\n"
+                f"<ul>\n{facts}\n</ul>\n"
+                "<h3>How it ships</h3>\n"
+                f"<ul>\n{packages}\n</ul>\n"
+                f'<p>The packages are on the <a href="{RELEASES}">engine\'s GitHub releases page</a>; '
+                '<a href="lemonade.html">how the engine installs through Lemonade</a> and '
+                '<a href="releases.html">what each release is built from</a> are in the docs.</p>\n'
+                "<h3>Models measured on a Ryzen AI MAX+ 395</h3>\n"
+                '<div class="table"><table><thead><tr><th>Model</th><th>File and route</th><th>Measured</th></tr></thead>'
+                f"<tbody>\n{models}\n</tbody></table></div>\n"
+                '<p>How each number is taken is in <a href="bench.html">how the numbers are measured</a>; '
+                'the routes are described in <a href="hrx.html">HRX on the Radeon 8060S iGPU</a> and '
+                '<a href="npu.html">the NPU engine</a>.</p>\n'
+                "</div></section>\n"
                 '<section class="section"><div class="container">\n'
                 '<span class="site-badge"><span class="dot"></span>site index</span>\n'
                 f'<div class="site-grid">{"".join(cards)}</div>\n</div></section>')
-        self.write("index", "1bit engine", main, "home", "", description=HOME_DESCRIPTION, jsonld={"@context": "https://schema.org", "@graph": [
-            {"@type": "WebSite", "name": "1bit engine", "url": SITE, "description": HOME_DESCRIPTION},
-            {"@type": "SoftwareSourceCode", "name": "1bit engine", "description": HOME_DESCRIPTION, "url": SITE,
-             "codeRepository": REPO, "license": "https://www.apache.org/licenses/LICENSE-2.0",
-             "programmingLanguage": "C++", "runtimePlatform": "Linux",
-             "keywords": HOME_KEYWORDS}]})
+        self.write("index", HOME_TITLE + SUFFIX, main, "home", "", description=HOME_DESCRIPTION,
+                   lastmod=max(last_commit_date(ROOT / "tools" / "site.py"), self.posts_modified()),
+                   jsonld=jsonld_graph(ORG, website_node(), software_node()))
 
     # ── 404 ───────────────────────────────────────────────────────────
     def not_found(self):
@@ -578,7 +783,9 @@ class Site:
                 r'  var m = location.pathname.match(/\/(1bit-[a-z0-9-]+\.html)$/);' "\n"
                 f'  if (m && m[1] !== "1bit-jarvis.html") document.getElementById("old").href = "{OLD_SITE}" + m[1];\n'
                 "</script>\n</div></section>")
-        self.write("404", "Page not found · 1bit engine", main, "doc", "", extra_head=f'<base href="{SITE}">', noindex=True)
+        self.write("404", "Page not found · 1bit engine", main, "doc", "",
+                   "This address is not on 1bit.gg. Pages of the old 1bit.MONSTER site are kept in its archive.",
+                   extra_head=f'<base href="{SITE}">', noindex=True)
 
     def build(self):
         readme = ENGINE / "README.md"

@@ -17,6 +17,7 @@ limitations under the License.
 tags: milestones, npu, hrx, vulkan, zinc
 summary: Three days in: the engine runs on the NPU, HRX, Vulkan and ZINC inside Lemonade, each step verified on Strix Halo.
 
+title: The first week: NPU, HRX, Vulkan, ZINC
 # The first week of 1bit engine
 
 The clean repository started on 2026-09-22. In its first three days, the engine came up on every device it targets, inside Lemonade, with each step verified on real hardware before it merged. These are the milestones, with the numbers and where they come from.

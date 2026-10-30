@@ -288,6 +288,11 @@ html[data-theme="dark"]  .theme-switch [data-choice="dark"] {
 .prose blockquote p:last-child { margin-bottom: 0; }
 .prose hr { border: 0; border-top: 1px solid var(--border); margin: var(--gap-xl) 0; }
 .prose img { max-width: 100%; }
+.prose p img { display: inline-block; vertical-align: middle; }   /* README badges sit on one line */
+.home-facts { max-width: 860px; }
+.home-facts h2 { font-size: clamp(24px, 2.6vw, 30px); margin: 0 0 var(--gap-md); }
+.home-facts h3 { margin: var(--gap-lg) 0 var(--gap-sm); }
+.home-facts ul { padding-left: 1.2em; }
 .prose .table { overflow-x: auto; margin: 0 0 var(--gap-lg); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .prose table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .prose th, .prose td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--border); }
