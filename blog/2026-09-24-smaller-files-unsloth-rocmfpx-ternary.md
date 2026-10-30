@@ -24,6 +24,8 @@ A smaller model file decodes faster, because decode is limited by how many bytes
 
 > **Since 21 October 2026:** the lean ROCm route these ROCmFPX files ran on is gone from the engine (engine #306); the GGUF measurements stand as measured. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
 
+> **Update (2026-10-30):** ternary files now decode on HRX: PrismML Ternary-Bonsai-2-27B in PQ2_0 (6.7 GiB) at 43.3 tok/s with MTP, and Microsoft BitNet b1.58 2B-4T in TQ2_0 (1.11 GiB) at 123.4 tok/s. See [Models measured](../docs/models.md).
+
 ## Qwen3.8-27B: Unsloth against ROCmFPX
 
 Every file below is quantized from the same BF16 checkpoint, the ROCmFPX ones with Unsloth's own importance matrix so the comparison is fair.
