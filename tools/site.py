@@ -104,10 +104,6 @@ HOME_KEYWORDS = ("LLM inference, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Rad
 
 # The landing page stays short: what the engine is, how it ships, where the docs are. Measured
 # numbers live in the docs (engine docs/models.md -> models.html).
-HOME_WHAT = ("The 1bit engine runs local LLMs on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside AMD's Lemonade Server, "
-             "as its onebit backend: the Radeon 8060S iGPU through HRX with our own HIP kernels, and the XDNA 2 NPU "
-             "through our own NPU runtime, behind an OpenAI-compatible API. It ships as a Linux tarball, a "
-             "Lemonade + onebit package and a bootable 1bit OS live image (Secure Boot signed).")
 
 # Doc pages: name -> (search title without the " · 1bit engine" suffix, meta description).
 # The docs themselves live in the engine repository; this is where their search text is kept.
@@ -761,22 +757,12 @@ class Site:
         mark = ('<svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/>'
                 '<rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/>'
                 '<rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>')
-        pin = lemonade_pin_text(lemonade_pin())
         main = ('<section class="section hero-center"><div class="container">\n'
                 f"<h1>{mark}1bit engine</h1>\n"
                 f'<p class="lead">{html.escape(TAGLINE)}</p>\n'
                 '<div class="cta-row"><a class="btn btn-primary" href="serve.html">Get started&nbsp;→</a>'
                 '<a class="btn btn-ghost" href="overview.html">Meet the engine&nbsp;→</a></div>\n'
                 f"{latest}\n</div></section>\n"
-                '<section class="section"><div class="container prose home-what">\n'
-                '<p class="eyebrow">What it is</p>\n'
-                f"<p>{html.escape(HOME_WHAT)} It runs on {html.escape(pin)}.</p>\n"
-                f'<p>Download: the <a href="{RELEASES}">engine\'s GitHub releases page</a>. '
-                'The <a href="docs.html">documentation</a> covers <a href="lemonade.html">how it installs through Lemonade</a>, '
-                '<a href="hrx.html">the GPU route</a> and <a href="npu.html">the NPU route</a>; '
-                '<a href="models.html">the models it is checked against and their measured numbers</a> are one page; '
-                'the <a href="blog.html">blog</a> is the build log.</p>\n'
-                "</div></section>\n"
                 '<section class="section"><div class="container">\n'
                 '<span class="site-badge"><span class="dot"></span>site index</span>\n'
                 f'<div class="site-grid">{"".join(cards)}</div>\n</div></section>')
