@@ -28,6 +28,8 @@ method in the linked docs.
 
 > **Since 21 October 2026:** Vulkan is no longer a route of the engine (engine #306): Zamba, Zamba2 and BlackMamba wait for an HRX port, and `--moe-slots` is not in the current build. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
 
+> **Update (2026-10-30):** ZAYA1-8B (Q4_K_M) decodes at 157 tok/s on HRX. See [Models measured](../docs/models.md).
+
 ## Zyphra, all of it
 
 ZAYA1-8B already ran on Vulkan, HRX and ROCm. The rest of the family followed:

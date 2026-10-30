@@ -22,6 +22,8 @@ title: HRX long prompts fixed; Unsloth sweet spots
 
 Two results from the end of the day: a bug fixed in HRX decoding, and one table that answers "which Unsloth file should I download?" for five popular models.
 
+> **Update (2026-10-30):** the sub-4-bit files no longer run partly on the CPU: every ggml weight type runs on HRX, including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ formats, and Vulkan is no longer a route of the engine (engine #306). See [HRX on the Radeon 8060S iGPU](../docs/hrx.md).
+
 ## HRX: decoding past 256 tokens
 
 `1bit serve --device hrx` gave garbled answers to prompts of about 400 to 1,700 tokens, while short prompts and very long ones read fine. Prompt processing was right at every length; what went wrong was decoding one token at a time once the KV cache held more than 256 tokens.

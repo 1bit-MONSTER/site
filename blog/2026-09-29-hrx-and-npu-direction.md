@@ -21,6 +21,8 @@ summary: Heading to HRX plus the NPU: Laya's scorer runs on HRX at 15-16 ms a de
 
 The engine is heading to AMD's HRX backend, whose kernels we write in Loom, plus the NPU.
 
+> **Update (2026-10-30):** HRX met the gates of RFC #213 and the Vulkan and ROCm builds were removed (engine #306); every graph node of every model and mode we test runs on HRX with our own HIP kernels, and the NPU engine runs on our own runtime. See [HRX](../docs/hrx.md) and [NPU engine](../docs/npu.md).
+
 A review of the Laya work[^geramyl] put it plainly: we want it on the NPU, a Vulkan version
 already exists, and the stack is HRX + Loom + NPU. That was right, and not only for Laya. Vulkan
 stays the default until HRX meets the gates in
