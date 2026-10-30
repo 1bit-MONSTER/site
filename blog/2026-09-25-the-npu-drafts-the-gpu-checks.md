@@ -21,6 +21,8 @@ summary: A small model on the NPU drafts, the GPU checks: Qwen3-32B goes from 10
 
 Speculative decoding makes a large model faster by letting a small one guess ahead: the small model proposes a few tokens, the large model checks them all in one pass, and every guess it agrees with is a token it did not have to produce one at a time. Usually both models run on the GPU. On Strix Halo there is a second processor sitting idle during chat: the XDNA 2 NPU. So we gave it the small model.
 
+> **Update (2026-10-30):** Vulkan is no longer a route of the engine (engine #306). The NPU and the GPU now combine through the hybrid route, the prompt on the NPU engine and the tokens on HRX ([Hybrid](../docs/hybrid.md)); the NPU route decodes Qwen3-0.6B at 88.6 tok/s in the release gate ([NPU engine](../docs/npu.md)).
+
 ## How it works
 
 The NPU runs Qwen3-0.6B through the engine. The GPU runs the target, a Qwen3 model from 14B to 32B, through llama.cpp on Vulkan. Each round:

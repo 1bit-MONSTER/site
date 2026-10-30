@@ -22,6 +22,8 @@ title: 1bit.MONSTER becomes 1bit engine
 
 1bit.MONSTER grew fast: an inference engine, a model zoo, benchmarks, a store, a voice assistant and a lot of experiments, all in one repository with all of its history. The engine that came out of it is now its own project, **1bit engine**, and this site is its home.
 
+> **Update (2026-10-30):** Vulkan, ROCm and ZINC are no longer routes of the engine (engine #306); it is HRX with our own HIP kernels plus the NPU engine, inside Lemonade, pinned to Lemonade's weekly release. See [What the engine is](../README.md).
+
 ## What changed
 
 **A clean repository.** The engine lives in [1bit-MONSTER/engine](https://github.com/1bit-MONSTER/engine). It holds verified code only, without the development history. Each piece is ported over once it passes its end-to-end test on Strix Halo, and the [porting map](../docs/PORTING.md) shows what has moved and what is next.

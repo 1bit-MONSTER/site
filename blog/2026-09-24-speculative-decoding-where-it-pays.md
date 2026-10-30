@@ -24,6 +24,8 @@ Speculative decoding lets a cheap drafter guess the next few tokens and the mode
 
 > **Since 21 October 2026:** these MTP numbers were taken on the removed Vulkan build; on HRX, Qwen3.8-27B with MTP now decodes at 36.0 / 26.8 / 29.9 tok/s (engine #487). See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
 
+> **Update (2026-10-30):** on HRX, Qwen3.8-27B (UD-Q4_K_XL) decodes at 36.0 tok/s with MTP on code prompts and 56.6 tok/s with the DFlash2 drafter. See [Models measured](../docs/models.md).
+
 ## Dense Qwen3.8-27B: up to 3.4x
 
 Qwen3.8-27B ships its own multi-token-prediction (MTP) head, a small extra layer trained to draft. `1bit serve --mtp` switches it on. Decode speed on three chat prompts (code, prose, short), UD-Q4_K_XL on Vulkan:

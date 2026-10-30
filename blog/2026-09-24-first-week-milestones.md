@@ -24,6 +24,8 @@ The clean repository started on 2026-09-22. In its first three days, the engine 
 
 > **Since 21 October 2026:** Vulkan and ZINC are no longer routes of the engine (engine #306); it is HRX with our HIP kernels plus the NPU engine, inside Lemonade. See [Every node on the GPU](2026-10-21-every-node-on-hrx.md).
 
+> **Update (2026-10-30):** the NPU route now decodes Qwen3-0.6B at 88.6 tok/s in the release gate, and the Linux kernel pin moved to v7.3-rc4 with the IOMMU PerfOpt backports. Current numbers: [Models measured](../docs/models.md); the routes: [NPU engine](../docs/npu.md), [HRX](../docs/hrx.md).
+
 ## The NPU
 
 The XDNA 2 NPU runs Qwen3-0.6B end to end through the engine, served inside Lemonade ([#8](https://github.com/1bit-MONSTER/engine/pull/8), [#9](https://github.com/1bit-MONSTER/engine/pull/9)). The XDNA driver is pinned to upstream ([#12](https://github.com/1bit-MONSTER/engine/pull/12)). The [NPU status page](../docs/npu.md) tracks where it stands.

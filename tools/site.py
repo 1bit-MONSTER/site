@@ -29,9 +29,14 @@
 #   404.html       sends old 1bit.MONSTER addresses to the archived old site
 #
 # A post may start with "tags: a, b" lines, a "summary: one line", an "image: card.png" (its own
-# 1200x630 link-preview card in site/assets) and a "title: short search title" (its <title> without
-# the " · 1bit engine" suffix, 46 characters at most; unset, the heading is cut to fit) before its
-# "# Title"; its first paragraph is its lead. The summary (the lead when there is none) is the
+# 1200x630 link-preview card in site/assets), a "title: short search title" (its <title> without
+# the " · 1bit engine" suffix, 46 characters at most; unset, the heading is cut to fit) and
+# "draft: true" (kept in blog/, not built) before its "# Title"; its first paragraph is its lead.
+# A dated "> **Update (YYYY-MM-DD):** ..." blockquote after the lead is how a post records a claim
+# that later changed; the post itself is not rewritten.
+#
+# The Lemonade pin is never written into a page by hand: lemonade_pin() reads it from the engine
+# checkout (the third_party/lemonade gitlink and its bump commit) at build time. The summary (the lead when there is none) is the
 # post's meta description and its feed.xml summary, which the Discord blog mirror posts. Links to
 # other docs become page links; links to other files in the repository go to them on GitHub.
 #
@@ -83,7 +88,6 @@ SITE_REPO = "https://github.com/1bit-MONSTER/site"
 
 RELEASES = REPO + "/releases"
 LEMONADE = "https://github.com/lemonade-sdk/lemonade"
-LEMONADE_PIN = "v2026.44.1"   # the Lemonade Server release the engine is pinned to (engine docs/lemonade.md)
 DISCORD = "https://discord.gg/fa5m4Vawpa"
 
 TAGLINE = ("Local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo), inside AMD's Lemonade Server: "
@@ -98,38 +102,18 @@ HOME_KEYWORDS = ("LLM inference, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Rad
                  "Lemonade Server, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, BitNet b1.58, ternary, "
                  "Ternary-Bonsai, gpt-oss-20b, MXFP4, NVFP4, MTP, speculative decoding, 1bit OS, local AI")
 
-# The home page's facts (plain, measured on a Ryzen AI MAX+ 395; README.md and the docs). Every
-# number here was measured on that box and is quoted as is.
-HOME_FACTS = [
-    f"The 1bit engine runs inside AMD's <a href=\"{LEMONADE}\">Lemonade Server</a> as its <code>onebit</code> "
-    f"backend; the engine is pinned to Lemonade {LEMONADE_PIN}.",
-    "It targets the AMD Ryzen AI MAX+ 395 (Strix Halo, gfx1151): the Radeon 8060S iGPU through HRX with our own "
-    "HIP kernels, and the XDNA 2 NPU through our own NPU runtime, which runs full-ELF kernel sets.",
-    "Every model is served behind an OpenAI-compatible API.",
-    "Every ggml weight type runs on HRX, including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ formats.",
-]
-HOME_PACKAGES = [
-    ("Linux tarball", "the engine and its HRX llama-server, unpacked and run"),
-    ("Lemonade + onebit package", "Lemonade Server with the onebit backend and the engine"),
-    ("1bit OS live image", "a bootable Lemonade appliance, Secure Boot signed"),
-]
-# (model, file and route, what was measured)
-HOME_MODELS = [
-    ("Qwen3.8-27B", "UD-Q4_K_XL, HRX", "decode 36.0 tok/s with MTP on code prompts; 56.6 tok/s with the DFlash2 drafter"),
-    ("Qwen3.8-Flash-Next (MoE)", "HRX", "prefill 287 tok/s, decode 24.0 tok/s"),
-    ("Zyphra ZAYA1-8B", "Q4_K_M, HRX", "decode 157 tok/s"),
-    ("PrismML Ternary-Bonsai-2-27B", "PQ2_0, 6.7 GiB, HRX", "decode 43.3 tok/s with MTP"),
-    ("Microsoft BitNet b1.58 2B-4T", "TQ2_0 ternary GGUF, 1.11 GiB (2.06 bits per weight), HRX",
-     "end to end on the Radeon 8060S with no CPU fallback; decode tg128 123.4 tok/s after the TQ2_0 load-time repack "
-     "onto the packed-ternary decode kernel (101.6 before it, same binary); perplexity 102.42 on HRX vs 102.56 on the CPU "
-     "for the same file"),
-    ("Qwen3-0.6B", "NPU route", "decode 88.6 tok/s in the release gate"),
-    ("gpt-oss-20b", "MXFP4, HRX", "runs on HRX"),
-]
+# The landing page stays short: what the engine is, how it ships, where the docs are. Measured
+# numbers live in the docs (engine docs/models.md -> models.html).
+HOME_WHAT = ("The 1bit engine runs local LLMs on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside AMD's Lemonade Server, "
+             "as its onebit backend: the Radeon 8060S iGPU through HRX with our own HIP kernels, and the XDNA 2 NPU "
+             "through our own NPU runtime, behind an OpenAI-compatible API. It ships as a Linux tarball, a "
+             "Lemonade + onebit package and a bootable 1bit OS live image (Secure Boot signed).")
 
 # Doc pages: name -> (search title without the " · 1bit engine" suffix, meta description).
 # The docs themselves live in the engine repository; this is where their search text is kept.
 PAGE_META = {
+    'models': ('Models measured on a Ryzen AI MAX+ 395',
+     'Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.'),
     'overview': ('What the 1bit engine is and what runs where',
      "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade."),
     'docs': ('Documentation: serve, HRX, NPU, Lemonade',
@@ -183,7 +167,7 @@ TOP = [("Engine", "overview"), ("Docs", "docs"), ("Blog", "blog"), ("Benchmarks"
 
 # docs sidebar groups: (title, [(doc name, label)])
 NAV = [
-    ("Start", [("serve", "1bit serve"), ("lemonade", "Lemonade"), ("releases", "Releases"),
+    ("Start", [("serve", "1bit serve"), ("models", "Models measured"), ("lemonade", "Lemonade"), ("releases", "Releases"),
                ("bench", "How we measure"), ("recipes", "Recipes"), ("hw-gate", "Hardware gate")]),
     ("Devices", [("hrx", "HRX"), ("npu", "NPU engine"), ("onnx", "ONNX Runtime"), ("dwarfstar", "DwarfStar")]),
     ("Components", [("laya", "Laya router"), ("pm", "Project Manager"), ("registry", "Model registry"),
@@ -203,7 +187,8 @@ def posts():
         m = re.fullmatch(r"(\d{4}-\d{2}-\d{2})-([a-z0-9-]+)", p.stem)
         if not m:
             sys.exit(f"blog post names are YYYY-MM-DD-<slug>.md: {p.name}")
-        out.append((m.group(1), m.group(2), p))
+        if not is_draft(p):
+            out.append((m.group(1), m.group(2), p))
     return sorted(out, reverse=True)
 
 
@@ -336,7 +321,7 @@ def software_node():
             "description": TAGLINE, "applicationCategory": "DeveloperApplication",
             "applicationSubCategory": "LLM inference engine", "operatingSystem": "Linux",
             "downloadUrl": RELEASES, "installUrl": SITE + "lemonade.html",
-            "softwareRequirements": f"AMD Ryzen AI MAX+ 395 (Strix Halo); Lemonade Server {LEMONADE_PIN}",
+            "softwareRequirements": f"AMD Ryzen AI MAX+ 395 (Strix Halo); Lemonade Server, {lemonade_pin_text(lemonade_pin())}",
             "license": "https://www.apache.org/licenses/LICENSE-2.0",
             "isAccessibleForFree": True,
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"},
@@ -369,6 +354,40 @@ def last_commit_date(path):
     except (OSError, subprocess.SubprocessError):
         d = ""
     return d or datetime.date.today().isoformat()
+
+
+def lemonade_pin():
+    """The Lemonade the engine is pinned to, from the engine checkout alone (the site workflow checks
+    out no submodules): the gitlink of third_party/lemonade and the subject of the commit that last
+    moved it, which the bump-lemonade workflow writes as
+    "Bump Lemonade: 1bit-MONSTER/lemonade <sha> (upstream vYYYY.WW.N)". A checked-out submodule, when
+    there is one, must agree with the gitlink. -> {"short", "date", "upstream"} or {} when git cannot say."""
+    try:
+        tree = subprocess.run(["git", "-C", str(ENGINE), "ls-tree", "HEAD", "third_party/lemonade"],
+                              capture_output=True, text=True, timeout=30).stdout.split()
+        if len(tree) < 3 or tree[1] != "commit":
+            return {}
+        sha = tree[2]
+        log = subprocess.run(["git", "-C", str(ENGINE), "log", "-1", "--format=%cs%n%s", "--", "third_party/lemonade"],
+                             capture_output=True, text=True, timeout=30).stdout.splitlines()
+        sub = ENGINE / "third_party" / "lemonade"
+        if (sub / ".git").exists():
+            head = subprocess.run(["git", "-C", str(sub), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=30).stdout.strip()
+            if head and head != sha:
+                sys.exit(f"third_party/lemonade is checked out at {head[:12]} but the engine pins {sha[:12]}")
+    except (OSError, subprocess.SubprocessError):
+        return {}
+    m = re.search(r"upstream (v\d{4}\.\d{1,2}\.\d+)", log[1]) if len(log) > 1 else None
+    return {"short": sha[:12], "date": log[0] if log else "", "upstream": m.group(1) if m else ""}
+
+
+def lemonade_pin_text(pin):
+    """"the weekly Lemonade pin (fork commit <sha>, bumped <date>, upstream vX)" for the pages."""
+    if not pin:
+        return "the weekly Lemonade pin"
+    parts = [f"fork commit {pin['short']}"] + ([f"bumped {pin['date']}"] if pin["date"] else []) + \
+            ([f"upstream {pin['upstream']}"] if pin["upstream"] else [])
+    return "the weekly Lemonade pin (" + ", ".join(parts) + ")"
 
 
 def first_commit_date(path):
@@ -431,14 +450,17 @@ def post_image(text):
 
 
 def split_post(text):
-    """-> (tags, title, lead paragraph, the rest, one-line summary or "", search title or "") of a post."""
+    """-> (tags, title, lead, the rest, summary or "", search title or "", draft) of a post. A post that
+    starts with "draft: true" is kept in blog/ but not built (no page, no feed entry, no sitemap line)."""
     text = strip_notice(text)
-    tags, summary, seo_title = [], "", ""
+    tags, summary, seo_title, draft = [], "", "", False
     while True:
-        m = re.match(r"\s*(tags|summary|image|title):\s*(.+)\n", text)
+        m = re.match(r"\s*(tags|summary|image|title|draft):\s*(.+)\n", text)
         if not m:
             break
-        if m.group(1) == "tags":
+        if m.group(1) == "draft":
+            draft = m.group(2).strip().lower() in ("true", "yes", "1")
+        elif m.group(1) == "tags":
             tags += [t.strip() for t in m.group(2).split(",") if t.strip()]
         elif m.group(1) == "summary":
             summary = m.group(2).strip()
@@ -450,7 +472,11 @@ def split_post(text):
         sys.exit("a post starts with its '# Title'")
     rest = text[m.end():].strip()
     lead, _, body = rest.partition("\n\n")
-    return tags, re.sub(r"[`*]", "", m.group(1)).strip(), lead.strip(), body, summary, seo_title
+    return tags, re.sub(r"[`*]", "", m.group(1)).strip(), lead.strip(), body, summary, seo_title, draft
+
+
+def is_draft(path):
+    return split_post(path.read_text())[6]
 
 
 def first_paragraph(text):
@@ -637,7 +663,7 @@ class Site:
             return []
         rows = []
         for i, (date, slug, src) in enumerate(self.posts):
-            tags, title, lead, body, summary, seo_title = split_post(src.read_text())
+            tags, title, lead, body, summary, seo_title, _ = split_post(src.read_text())
             summary = summary or plain(lead)
             if seo_title and len(seo_title) + len(SUFFIX) > TITLE_MAX:
                 sys.exit(f"{src.name}: title: line over {TITLE_MAX - len(SUFFIX)} characters")
@@ -735,31 +761,21 @@ class Site:
         mark = ('<svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/>'
                 '<rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/>'
                 '<rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>')
-        facts = "\n".join(f"<li>{f}</li>" for f in HOME_FACTS)
-        packages = "\n".join(f"<li><strong>{html.escape(n)}</strong>: {html.escape(d)}.</li>" for n, d in HOME_PACKAGES)
-        models = "\n".join(f"<tr><td>{html.escape(m)}</td><td>{html.escape(f)}</td><td>{html.escape(w)}</td></tr>"
-                           for m, f, w in HOME_MODELS)
+        pin = lemonade_pin_text(lemonade_pin())
         main = ('<section class="section hero-center"><div class="container">\n'
                 f"<h1>{mark}1bit engine</h1>\n"
                 f'<p class="lead">{html.escape(TAGLINE)}</p>\n'
                 '<div class="cta-row"><a class="btn btn-primary" href="serve.html">Get started&nbsp;→</a>'
                 '<a class="btn btn-ghost" href="overview.html">Meet the engine&nbsp;→</a></div>\n'
                 f"{latest}\n</div></section>\n"
-                '<section class="section"><div class="container prose home-facts">\n'
+                '<section class="section"><div class="container prose home-what">\n'
                 '<p class="eyebrow">What it is</p>\n'
-                "<h2>Local LLM inference on the AMD Ryzen AI MAX+ 395, inside Lemonade Server</h2>\n"
-                f"<ul>\n{facts}\n</ul>\n"
-                "<h3>How it ships</h3>\n"
-                f"<ul>\n{packages}\n</ul>\n"
-                f'<p>The packages are on the <a href="{RELEASES}">engine\'s GitHub releases page</a>; '
-                '<a href="lemonade.html">how the engine installs through Lemonade</a> and '
-                '<a href="releases.html">what each release is built from</a> are in the docs.</p>\n'
-                "<h3>Models measured on a Ryzen AI MAX+ 395</h3>\n"
-                '<div class="table"><table><thead><tr><th>Model</th><th>File and route</th><th>Measured</th></tr></thead>'
-                f"<tbody>\n{models}\n</tbody></table></div>\n"
-                '<p>How each number is taken is in <a href="bench.html">how the numbers are measured</a>; '
-                'the routes are described in <a href="hrx.html">HRX on the Radeon 8060S iGPU</a> and '
-                '<a href="npu.html">the NPU engine</a>.</p>\n'
+                f"<p>{html.escape(HOME_WHAT)} It runs on {html.escape(pin)}.</p>\n"
+                f'<p>Download: the <a href="{RELEASES}">engine\'s GitHub releases page</a>. '
+                'The <a href="docs.html">documentation</a> covers <a href="lemonade.html">how it installs through Lemonade</a>, '
+                '<a href="hrx.html">the GPU route</a> and <a href="npu.html">the NPU route</a>; '
+                '<a href="models.html">the models it is checked against and their measured numbers</a> are one page; '
+                'the <a href="blog.html">blog</a> is the build log.</p>\n'
                 "</div></section>\n"
                 '<section class="section"><div class="container">\n'
                 '<span class="site-badge"><span class="dot"></span>site index</span>\n'
