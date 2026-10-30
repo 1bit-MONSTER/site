@@ -17,6 +17,7 @@ limitations under the License.
 tags: quantization, ternary, rocmfpx, unsloth
 summary: What smaller files cost: Unsloth UD-Q4_K_XL stays at KLD 0.008 (95.3% same top token); ROCmFPX formats trade more; ternary is effectively lossless vs F16.
 
+title: Smaller files: Unsloth, ROCmFPX, ternary 27B
 # Smaller files: Unsloth, ROCmFPX and a ternary 27B
 
 A smaller model file decodes faster, because decode is limited by how many bytes the GPU reads per token. The question is what each format costs in accuracy. We measured three families of small files on Strix Halo against their full-precision originals: KL divergence (how far the model's predictions move) and how often the top predicted token stays the same.

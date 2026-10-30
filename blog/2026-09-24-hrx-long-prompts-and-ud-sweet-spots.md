@@ -17,6 +17,7 @@ limitations under the License.
 tags: hrx, quantization, unsloth
 summary: HRX decoding was wrong once the KV cache passed 256 tokens, now fixed; and which Unsloth file to get: UD-Q4_K_XL lean, UD-Q5_K_XL accurate.
 
+title: HRX long prompts fixed; Unsloth sweet spots
 # HRX answers long prompts correctly, and where Unsloth quants pay
 
 Two results from the end of the day: a bug fixed in HRX decoding, and one table that answers "which Unsloth file should I download?" for five popular models.

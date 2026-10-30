@@ -18,6 +18,7 @@ tags: milestone, strix-halo, local-llm, hrx, lemonade, qwen, speculative-decodin
 image: og-every-node-on-hrx.png
 summary: On AMD Strix Halo, all 43 local LLM configurations we test run fully on the GPU with HRX and our HIP kernels, and Qwen3.8-27B decodes at 36 tok/s.
 
+title: Every local LLM node on the GPU with HRX
 # Every node on the GPU: local LLMs on Strix Halo in Lemonade
 
 On a Ryzen AI Max+ 395 (Strix Halo), the 1bit engine now runs every graph node of every local LLM

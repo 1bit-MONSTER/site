@@ -17,6 +17,7 @@ limitations under the License.
 tags: speculative decoding, mtp, qwen3.8
 summary: MTP takes Qwen3.8-27B to 42.0 tok/s on code; on Qwen3-Coder-30B-A3B, already at 88 tok/s, every draft model we tried was slower.
 
+title: Speculative decoding: where it pays
 # Speculative decoding: where it pays, and where it does not
 
 Speculative decoding lets a cheap drafter guess the next few tokens and the model check them all in one pass. When the guesses are right, several tokens come out of one pass instead of one. We measured it on the two most popular Unsloth models on Strix Halo, and the answer depends entirely on the model.
