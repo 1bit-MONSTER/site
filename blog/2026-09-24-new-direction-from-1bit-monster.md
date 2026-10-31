@@ -40,8 +40,8 @@ One `1bit serve` drives:
 
 - the [XDNA 2 NPU](../docs/npu.md);
 - [HRX and Vulkan](../docs/hrx.md) on the Radeon iGPU, one llama.cpp build with both;
-- [ZINC](../docs/zinc.md), which also reaches NVIDIA GPUs through CUDA;
-- [MLX](../docs/apple.md) on Apple Silicon.
+- ZINC, which also reaches NVIDIA GPUs through CUDA;
+- MLX on Apple Silicon.
 
 Measured numbers live on the [wiki](https://github.com/1bit-MONSTER/engine/wiki). [The first week of 1bit engine](2026-09-24-first-week-milestones.md) lists what the first three days produced.
 

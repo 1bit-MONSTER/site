@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture gaps in the registry · 1bit engine</title>
+<meta name="description" content="Model architectures the registry does not map yet, with the upstream commits that add them and what each needs before the engine serves it.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Architecture gaps in the registry · 1bit engine">
+<meta property="og:description" content="Model architectures the registry does not map yet, with the upstream commits that add them and what each needs before the engine serves it.">
+<link rel="canonical" href="https://1bit.gg/arch-gaps.html">
+<meta property="og:url" content="https://1bit.gg/arch-gaps.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Architecture gaps in the registry · 1bit engine">
+<meta name="twitter:description" content="Model architectures the registry does not map yet, with the upstream commits that add them and what each needs before the engine serves it.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-25">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/arch-gaps.html#article", "headline": "Architecture gaps: significant arrivals the registry does not map", "description": "Model architectures the registry does not map yet, with the upstream commits that add them and what each needs before the engine serves it.", "url": "https://1bit.gg/arch-gaps.html", "mainEntityOfPage": "https://1bit.gg/arch-gaps.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-25", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html" aria-current="page">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="architecture-gaps-significant-arrivals-the-registry-does-not-map">Architecture gaps: significant arrivals the registry does not map<a class="anchor" href="#architecture-gaps-significant-arrivals-the-registry-does-not-map" title="Permanent link">#</a></h1>
+<p>The registry (<a href="registry.html">Model registry</a>) maps an HF architecture only when a pinned backend's own code accepts it. It is generated from the pinned sources; nothing in it is typed in by hand. So "support" cannot be faked with an alias, and the census counts every other architecture as unmapped.</p>
+<p><strong>Alias or real work?</strong> Some unmapped arrivals are renamed or same-shape siblings of a supported family, and are fixed where the backend is (upstream, or our fork) by mapping the name. Others only look like a supported family. For those, mapping the name would advertise support that cannot be served, or silently compute something else.</p>
+<p>This page is the reviewed evidence for the second kind: what each family is, what it adds over the closest supported architecture, and what real support requires. It exists so that:
+- nobody later "fixes" one of them with an alias;
+- whoever implements one starts from these measurements.</p>
+<p><code>registry/significant.json</code> lists the reviewed classes. <code>tools/registry_build.py --check-gaps</code> (ctest <code>registry_gaps</code>) fails if one of them becomes mapped without a recorded reason (<code>mapped_ok</code> must be a non-empty string; a missing, empty or vacuous value is still a violation), and the build prints the same warning. The census and pin-bump workflows run <code>--check-gaps</code> right after regenerating the registry, so a mapping lands nowhere without failing. ctest <code>registry_gaps_fire</code> (<code>tests/registry_gaps_test.py</code>) pins the guard's firing behavior against synthetic registries — <code>registry_gaps</code> on its own only ever sees a clean registry, so that test is what catches a regression that makes the guard stop firing. A pin bump that brings real upstream support then gets a person's look before the class counts as supported.</p>
+<p><strong>Provenance.</strong> The review was written for 1bit-MONSTER's own engine, before this repository (the 1bit-MONSTER census, 2026-09-12/13), and is kept as written below. The <code>RCPP_ARCH_*</code> names, <code>rcpp_arch_from_string</code>, <code>registry/arch.h</code>, <code>src/*.cpp</code> and <code>census/*</code> it cites are that engine's, not this one's. Where it says "the engine", read the old engine: <code>englishbase</code>, for example, was implemented there, not here. The configs, checkpoints and reasons are the models' own, so the conclusions hold here too: none of these is an alias of a family this engine's backends run.</p>
+<hr />
+<h2 id="deepseekv41-deepseek-v41"><code>deepseekv41</code> — DeepSeek V4.1<a class="anchor" href="#deepseekv41-deepseek-v41" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Class / model_type</strong>: <code>DeepseekV41ForCausalLM</code> / <code>deepseek_v41</code> (text tower
+  <code>deepseek_v41_text</code>); example <code>deepseek-ai/DeepSeek-V4.1-Flash</code>,
+  <code>Solstice-AI/DeepSeek-V4.1-Flash-UNCENSORED-FP8</code>.</li>
+<li><strong>Shape</strong>: <strong>40 layers, H=5120, 64 heads, 1 kv head, 384 experts, vocab
+  129280</strong> — versus V4 Flash's 43 layers / H=4096 / 256 experts. It is a
+  different model, not a revision label.</li>
+<li><strong>Keys V4 does not have</strong>: <code>engram_*</code> (8: <code>engram_layer_ids</code>,
+  <code>engram_num_embeddings</code>, <code>engram_vocab_size</code>, <code>engram_compressed_vocab_size</code>,
+  <code>engram_max_ngram_size</code>, <code>engram_n_heads</code>, <code>engram_head_dim</code>,
+  <code>engram_pad_token_id</code>), <code>candidate_block_size</code>, <code>candidate_source_layer_id</code>,
+  <code>candidate_topk_blocks</code>, <code>index_source_layer_ids</code>, <code>kv_source_layer_ids</code>.
+  (<code>dspark_*</code> is <em>not</em> V4.1-exclusive — <code>DeepSeek-V4-Flash-DSpark</code> carries it
+  under <code>model_type: deepseek_v4</code>.) It is also a multimodal wrapper
+  (<code>vision_config: deepseek_v41_vision</code>, <code>image_token_id</code>).</li>
+<li><strong>Why an alias is wrong</strong>: <code>src/deepseek_v4.cpp</code> reads only
+  hidden/layer/head/expert/<code>hc_*</code> scalars, so a V4.1 checkpoint would load
+  through the V4 path and produce tokens while <strong>silently ignoring the engram
+  and candidate-block machinery</strong> — the silent-substitution failure this repo
+  bans, not a crash.</li>
+<li><strong>Why it is not mapped</strong> (rechecked 2026-10-23 on the pin <code>main</code> carries,
+  <code>third_party/llama.cpp</code> af04c9f2, and again 2026-10-25 at <code>6b397ee9</code>): the fork
+  registers no <code>DeepseekV41ForCausalLM</code> converter class — <code>conversion/deepseek.py</code>
+  has <code>DeepseekV4ForCausalLM</code> only — and <code>src/llama-arch.cpp</code> has
+  <code>LLM_ARCH_DEEPSEEK4</code> with the <code>hc_*</code> tensors but no <code>deepseek_v41</code>/<code>deepseek41</code>
+  architecture and no <code>engram_*</code> / <code>candidate_block_*</code> parameter. <code>conversion/</code>
+  reads neither key family at all. So <code>tools/registry_build.py</code> finds nothing to
+  read the class from, and a mapping would load a V4.1 checkpoint through the V4
+  path and silently ignore the machinery above.</li>
+<li><strong>Watcher</strong> (engine #522): <code>registry/significant.json</code> carries
+  <code>"watch": "report"</code> for this class, so the census prints it as
+  <code>REVIEWED</code> and does not alert on every new upload of the family. That is a
+  statement about the <em>review</em>, not about support: the class stays out of
+  <code>registry/architectures.json</code>, <code>tools/registry_build.py --check-gaps</code> still
+  fails if anyone maps it without a <code>mapped_ok</code> reason, and real support (engram
+  embedding path + candidate-block sparse attention, plus a scope decision for
+  the vision tower) needs the logits validation listed above.</li>
+<li>
+<p><strong>Real support needs</strong>: shape-agnostic config + the engram embedding path +
+  candidate-block sparse attention (and a scope decision for the vision tower),
+  validated against reference logits from the HF implementation.</p>
+</li>
+<li>
+<p><strong>Mapped since <code>5e6388a5a</code></strong> (2026-10-30, the pin engine PR "Bump HRX: llama.cpp 5e6388a5a" carries): the fork
+  now registers the class itself — <code>conversion/__init__.py</code> maps <code>DeepseekV41ForCausalLM</code> to <code>deepseek41</code>,
+  <code>src/llama-arch.cpp</code> registers <code>LLM_ARCH_DEEPSEEK41</code>, and <code>src/models/deepseek41.cpp</code> implements the hparams,
+  the tensor set, the graph and the engram/indexer machinery (fork #156, the port of upstream #31086 + #31300).
+  That is not an alias of <code>deepseek4</code>: it is a second architecture, which is what the reasoning above asked for,
+  and the recheck it quotes was against <code>6b397ee9</code>, before the port existed.
+  <code>registry/significant.json</code> records the same fact as a <code>mapped_ok</code> reason, so <code>--check-gaps</code> stays quiet.</p>
+</li>
+</ul>
+<h2 id="qwen3mamba3-qwen3-mamba-3-hybrid"><code>qwen3mamba3</code> — Qwen3 + Mamba-3 hybrid<a class="anchor" href="#qwen3mamba3-qwen3-mamba-3-hybrid" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Class / model_type</strong>: <code>Qwen3Mamba3ForCausalLM</code> / <code>qwen3_mamba3</code>; example
+  <code>arianraje/qwen3-4b-mamba3-hybrid-stage2b-kd-bias1</code>.</li>
+<li><strong>Keys</strong>: <code>layer_types</code> (attention/SSM mix) plus Mamba-<strong>3</strong> knobs —
+  <code>mamba_mimo_rank</code>, <code>mamba_bc_norm_eps</code>, <code>mamba_bc_bias_init</code>,
+  <code>mamba_rope_fraction</code>, <code>mamba_a_floor</code>, <code>mamba_chunk_size</code>, <code>mamba_d_head</code>,
+  <code>mamba_d_state</code>, <code>mamba_expand</code>, <code>mamba_n_groups</code>, <code>mamba_n_heads</code>.</li>
+<li><strong>Why an alias is wrong</strong>: the engine has Mamba-1 (<code>RCPP_ARCH_MAMBA</code>) and
+  Mamba-2 hybrids (<code>FALCONH1</code>, <code>NEMOTRONH</code>, <code>GRANITEMOEHYBRID</code>). MIMO rank, BC
+  normalisation, an <code>a_floor</code>, and a rope fraction inside the SSM are Mamba-3
+  parameters with no Mamba-2 equivalent — mapping to a Mamba-2 path would
+  compute a different recurrence.</li>
+<li><strong>Real support needs</strong>: a Mamba-3 SSM kernel + the hybrid layer loop, gated
+  on decode validation against the reference.</li>
+</ul>
+<h2 id="molmoact2-molmoact2-vision-language-action"><code>molmoact2</code> — MolmoAct2 (vision-language-action)<a class="anchor" href="#molmoact2-molmoact2-vision-language-action" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Class / model_type</strong>: <code>MolmoAct2ForConditionalGeneration</code> / <code>molmoact2</code>;
+  example <code>NUSMAGIC/MolmoAct2-MolmoAct2-SO100_101</code>.</li>
+<li><strong>Text tower</strong>: <code>text_config: molmoact2_text</code> — 36 layers, H=2560, 32 heads,
+  8 kv, vocab 154624 (<code>qk_norm_type</code>, <code>rope_scaling_layers</code>, <code>norm_after</code>).</li>
+<li><strong>Not a text-only decoder</strong>: <code>action_expert_config</code>, <code>flow_matching_*</code> (6
+  keys), <code>max_action_dim</code>, <code>max_action_horizon</code>, action/state/depth token
+  ranges — the model's contract is action generation, with depth reasoning.</li>
+<li><strong>Why an alias is wrong</strong>: the existing <code>molmo</code> → <code>RCPP_ARCH_OLMO</code> mapping is
+  right for a Molmo <em>VLM</em>; here it would drop the entire action expert.</li>
+<li><strong>Real support needs</strong>: a scope decision first (text tower only, or the action
+  path), then the action-expert/flow-matching head if in scope.</li>
+</ul>
+<h2 id="cosmos3edge-cosmos3-edge-video-world-model"><code>cosmos3edge</code> — Cosmos3-Edge (video world model)<a class="anchor" href="#cosmos3edge-cosmos3-edge-video-world-model" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Class / model_type</strong>: <code>Cosmos3EdgeForConditionalGeneration</code> /
+  <code>cosmos3_edge</code>; example <code>ubr-physical-ai/Cosmos3-Edge-NF4-bnb</code>.</li>
+<li><strong>Text tower</strong>: <code>cosmos3_edge_text</code> — 28 layers, H=2048, 16 heads, 8 kv,
+  vocab 131072, <code>mlp_bias</code>, <code>pretraining_tp</code> (llama-shaped). Alongside
+  <code>vision_config</code> (<code>cosmos3_edge_vision</code>, <code>num_channels</code> → video patch embed),
+  <code>projector_config</code>, <code>video_token_id</code>.</li>
+<li><strong>Why an alias is wrong</strong>: the text tower <em>looks</em> llama-shaped, but the model
+  is a video world model; the engine has no video/image pipeline for it, so a
+  mapping would advertise support for something that cannot be served.</li>
+<li><strong>Real support needs</strong>: scope decision (is video in scope at all?) before any
+  mapping.</li>
+</ul>
+<h2 id="qwendriveforplanning-qwen-drive-driving-planner"><code>qwendriveforplanning</code> — Qwen-Drive (driving planner)<a class="anchor" href="#qwendriveforplanning-qwen-drive-driving-planner" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Class / model_type</strong>: <code>QwenDriveForPlanning</code> / <code>qwen_drive</code>; example
+  <code>Yuro1991/Qwen-Drive-1.0-4B</code>.</li>
+<li><strong>Not a text decoder</strong>: the top-level config nests a <code>vlm_config</code>
+  (<code>Qwen3_5ForConditionalGeneration</code> — the Qwen3.5 text tower plus vision) and an
+  <code>expert_config</code>, and its own keys are trajectory planning: <code>trajectory_hz</code>,
+  <code>trajectory_point_dim</code>, <code>num_future_points</code>, <code>num_history_points</code>,
+  <code>trajectory_scale</code>, <code>num_inference_steps</code>, <code>noise_init_std</code>, <code>min_one_minus_t</code>,
+  <code>max_reasoning_tokens</code>, plus <code>id2label</code>/<code>label2id</code> for two labels. Image
+  geometry (<code>image_patch_size</code>, <code>image_spatial_merge_size</code>,
+  <code>image_temporal_patch_size</code>, <code>current_image_pixels</code>, <code>history_image_pixels</code>)
+  confirms a video/image input path.</li>
+<li><strong>Why an alias is wrong</strong>: the familiar part is the Qwen3.5 tower; the model's
+  contract is a <strong>driving trajectory</strong> — a sampled (denoising) plan over
+  <code>num_inference_steps</code> with a noise seed and <code>min_one_minus_t</code>, not tokens. The
+  engine has no head or pipeline for that, so a mapping would serve the tower and
+  silently drop the planner, exactly as with <code>molmoact2</code> and <code>cosmos3edge</code> above.</li>
+<li><strong>Real support needs</strong>: a scope decision first (is trajectory planning in scope
+  at all?), then the expert/trajectory head.</li>
+</ul>
+<h2 id="qwen3_5_mla-qwen35-mla-attention-variant"><code>qwen3_5_mla</code> — Qwen3.5 MLA attention variant<a class="anchor" href="#qwen3_5_mla-qwen35-mla-attention-variant" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Class / model_type</strong>: <code>Qwen3_5MLAForConditionalGeneration</code> / <code>qwen3_5_mla</code>;
+  example <code>TelperionAI/Qwen3.8-27B-GLA-g2-EXL3-4.0bpw</code>.</li>
+<li><strong>Why an alias is wrong</strong>: the supported <code>qwen35</code> path handles Qwen3.5's hybrid
+  gated-delta-net/full-attention architecture; this class declares an MLA
+  attention variant. The shared Qwen3.5 name does not establish compatible
+  attention configuration or tensor layout, and mapping it to <code>qwen35</code> would
+  advertise unverified support.</li>
+<li><strong>Real support needs</strong>: verify the model config and tensor layout, then add
+  and validate an MLA conversion/runtime path before mapping the class.</li>
+</ul>
+<hr />
+<h2 id="uncovered-classes-reviewed-later-same-standard-and-still-not-aliases">Uncovered classes reviewed later — same standard, and still not aliases<a class="anchor" href="#uncovered-classes-reviewed-later-same-standard-and-still-not-aliases" title="Permanent link">#</a></h2>
+<p>The lane split above is the <em>watcher's</em>: a class is printed <code>!! SIGNIFICANT</code> when
+<code>_is_significant()</code> calls it a major-family/vision arrival, and <code>!! UNCOVERED</code>
+otherwise — and the alert's instruction for that second lane is "add the mapping
+… alias if it is a known family". The three below arrived in the <code>!! UNCOVERED</code>
+lane on 2026-09-13 and are <strong>not</strong> aliases either, for the same reason the
+sections above exist: a mapping would claim support the engine has not
+validated, and for <code>englishbase</code> it would be silently wrong rather than merely
+unsupported.</p>
+<p>Evidence below is from the official HF configs <strong>and the models' own modeling
+code</strong>, fetched 2026-09-13.</p>
+<h3 id="englishbase-slayerlabfabryka-english-250m-e01-sft-v1"><code>englishbase</code> — <code>SlayerLab/fabryka-english-250m-e01-sft-v1</code><a class="anchor" href="#englishbase-slayerlabfabryka-english-250m-e01-sft-v1" title="Permanent link">#</a></h3>
+<p><strong>Implemented 2026-09-13 — no longer an uncovered class</strong> (<code>RCPP_ARCH_ENGLISHBASE</code>
+= 1006, generic backend): the two-matrix relu2 MLP rides the non-gated FFN branch
+and the parameter-free QK-norm is the existing per-head path driven by an all-ones
+<code>[head_dim]</code> weight. Validated token-for-token against the model's own code — 68/68
+greedy tokens over three prompts — with <code>census/englishbase_parity_check.cpp</code>. The
+review below is kept as the record of <em>why it was not an alias</em>, which is what
+decided the shape of the implementation.</p>
+<ul>
+<li><strong>Class / model_type</strong>: <code>EnglishBaseForCausalLM</code> / <code>fabryka_english_base</code>.</li>
+<li><strong>Shape</strong>: 36 layers, H=768, 6 heads / 2 kv, head_dim 128, intermediate 3040,
+  vocab 32768, tied embeddings, rope theta 10000, <code>rms_norm_eps</code> 1e-6,
+  <code>qk_norm: true</code> — llama-shaped on the surface, which is why the watcher filed
+  it as a family variant rather than a significant arrival.</li>
+<li><strong>Decisive evidence — the model's own <code>model.py</code></strong>: when
+  <code>recipe.activation == "relu2"</code> (this config's <code>recipe</code> says exactly that) the
+  block's MLP is replaced by <code>ReluSquaredMLP</code>, which computes
+  <code>down_proj(relu(up_proj(x)).square())</code> — <strong>one up matrix, no gate, ReLU²</strong> —
+  and the same file describes its QK normalization as <em>parameter-free</em>.
+  <code>hidden_act: "silu"</code> is only the default the Llama config class fills in; the
+  recipe overrides the MLP at construction, so the two keys disagree and the
+  code is what settles it.</li>
+<li><strong>Why an alias is wrong</strong>: Llama's and Qwen3's MLP is gated SwiGLU
+  (<code>gate_proj</code> + <code>up_proj</code> + <code>down_proj</code>, SiLU), and Qwen3's qk-norm carries
+  learned <code>q_norm</code>/<code>k_norm</code> weights. A mapping would load and then compute a
+  different function — silent substitution, not a crash.</li>
+<li><strong>Real support needs</strong>: a two-matrix ReLU² MLP and a parameter-free QK-norm, or
+  a loud refusal.</li>
+</ul>
+<h3 id="gdn2-berlmhyb16-gdn2-s1"><code>gdn2</code> — <code>Berlm/hyb16-gdn2-s1</code><a class="anchor" href="#gdn2-berlmhyb16-gdn2-s1" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Class / model_type</strong>: <code>GDN2ForCausalLM</code> / <code>gdn2</code>.</li>
+<li><strong>Shape</strong>: 24 layers, H=1024, 6 heads, head_dim 128, <code>conv_size</code> 4, hybrid —
+  full attention on layers 3/7/11/15/19/23 — dense SwiGLU (2816), vocab 32000,
+  tied embeddings.</li>
+<li><strong>The config schema is <code>fla</code>'s</strong> (flash-linear-attention), not HF's:
+  <code>attn_mode: chunk</code>, <code>fuse_cross_entropy</code> / <code>fuse_norm</code> / <code>fuse_swiglu</code>,
+  <code>expand_v</code>, <code>use_short_conv</code>, <code>allow_neg_eigval</code>, and an <code>ra_*</code> block
+  (<code>ra_project</code>, <code>ra_gate_b</code>, <code>ra_theta_init</code>, <code>ra_lambda_max</code>, <code>ra_feedback</code>)
+  that no engine path reads.</li>
+<li><strong>Nearest implemented family, and why that is still not a mapping</strong>: the
+  registry does have Gated-Delta paths — <code>gateddeltanet</code> / <code>deltanet</code> /
+  <code>tinygdn</code> → <code>RCPP_ARCH_QWEN3NEXT</code>, and <code>RCPP_ARCH_QWEN35</code> is Qwen3.5's <em>dense</em>
+  GDN — but the engine's reader (<code>src/qwen3_5.cpp</code>) keys on Qwen3.5's own field
+  names (<code>linear_conv_kernel_dim</code>, <code>linear_num_key_heads</code>,
+  <code>linear_value_head_dim</code>) and on tensor names with expected sizes
+  (<code>linear_attn.conv1d.weight</code>). This config supplies neither. A matching
+  mechanism is not a matching checkpoint; an alias here would be a guess about
+  weight layout.</li>
+<li><strong>Real support needs</strong>: an <code>fla</code> → engine config adapter, a tensor-layout check
+  against one real checkpoint, and a decision on <code>ra_*</code>.</li>
+</ul>
+<h3 id="haiku-kerzgrrhaiku-base"><code>haiku</code> — <code>kerzgrr/Haiku-base</code><a class="anchor" href="#haiku-kerzgrrhaiku-base" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Class / model_type</strong>: <code>HaikuForCausalLM</code> / <code>haiku</code>.</li>
+<li><strong>Shape</strong>: 36 layers, H=1024, 8 heads / 8 kv, <code>layer_types</code> = <code>kda</code> ×3 then
+  <code>gated_mla</code> (<code>full_attention_interval: 4</code>), <code>mlp_activation: "situ_glu"</code>
+  (<code>situ_gate_cap</code>, <code>situ_up_cap</code>), MLA ranks (<code>mla_q_lora_rank</code> 512,
+  <code>mla_kv_lora_rank</code> 256, <code>mla_qk_nope_head_dim</code> / <code>mla_v_head_dim</code> 128),
+  <code>partial_rotary_factor</code> 0.5, rope 1e6, and MTP heads (<code>mtp_num_heads</code>,
+  <code>mtp_adapter_rank</code>, <code>mtp_loss_weight</code>).</li>
+<li><strong>Why an alias is wrong</strong>: KDA and gated MLA <em>are</em> named in the registry —
+  <code>RCPP_ARCH_KIMI_K3</code> is "Moonshot Kimi K3 — 2.8T MoE with KDA + Gated MLA +
+  LatentMoE" — but that token is <strong>routed, not implemented</strong>: <code>include/kimi_k3.h</code>
+  is included by nothing in the tree and its <code>load_from_gguf</code> prints
+  <code>[KimiK3] Loading not yet implemented for Strix Halo targets.</code> and returns
+  false; <code>src/model_router.cpp</code> has no branch for the arch, so it falls through
+  to the generic <code>hip_gpu</code> → <code>cpu_generic</code> default; and <code>situ_glu</code> appears in no
+  engine source — the only SITU in the tree is upstream llama.cpp's
+  <code>kimi_k3_situ</code>. (That routing/validation split is deliberate and documented:
+  issue #1635, closed as "not fixable on this box".) Mapping Haiku onto KIMI_K3
+  would chain one unvalidated class onto another.</li>
+<li><strong>Real support needs</strong>: a SITU-GLU MLP plus a real KDA / gated-MLA
+  implementation — the K3 work itself, which <code>research/TRACKING.md</code> still
+  carries as not started ("QK-Normed MLA absorption on Kimi K3 gated-MLA
+  decode").</li>
+</ul>
+<h3 id="vapor-neezevapor-2b-v12"><code>vapor</code> — <code>Neeze/Vapor-2B-V1.2</code><a class="anchor" href="#vapor-neezevapor-2b-v12" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Class / model_type</strong>: <code>VaporForCausalLM</code> / <code>vapor</code>.</li>
+<li><strong>It looks like the cleanest alias of the five.</strong> The config carries the LFM2
+  schema <em>verbatim</em>: every <code>block_*</code> and <code>conv_*</code> key identical to LFM2-2.6B,
+  <strong>all 30 <code>layer_types</code> identical</strong>, hidden 2048, 30 layers, 32 heads / 8 kv,
+  intermediate 10752, <code>conv_L_cache</code> 3. What is left over is packaging (<code>dtype</code>,
+  <code>auto_map</code>, the <code>tie_*</code> pair), config-driven (vocab 128000, rope theta 1e7) —
+  and one thing that is neither: an explicit <code>rank_config</code>.</li>
+<li><strong>The checkpoint is what disqualifies it</strong> (weights index read 2026-09-13):
+  layer 0 stores the dense SwiGLU form — <code>feed_forward.w1/w2/w3</code> — and
+  <strong>layers 1–28 do not</strong>. They store <code>feed_forward.A2</code>, <code>A_shared</code>, <code>B1</code>, <code>B2</code>,
+  <code>B3</code> plus <code>side_A2</code>, <code>side_A_shared</code>, <code>side_B1..B3</code>: the <code>rank_config</code>'s
+  <code>SharedSwiGLULinear</code> (r_shared 1396, r2 1116, side_rank 8) realised in the
+  tensors rather than a training-time detail that materialises on export.</li>
+<li><strong>Why an alias is wrong</strong>: the dense names the readers know (<code>w1</code>/<code>w3</code>, ~18
+  hits each in this repo) describe layer 0 only; <code>A_shared</code>, <code>side_B1</code> and
+  <code>feed_forward.A2</code> have <strong>0 hits</strong> anywhere in the tree. An LFM2 mapping would
+  read the two dense layers it recognises and have nothing for the 28 factorized
+  ones.</li>
+<li><strong>Real support needs</strong>: a materialisation (or runtime) path for
+  <code>SharedSwiGLULinear</code>, alongside the plain dense block, then decode validation.</li>
+</ul>
+<h3 id="fidel-4e-aifidel11-1b"><code>fidel</code> — <code>4E-AI/Fidel1.1-1B</code><a class="anchor" href="#fidel-4e-aifidel11-1b" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Class / model_type</strong>: <code>FidelForCausalLM</code> / <code>fidel</code>.</li>
+<li><strong>Not a text transformer at all.</strong> Its 359 tensors live entirely under a
+  <code>policy.</code> prefix and the stack is bespoke (from the safetensors header, read
+  by range request — the file is 5.6 GB and was never downloaded):<ul>
+<li><code>policy.model.layers.N.mixer.mamba.*</code> — 88 tensors: the per-layer mixer is
+<strong>Mamba</strong>, not attention;</li>
+<li><code>policy.model.layers.N.moe.shared_fc1_gate</code> / <code>moe.w_gate</code> — a MoE with
+shared experts;</li>
+<li><code>policy.model.layer_adapters.N.base.{up,down}</code> and <code>.delta.{up,down}</code> — the
+per-layer rank adapters the config's <code>ranks</code> block describes (base 512,
+delta 256);</li>
+<li><code>policy.model.prompt_hyper_conditioner.*</code> (78 tensors) and
+<code>policy.model.prompt_cross_conditioner.*</code>;</li>
+<li><code>policy.model.contextual_prompt_v7/v8/v9.*</code> and <code>policy.chat_prompt.*</code> —
+four separate prompt-attention blocks;</li>
+<li><code>policy.model.lm_head.base.weight</code> + <code>lm_head.lora_a</code> — the head itself is
+base plus LoRA.
+  The header's own metadata agrees with the config:
+  <code>execution_contract: fidel_step9051_legacy_reference_fp32</code>.</li>
+</ul>
+</li>
+<li><strong>Why an alias is wrong</strong>: no engine family has mamba mixers + MoE + rank
+  adapters + prompt conditioners, and <code>layer_adapters</code>,
+  <code>prompt_hyper_conditioner</code> and <code>mixer.mamba</code> each have <strong>0 hits</strong> in this repo.
+  There is no partial match to argue about.</li>
+<li><strong>Real support needs</strong>: a scope decision first — this is a policy model, not a
+  chat LM — and then the adapter/conditioner machinery.</li>
+</ul>
+<h3 id="zarya-ai-foreverzarya-4b-also-17b-06b"><code>zarya</code> — <code>ai-forever/Zarya-4B</code> (also -1.7B, -0.6B)<a class="anchor" href="#zarya-ai-foreverzarya-4b-also-17b-06b" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Class / model_type</strong>: <code>Zarya</code> / <code>zarya</code>.</li>
+<li><strong>Shape</strong>: 36 layers, H=2560, 32 heads / 8 kv, head_dim 128, intermediate 9728,
+  vocab 151936, tied embeddings, rope 1e6 — llama-shaped on the surface, which
+  is why the watcher's edit-distance guess proposed <code>zarya</code> → <code>RCPP_ARCH_ZAYA</code>.</li>
+<li><strong>Decisive evidence — the config is a diffusion LLM, not a Zaya MoE</strong>: the
+  official <code>config.json</code> carries <code>diffusion_attn_mode: causal</code>,
+  <code>diffusion_loss_proportion: 0.5</code>, <code>diffusion_shuffle</code>, <code>noise_eps</code>,
+  <code>noise_sorting</code>, <code>ordered_sampling</code>, <code>sample_t_override</code> / <code>sample_t_upper</code>,
+  <code>grouped_noise</code> — a full-sequence diffusion/masking sampler. <code>RCPP_ARCH_ZAYA</code>
+  is "Zaya MoE (Zyphra — MoE FFN with CCA attention)"; the Zaya configs carry
+  <code>num_experts</code>/CCA keys, none of which appear here, and Zarya has no expert
+  tensors to route. The two differ in the one thing a <code>rcpp_arch_from_string</code>
+  mapping cannot express: the computation itself.</li>
+<li><strong>Why an alias is wrong</strong>: mapping <code>zarya</code> onto ZAYA would route a diffusion
+  sampler into the CCA-attention + MoE-FFN decode path — silent substitution,
+  not a crash, exactly the <code>englishbase</code> / <code>vapor</code> failure mode above.</li>
+<li><strong>Real support needs</strong>: a diffusion-LM sampler (or a loud refusal), not a
+  one-line registry alias.</li>
+</ul>
+<p>The common thread: each of these is <em>shaped</em> like a family the engine already
+routes (<code>llama</code>, <code>gdn</code>, <code>kimi</code>, <code>lfm2</code>) — <code>fidel</code> only in the loosest sense, as a
+Mamba/MoE hybrid — and each differs in a mechanism that changes the computation,
+which is the one thing a <code>rcpp_arch_from_string</code> mapping cannot express. <code>vapor</code>
+is the case worth remembering: from the config alone it looked like a one-line
+alias, and only the tensors said otherwise.</p>
+<p><strong>Reading a checkpoint without downloading it.</strong> For a multi-GB
+<code>model.safetensors</code>, the header is enough to settle this class of question and
+costs one range request (follow redirects — <code>-L</code> — or you get the 302 body):</p>
+<pre><code class="language-sh">U=https://huggingface.co/&lt;repo&gt;/resolve/main/model.safetensors
+H=$(curl -sSL -r 0-7 &quot;$U&quot; | python3 -c 'import sys,struct; print(struct.unpack(&quot;&lt;Q&quot;, sys.stdin.buffer.read(8))[0])')
+curl -sSL -r 8-$((8+H-1)) &quot;$U&quot; | python3 -c 'import json,sys; d=json.load(sys.stdin); print(len(d), list(d)[:20])'
+</code></pre>
+<p><code>&lt;repo&gt;/raw/main/model.safetensors.index.json</code> answers the same question in one
+request when the model is sharded.</p>
+<hr />
+<h3 id="needle3-webmp3sakura-needle3-onnx"><code>needle3</code> - <code>webmp3/Sakura-Needle3-ONNX</code><a class="anchor" href="#needle3-webmp3sakura-needle3-onnx" title="Permanent link">#</a></h3>
+<p>Architecture class <code>Needle3ForCausalLM</code>, <code>model_type: needle3</code>, no <code>auto_map</code> - so the
+census classes it as native, not custom code. It is a small research model shipped as an
+ONNX export; no pinned backend (<code>hrx</code>, <code>npu</code>) implements the class, and an ONNX graph is
+not a GGUF architecture any backend could claim. Reviewed 2026-10-06: <strong>not an alias</strong>.</p>
+<h3 id="sepia-char-mlp-luscainksepia-0"><code>sepia-char-mlp</code> - <code>LUSCAINK/SEPIA-0</code><a class="anchor" href="#sepia-char-mlp-luscainksepia-0" title="Permanent link">#</a></h3>
+<p>Architecture class <code>SepiaCharMLP</code>, <code>model_type: sepia-char-mlp</code>, no <code>auto_map</code>. Its
+<code>config.json</code> is not a transformer configuration at all (<code>forward</code>, <code>vocab</code>, <code>embedding</code>,
+<code>hidden</code> - a character-level MLP), so it cannot be an alias of any supported family.
+Reviewed 2026-10-06: <strong>not an alias</strong>.</p>
+<h3 id="kairo-kairo-crypto-modelkairo-v15"><code>kairo</code> - <code>kairo-crypto-model/kairo-v1.5</code><a class="anchor" href="#kairo-kairo-crypto-modelkairo-v15" title="Permanent link">#</a></h3>
+<p>Architecture class <code>KairoForCausalLM</code>, <code>model_type: kairo</code>, no <code>auto_map</code> - so the census
+classes it as native rather than custom code. Nothing in the pinned llama.cpp tree
+mentions <code>kairo</code>, and no pinned backend (<code>hrx</code>, <code>npu</code>) implements the class. Reviewed
+2026-10-06: <strong>not an alias</strong>.</p>
+<h3 id="grug_moe-open-athenagrug-67b-a2b-merge-campaign2-dare-ties-02-20261010"><code>grug_moe</code> - <code>open-athena/Grug-67B-A2B-Merge-Campaign2-DARE-TIES-02-2026.10.10</code><a class="anchor" href="#grug_moe-open-athenagrug-67b-a2b-merge-campaign2-dare-ties-02-20261010" title="Permanent link">#</a></h3>
+<p>Architecture class <code>GrugMoeForCausalLM</code>, <code>model_type: grug_moe</code>, no <code>auto_map</code>, so the
+census classes it as native. It is the marin-community research MoE (<code>marin-community/marin</code>,
+<code>experiments/grug/moe</code>; <code>lib/levanter/src/levanter/models/snowball.py</code>): 67B total, about 2B
+active, 26 layers, hidden 2560, 20 heads with 5 KV heads, 256 routed experts (4 per token) plus
+one shared expert, a 2048-token sliding window with a global layer every 4 (<code>global_every</code>),
+and its own attention knobs (<code>qk_mult</code>, <code>sconv</code>, <code>grugmoe_attention_mode</code>). Transformers,
+upstream llama.cpp and upstream vLLM have no implementation; it is served through marin's own
+vLLM fork and loaded in training through <code>marin-community/MarinSkyRL</code>, which registers the class
+itself. The checkpoint flagged (engine#381) is a DARE-TIES merge-campaign upload with almost no
+downloads; the other uploads are the same group's training snapshots (<code>open-athena/Snowball-67B-A2B-*</code>,
+<code>penfever/grug-67b-a2b-*</code>). No pinned backend (<code>hrx</code>, <code>npu</code>) implements the class, and the
+<code>qk_mult</code> / <code>sconv</code> / local-global layout rules out treating it as a Mixtral- or Qwen-MoE
+alias. Reviewed 2026-10-12: <strong>not an alias</strong>. Its <code>registry/significant.json</code> entry carries
+<code>"watch": "report"</code>, so the census watcher lists new uploads of it as <code>. REVIEWED</code> and does
+not alert; remove that field if an upstream backend gains the architecture.</p>
+<h3 id="hrm_text-zyr-agentzy-s1"><code>hrm_text</code> - <code>zyr-AGENT/ZY-S1</code><a class="anchor" href="#hrm_text-zyr-agentzy-s1" title="Permanent link">#</a></h3>
+<p>Architecture class <code>HrmTextForCausalLM</code>, <code>model_type: hrm_text</code>, no <code>auto_map</code> and
+<code>library_name: transformers</code>, so the census classes it as native, not custom code. It is
+Sapient's HRM-Text hierarchical-reasoning LM, in-tree in upstream Transformers
+(<code>src/transformers/models/hrm_text/{configuration,modeling,modular}_hrm_text.py</code>, "The Sapient
+AI Authors and the HuggingFace Inc. team"). The base <code>sapientinc/HRM-Text-1B</code> config (read
+2026-10-15) is 128 layers of hidden 1536, 12 heads / 12 kv, head_dim 128, intermediate 4096,
+vocab 65536, rope 10000, <code>num_layers_per_stack: 16</code>, <code>H_cycles: 2</code>, <code>L_cycles: 3</code>,
+<code>L_bp_cycles: [0, 3]</code>, <code>embedding_scale</code> 39.19, <code>prefix_lm: true</code>; the flagged upload
+<code>zyr-AGENT/ZY-S1</code> (created 2026-10-12, last modified 2026-10-14) is a 16-layer finetune of it
+with the same <code>H_cycles</code> / <code>L_cycles</code> / <code>L_bp_cycles</code>.</p>
+<p><strong>Why an alias is wrong</strong>: <code>H_cycles</code> / <code>L_cycles</code> run a stack of layers
+(<code>num_layers_per_stack</code>) several times per token and <code>L_bp_cycles</code> feeds the low-level stack
+back through the high-level one, on a prefix-LM (<code>prefix_lm</code>, <code>embedding_scale</code>) schedule. No
+supported family does that: the closest decoder stack would read the same tensor names and
+silently compute a different function (each stack run once, no cycle), the silent-substitution
+failure this page exists to prevent.</p>
+<p><strong>Why it is not mapped</strong>: no pinned backend accepts <code>hrm_text</code>. Checked 2026-10-15 on the
+pinned submodule <code>third_party/llama.cpp</code> 0e255d77: no <code>hrm</code> in <code>src/llama-arch.cpp</code>,
+<code>gguf-py/gguf/constants.py</code> or <code>convert_hf_to_gguf.py</code>, and no <code>conversion/hrm_text.py</code>, so
+<code>tools/registry_build.py</code> finds neither a converter class nor a runnable GGUF architecture.
+The HRX fork's patched tip <code>ad18320a</code> is also free of <code>hrm</code>. Upstream <code>ggml-org/llama.cpp</code>
+master does have <code>LLM_ARCH_HRM_TEXT</code> ("hrm_text") and <code>conversion/hrm_text.py</code>, so a later pin
+bump that reaches it maps the class automatically - at that point
+<code>tools/registry_build.py --check-gaps</code> fails until this entry records why (<code>mapped_ok</code>).</p>
+<p><strong>Not a one-off.</strong> The HF <code>hrm_text</code> tag lists 60 models from 34 uploaders and the 2026-10-11
+census snapshot counts 41 <code>HrmTextForCausalLM</code> models, including <code>sapientinc/HRM-Text-1B</code>
+(14,437 downloads, 834 likes) and <code>danish-foundation-models/DFM-Mimir{,-v1.5}</code> (2,175 / 2,824
+downloads). Reviewed 2026-10-15: <strong>not an alias</strong>. Its <code>registry/significant.json</code> entry
+carries <code>"watch": "report"</code>, so the census watcher lists new uploads of it as <code>. REVIEWED</code> and
+does not alert while no pinned backend can serve the class; remove that field (and record
+<code>mapped_ok</code>) when the llama.cpp pin gains <code>hrm_text</code>.</p>
+<h3 id="dflash2-nchapmanqwen35-4b-dflash2-also-arc-kumbharincoai-qwen38-27b-dflash2"><code>dflash2</code> - <code>nchapman/Qwen3.5-4B-DFlash2</code> (also <code>arc-kumbhar/incoai-Qwen3.8-27B-DFlash2</code>)<a class="anchor" href="#dflash2-nchapmanqwen35-4b-dflash2-also-arc-kumbharincoai-qwen38-27b-dflash2" title="Permanent link">#</a></h3>
+<p>Architecture class <code>DFlash2DraftModel</code>, no <code>auto_map</code> and <code>library_name: speculators</code> on the
+nchapman upload, so the census classes it as native and it alerts. Both flagged checkpoints are
+<strong>speculative-decoding drafters, not standalone LMs</strong> (nchapman's card: "DFlash2 speculative
+drafter for Qwen/Qwen3.5-4B"). The 2026-10-16 tensor headers (81 tensors each, read by range
+request) carry machinery no pinned backend runs:</p>
+<ul>
+<li><code>candidate_selector.hidden_projection.weight</code>, <code>candidate_selector.predecessor_codebook</code>,
+  <code>candidate_selector.successor_codebook</code> - the candidate selector (<code>selector_rank: 256</code>,
+  <code>selector_top_k: 16</code>);</li>
+<li><code>layers.N.attention_conv.{base_kernel,kernel_projection.weight}</code> and
+  <code>layers.N.mlp_conv.{base_kernel,kernel_projection.weight}</code> - the short convolutions
+  (<code>conv_group_size: 16</code>, <code>conv_kernel_size: 2</code>);</li>
+<li><code>fc.weight</code>, <code>hidden_norm.weight</code>, <code>norm.weight</code> and the per-layer attention/MLP tensors.</li>
+</ul>
+<p>The pinned <code>third_party/llama.cpp</code> 1a5dcba2 <strong>does</strong> have a DFlash draft architecture
+(<code>@ModelBase.register("DFlashDraftModel")</code> in <code>conversion/qwen.py</code>, <code>model_arch =
+MODEL_ARCH.DFLASH</code>, runtime <code>src/models/dflash.cpp</code>), but that is DFlash-1. Its converter reads
+<code>dflash_config.{target_layer_ids,mask_token_id}</code> and the runtime requires <code>target_layers</code>
+metadata; it has no <code>candidate_selector</code> or <code>*_conv</code> tensors and no handling for
+<code>selector_rank</code>, <code>selector_top_k</code>, <code>conv_group_size</code>, <code>conv_kernel_size</code>,
+<code>aux_hidden_state_layer_ids</code>, <code>sliding_window_non_causal</code> or the <code>speculators_config</code> block.
+Registering DFlash2 under <code>DFlashDraftModel</code> therefore loads a draft that silently drops the
+selector and convolution heads - the silent-substitution failure this page exists to prevent -
+and the <code>nchapman</code> config does not even carry <code>target_layer_ids</code> under <code>dflash_config</code>, so the
+pinned converter could not build a GGUF for it at all. Reviewed 2026-10-16: <strong>not an alias</strong>.
+Its <code>registry/significant.json</code> entry carries <code>"watch": "report"</code>, so the census watcher lists
+new uploads of it as <code>. REVIEWED</code> and does not alert; remove that field (and record <code>mapped_ok</code>)
+when a pin bump reaches DFlash2 support (selector + conv heads, per-layer window) and its
+converter class registers <code>DFlash2DraftModel</code>.</p>
+<h3 id="tashkeel_nano-ahmadsytashkeel-nano-1p1m"><code>tashkeel_nano</code> - <code>ahmadsy/tashkeel-nano-1p1m</code><a class="anchor" href="#tashkeel_nano-ahmadsytashkeel-nano-1p1m" title="Permanent link">#</a></h3>
+<p>Architecture class <code>DiacritizerModel</code>, <code>model_type: tashkeel_nano</code>, no <code>library_name</code> and no
+<code>auto_map</code>, so the census classes it as native. It is <strong>not a causal LM</strong>: its <code>config.json</code>
+carries <code>causal: false</code>, <code>num_classes: 15</code> (the diacritic labels), <code>vocab_size: 171</code>,
+<code>hidden_size: 64</code>, 18 layers, 2 KV heads, and a windows/decoding block (<code>window: 256</code>,
+<code>stride: 128</code>, <code>arm: centered</code>). The repo ships its own <code>tashkeel_nano/</code> package
+(<code>model.py</code>, <code>inference.py</code>, <code>labels.py</code>), so the class is served by that code, not by any
+backend. No pinned backend registers <code>tashkeel_nano</code> and no supported family is a
+fixed-window, 15-class tagger. Reviewed 2026-10-16: <strong>not an alias</strong>. Its
+<code>registry/significant.json</code> entry carries <code>"watch": "report"</code>.</p>
+<h3 id="mbart-nhatho1999orthomni-codeco"><code>mbart</code> - <code>nhatho1999/orthomni-codeco</code><a class="anchor" href="#mbart-nhatho1999orthomni-codeco" title="Permanent link">#</a></h3>
+<p>Architecture class <code>MBartForConditionalGeneration</code>, <code>model_type: mbart</code>, <code>library_name:
+ctranslate2</code>. It is an <strong>encoder-decoder seq2seq</strong> model - <code>is_encoder_decoder: true</code>, 12
+encoder + 12 decoder layers, <code>d_model: 1024</code>, 16 heads per side, <code>BartphoTokenizer</code> - and the
+upload is a CTranslate2/ONNX export with no PyTorch weights (<code>ct2/model.bin</code>,
+<code>onnx/encoder_model.onnx</code>, <code>onnx/decoder_model_merged.onnx</code>). The engine's backends are
+decoder-only text decoders (the HRX llama.cpp route and the NPU lanes), and the pinned
+<code>third_party/llama.cpp</code> 1a5dcba2 registers no <code>mbart</code>/<code>bart</code> converter class or GGUF
+architecture, so no pinned backend accepts the class. It is not an alias of any supported
+family either - nothing the engine runs is an encoder-decoder. Serving it would need a
+translation/seq2seq route the engine does not have, not a mapping. Reviewed 2026-10-16:
+<strong>not an alias</strong>. Its <code>registry/significant.json</code> entry carries <code>"watch": "report"</code>, so the
+census watcher lists new uploads as <code>. REVIEWED</code> and does not alert; remove that field (and
+record <code>mapped_ok</code>) if a pinned backend ever grows an encoder-decoder route that accepts
+<code>mbart</code>.</p>
+<h3 id="blind_decoder-vi-labkent_05b_base"><code>blind_decoder</code> - <code>Vi-LAB/KenT_0.5B_Base</code><a class="anchor" href="#blind_decoder-vi-labkent_05b_base" title="Permanent link">#</a></h3>
+<p>Architecture class <code>BlindForCausalLM</code>, <code>model_type: blind_decoder</code>, no <code>auto_map</code>,
+<code>library_name: transformers</code>, so the census classes it as native. It is the only upload (0
+downloads, 0 likes, created 2026-10-16) and the repo is internally inconsistent: <code>config.json</code>
+declares <code>architectures: ["BlindForCausalLM"]</code> and <code>model_type: "blind_decoder"</code>, but the
+shipped <code>configuration_kent.py</code> sets <code>model_type = "kent"</code> and <code>modeling_kent.py</code> defines
+<code>KenTForCausalLM</code>; <code>BlindForCausalLM</code> is defined nowhere in the repo and there is no
+<code>auto_map</code>, so stock Transformers sees an unknown model type with no remote code and cannot
+load it (upstream Transformers has no <code>blind_decoder</code> module). The architecture itself is
+bespoke, not a rename: 31 layers, <code>embed_dim: 1024</code>, 8 heads, vocab 50257, with
+<strong>Compressed-QK attention</strong> (q/k head_dim 64 against a 128-dim value head) and <strong>gated key
+refinement</strong> - <code>k = softmax(G G^T / sqrt(d)) K_raw</code> over a separate gate projection, before
+RoPE - plus RMSNorm and a SwiGLU MLP (intermediate 2816). No supported family computes that
+refinement; the closest decoder stack would read the same tensor names and silently compute a
+different function. Reviewed 2026-10-16: <strong>not an alias</strong>. Its <code>registry/significant.json</code>
+entry carries <code>"watch": "report"</code>; remove that field (and record <code>mapped_ok</code>) if a backend
+implements the class.</p>
+<h3 id="sn38-nanochrono-tensin320round14_5_114_fitleech_sn38-2023-01"><code>sn38-nanochrono</code> - <code>tensin320/round14_5_114_fitleech_sn38-2023-01</code><a class="anchor" href="#sn38-nanochrono-tensin320round14_5_114_fitleech_sn38-2023-01" title="Permanent link">#</a></h3>
+<p>Architecture class <code>NanochronoForCausalLM</code>, <code>model_type: sn38-nanochrono</code>, no <code>auto_map</code> and
+<code>library_name: transformers</code>, so the census classes it as native. The repo carries <strong>no modeling
+code at all</strong> (only <code>config.json</code>, <code>generation_config.json</code>, <code>model.safetensors</code>, the tokenizer
+and a README), and upstream Transformers has no <code>nanochrono</code>/<code>chrono</code> module, so nothing can
+load it as published. Its config (read 2026-10-16) is 28 layers, hidden 1792, 14 heads / 14 kv,
+vocab 32768, <code>layer_types</code> of 3 sliding + 1 full attention per group, <code>sliding_window: 512</code>,
+<code>max_position_embeddings: 2048</code>, <code>final_logit_softcapping: 15.0</code>, <code>attention_multiplier: 1.2</code>,
+<code>use_cache: false</code>, <code>tie_word_embeddings: false</code> - plus machinery no supported family has:
+<code>tap_layer: 14</code>, <code>aux_layers</code> (every other layer), <code>aux_gate_dim: 12</code> and <code>mix_gate_dim: 24</code>,
+the ChronoLLM/year-cutoff tap-and-gate stack the tags (<code>chronollm</code>, <code>year-cutoff</code>) name. There
+is no pinned-backend mapping and no alias to claim: the tap/aux-gate path changes the
+computation, so a plain decoder stack would be silent substitution. Reviewed 2026-10-16:
+<strong>not an alias</strong>. Its <code>registry/significant.json</code> entry carries <code>"watch": "report"</code>; remove
+that field (and record <code>mapped_ok</code>) if a backend implements the class.</p>
+<h3 id="muse_spark-interchainedmuse-spark-open-816b-a42b-gguf"><code>muse_spark</code> - <code>Interchained/Muse-Spark-Open-816B-A42B-GGUF</code><a class="anchor" href="#muse_spark-interchainedmuse-spark-open-816b-a42b-gguf" title="Permanent link">#</a></h3>
+<p>Architecture class <code>MuseSparkForConditionalGeneration</code>, <code>model_type: muse_spark</code>: Meta's
+Muse Spark Open (<code>meta-models/Muse-Spark-Open-816B-A42B</code>, created 2026-09-15, gated by
+manual approval), a 62-layer text model with vision and audio towers. The flagged upload is
+a GGUF conversion (F16, Q4_0, Q4_K_M, Q5_K_M) whose header (read 2026-10-17 by range request)
+declares <code>general.architecture = muse-spark</code>: 256 experts, 8 used, <code>moe_latent_size: 4096</code>
+(experts run in a 4096-wide latent, like Nemotron 3 Super's <code>ffn_latent_down</code>/<code>ffn_latent_up</code>),
+<code>expert_gating_func: 2</code>, hidden 8192, 128 heads / 16 kv, head_dim 64, sliding window 2048 with
+one full-attention layer in four (<code>sliding_window_pattern</code>), <code>final_logit_softcapping: 20.0</code>,
+<code>logit_scale</code> 0.177, context 1,048,576, <code>gpt-4o</code> pre-tokenizer.</p>
+<p><strong>Why an alias is wrong</strong>: the latent-space experts, the per-layer rope schedule
+(<code>layer_rope_theta</code> 0 on the full-attention layers) and the softcapped logits change the
+computation; no supported family has that combination, so mapping it to a Llama 4 or
+Nemotron-H shape would be silent substitution.</p>
+<p><strong>Why it is not mapped</strong>: the pinned <code>third_party/llama.cpp</code> 1a5dcba2 has no <code>muse-spark</code>
+architecture (it has the <code>moe_latent_size</code> key and the latent tensors only for Nemotron 3
+Super). Upstream <code>ggml-org/llama.cpp</code> added it on 2026-10-15 in ba3c05f71 ("model: add Muse
+Spark Open (text, vision and audio)", #30616: <code>LLM_ARCH_MUSE_SPARK</code>, <code>src/models/muse-spark.cpp</code>,
+<code>conversion/muse_spark.py</code>), after the fork's last upstream sync, so a later fork sync that
+reaches it maps the class automatically - at that point <code>tools/registry_build.py --check-gaps</code>
+fails until this entry records why (<code>mapped_ok</code>).</p>
+<p><strong>Not a one-off, but not servable here.</strong> The HF <code>muse_spark</code> tag lists 23 models (Meta's
+base and NVFP4, unsloth, mlx-community, intel-ai INT4, amd Quark-MXFP4). Even its smallest
+GGUF (Q4_K_M, ~500 GB) is about four times the 128 GB Strix Halo, so the gap costs nothing on
+the target box today. Reviewed 2026-10-17: <strong>not an alias</strong>. Its <code>registry/significant.json</code>
+entry carries <code>"watch": "report"</code>, so the census watcher lists new uploads as <code>. REVIEWED</code> and
+does not alert; remove that field (and record <code>mapped_ok</code>) when the pin gains <code>muse-spark</code>.</p>
+<h3 id="glm5_next-azampattiglm-53-flash-az-also-zai-orgglm-53-flash"><code>glm5_next</code> - <code>azampatti/GLM-5.3-Flash-AZ</code> (also <code>zai-org/GLM-5.3-Flash</code>)<a class="anchor" href="#glm5_next-azampattiglm-53-flash-az-also-zai-orgglm-53-flash" title="Permanent link">#</a></h3>
+<p>Architecture class <code>Glm5NextForConditionalGeneration</code>, <code>model_type: glm5_next</code>, no <code>auto_map</code> and
+<code>library_name: transformers</code>, so the census classes it as native and it alerts. The flagged upload
+is a 4-bit auto-round derivative of <code>Intel/GLM-5.3-Flash-W4A16-AutoRound</code>; the release itself is
+zai-org's GLM-5.3-Flash.</p>
+<p><strong>Shape</strong> (configs read 2026-10-23, <code>text_config</code>): 45 layers, hidden 4096, 64 heads, vocab
+154880, 288 routed experts with 4 used plus 1 shared (<code>moe_intermediate_size</code> 2048,
+<code>first_k_dense_replace</code> 3), DeepSeek-style MLA (<code>kv_lora_rank</code> 512, <code>qk_nope_head_dim</code> /
+<code>qk_rope_head_dim</code>, <code>mla_use_nope</code>), <code>index_topk</code> 2048 with 32 index heads, and
+<code>num_nextn_predict_layers: 1</code> (MTP). The top level wraps a <code>text_config</code> plus a <code>vision_config</code>
+and image/video token ids, so the class is a VLM wrapper, not a bare decoder.</p>
+<p><strong>Machinery no pinned family runs</strong>:</p>
+<ul>
+<li><code>layer_types</code> is a <strong>34 + 11 hybrid</strong> - 34 <code>linear_attention</code> layers (KDA:
+  <code>linear_attn_config.kda_layers</code>, <code>gate_lower_bound</code> -5.0, <code>short_conv_kernel_size</code> 4, head_dim
+  128) and 11 <code>deepseek_sparse_attention</code> layers (<code>full_attn_layers</code> 3/7/11/.../43, all with
+  <code>indexer_types: full</code>).</li>
+<li><code>hc_mult</code> 4, <code>hc_sinkhorn_iters</code> 20, <code>hc_eps</code> 1e-6 - hyper-connections, i.e. the residual stream
+  is a 4-wide Sinkhorn-normalised expansion rather than one residual per layer.</li>
+<li><code>index_kpool</code> 4 with <code>index_kpool_compress</code> and <code>index_kpool_always_select_tail</code> - the sparse
+  attention's key pool is compressed and a tail is always selected, which the fork's GLM-5.2
+  indexer does not implement.</li>
+</ul>
+<p><strong>Why an alias is wrong</strong>: the pinned fork's GLM-5.2 path (<code>GlmMoeDsaForCausalLM</code> -&gt;
+<code>LLM_ARCH_GLM_DSA</code>, <code>src/models/glm-dsa.cpp</code>) is an MLA + DeepSeek-sparse-attention stack on
+<strong>every</strong> layer: it reads the MLA, <code>indexer_top_k</code> and <code>indexer_types</code> keys and assumes each layer
+runs that attention. The fork's KDA support is Kimi's (<code>LLM_ARCH_KIMI_LINEAR</code>, <code>LLM_KV_KDA_HEAD_DIM</code>,
+the Kimi converter), and nothing in the tree reads <code>hc_mult</code> / <code>hc_sinkhorn_iters</code> for a GLM model
+(only <code>dsv4_hc_mult</code> on DeepSeek V4 / qwen4exp). Mapping <code>glm5_next</code> onto <code>glm-dsa</code> would run 34
+KDA layers as full sparse attention, drop the hyper-connection expansion and ignore the compressed
+k-pool - tokens out, a different function in: the silent-substitution failure this page exists to
+prevent. Mapping it onto <code>kimi-linear</code> would drop the DSA layers and the indexer instead.</p>
+<p><strong>Why it is not mapped</strong>: the pinned <code>third_party/llama.cpp</code> af04c9f2 has no <code>glm5-next</code> at all -
+no <code>@ModelBase.register("Glm5NextForConditionalGeneration")</code> in <code>conversion/glm.py</code> (it registers
+<code>Glm4ForCausalLM</code>, <code>Glm4vForConditionalGeneration</code>, <code>GlmOcrForConditionalGeneration</code>,
+<code>Glm4MoeForCausalLM</code>, <code>Glm4vMoeForConditionalGeneration</code>, <code>Glm4MoeLiteForCausalLM</code>,
+<code>GlmMoeDsaForCausalLM</code>, <code>SolarOpenForCausalLM</code>), no <code>glm5-next</code> in <code>src/llama-arch.cpp</code>'s
+<code>LLM_ARCH_NAMES</code> (<code>glm4</code>, <code>glm4moe</code>, <code>glm-dsa</code> only) and no <code>src/models/glm5-next.cpp</code>. Upstream
+<code>ggml-org/llama.cpp</code> added it in #27773 (<code>649dcb10</code>, 2026-09-30, <code>LLM_ARCH_GLM5_NEXT</code>,
+<code>src/models/glm5-next.cpp</code>, <code>MODEL_ARCH.GLM5_NEXT</code> in the GLM converter) and the MTP follow-up
+PR #29928 (<code>b9acf138</code>, 2026-10-07) - both after the fork's last upstream sync, so a later fork sync
+that reaches them maps the class automatically. At that point <code>tools/registry_build.py
+--check-gaps</code> fails until this entry records why (<code>mapped_ok</code>), which is the intended prompt for a
+person to confirm the sync really brought the KDA + DSA + hyper-connection layers before the class
+counts as supported. Reviewed 2026-10-23: <strong>not an alias</strong>. Its <code>registry/significant.json</code> entry
+carries <code>"watch": "report"</code>, so the census watcher lists new uploads as <code>. REVIEWED</code> and does not
+alert; remove that field (and record <code>mapped_ok</code>) when the pin gains <code>glm5-next</code>.</p>
+<h3 id="2026-10-27-batch-engine619">2026-10-27 batch (engine#619)<a class="anchor" href="#2026-10-27-batch-engine619" title="Permanent link">#</a></h3>
+<p>All four classes in that census run are reviewed below. The mirror the run named for
+<code>GraniteSwitchForCausalLM</code> (<code>cestaristudio/granite-switch-4.1-3b-preview</code>) is gated, so that one
+listing stays unclassifiable and is listed under <em>Unverifiable: gated configs</em>; the class itself
+is IBM's own and its configs are public, so it is reviewed here from
+<code>ibm-granite/granite-switch-4.1-*</code>. None of the four is registered by the pin: <code>git grep</code> over
+<code>third_party/llama.cpp</code> <code>e7e5cd08</code> for <code>LiveMemForCausalLM</code>/<code>livemem</code>,
+<code>CDMMoELMPoincare</code>/<code>cdm_moe_poincare</code> and <code>Senryu2ForCausalLM</code>/<code>senryu2</code> returns nothing, and the
+same grep over the pin <code>main</code> carries now (<code>40c4ccb7</code>, re-checked 2026-10-29) returns nothing for
+those three or for <code>GraniteSwitchForCausalLM</code>/<code>granite_switch</code> either, so no pinned backend reads
+them and a mapping would be a claim the engine cannot honour.</p>
+<p>The same run also printed the REMOTE-CODE families <code>KeuralMoECausalLM</code>,
+<code>LNewqForConditionalGeneration</code>, <code>Newq1ForConditionalGeneration</code> and
+<code>NewqForConditionalGeneration</code>. Those are not significant gaps and are not in
+<code>registry/significant.json</code>: they are recorded under <em>If a family is a variant</em> instead, because
+what they need is a converter registration (a renamed class), not a review of a new architecture.</p>
+<h3 id="livemem-popboneslivemem-rl-mlx-q4-backbone"><code>livemem</code> - <code>Popbones/LiveMem-RL-mlx-q4-backbone</code><a class="anchor" href="#livemem-popboneslivemem-rl-mlx-q4-backbone" title="Permanent link">#</a></h3>
+<p>Architecture class <code>LiveMemForCausalLM</code>, <code>model_type: livemem</code>, <code>library_name: livemem-mlx</code>, no
+<code>auto_map</code> (the censused upload is MLX-format weights: <code>model.safetensors</code> + <code>manifest.json</code>,
+vendored <code>livemem-mlx</code> runtime). The config is a plain dense decoder - <code>hidden_size</code> 2560,
+<code>intermediate_size</code> 9728, <code>head_dim</code> 128, every entry of <code>layer_types</code> is <code>full_attention</code>, Qwen2.5
+vocab ids (151643/151645) - so the machinery is unremarkable; what is missing is the format and
+the registration, not the layers. Serving it needs an MLX dequant and a converter, and the pin has
+neither. Reviewed 2026-10-27: <strong>not an alias</strong>. Its <code>registry/significant.json</code> entry carries
+<code>"watch": "report"</code>.</p>
+<h3 id="cdm_moe_poincare-duoneurallattice-7-hermes-cdm-poincare-instruct"><code>cdm_moe_poincare</code> - <code>DuoNeural/Lattice-7-Hermes-CDM-Poincare-Instruct</code><a class="anchor" href="#cdm_moe_poincare-duoneurallattice-7-hermes-cdm-poincare-instruct" title="Permanent link">#</a></h3>
+<p>Architecture class <code>CDMMoELMPoincare</code>, <code>model_type: cdm_moe_poincare</code>, no <code>auto_map</code>,
+<code>library_name: transformers</code>. Not an alias for a structural reason: attention runs in a Poincare
+ball (<code>geometry: poincare</code>, learnable <code>curvature: 1.4427</code>) and a <code>telepathy</code> gate
+(<code>beta_tele: 0.5</code>) mixes it, neither of which any pinned family implements; the rest is small
+(<code>d_model</code> 768, 8 layers, 12 heads, 4 experts, <code>teacher: Qwen/Qwen3.5-4B</code>, 629M params). The repo
+ships <code>lattice7_hermes-q8-attn-q6-rest-text.gguf</code>, but a GGUF of an architecture no converter
+knows is not loadable by the pinned runtime - the metadata would name an arch
+<code>src/llama-arch.cpp</code>'s <code>LLM_ARCH_NAMES</code> does not have. Reviewed 2026-10-27: <strong>not an alias</strong>. Its
+<code>registry/significant.json</code> entry carries <code>"watch": "report"</code>.</p>
+<h3 id="senryu2-kerzgraisenryu-22-1b"><code>senryu2</code> - <code>KerzgrAI/Senryu-2.2-1B</code><a class="anchor" href="#senryu2-kerzgraisenryu-22-1b" title="Permanent link">#</a></h3>
+<p>Architecture class <code>Senryu2ForCausalLM</code>, <code>model_type: senryu2</code>, <code>library_name: tiny_gdn</code>, no
+<code>auto_map</code>, and the weights come with the repo's own <code>inference.py</code> plus
+<code>ngram_tables.safetensors</code> - the class is served by that code, not by any backend. Its
+<code>layer_types</code> are a 3+1 hybrid of <code>gdn2</code> and <code>parallax</code> (<code>full_attention_interval</code> 4,
+<code>attention_layer_type: parallax</code>, <code>kda_lower_bound</code> -5.0, <code>linear_conv_kernel_dim</code> 4,
+<code>allow_negative_eigenvalues: false</code>): the GDN2 half is the class this page reviews elsewhere, but
+<code>parallax</code> attention and the n-gram tables are not in the pin, so <code>gdn2</code> would be a partial
+substitution, not an alias. Reviewed 2026-10-27: <strong>not an alias</strong>. Its <code>registry/significant.json</code>
+entry carries <code>"watch": "report"</code>.</p>
+<h3 id="granite_switch-ibm-granitegranite-switch-41-3b-preview-also-8b-30b"><code>granite_switch</code> - <code>ibm-granite/granite-switch-4.1-3b-preview</code> (also -8b, -30b)<a class="anchor" href="#granite_switch-ibm-granitegranite-switch-41-3b-preview-also-8b-30b" title="Permanent link">#</a></h3>
+<p>Architecture class <code>GraniteSwitchForCausalLM</code>, <code>model_type: granite_switch</code>, no <code>auto_map</code>,
+<code>library_name: transformers</code>. <code>registry/census.json</code> (2026-10-29) counts <strong>17</strong> models of this
+class, so it is not a one-off: <code>ibm-granite/granite-switch-4.1-{3b,8b,30b}</code> are public and the
+family already ships GGUFs (<code>ibm-granite/granite-switch-4.1-8b-GGUF</code>, whose
+<code>general.architecture</code> is <code>graniteswitch</code>).</p>
+<ul>
+<li><strong>Shape</strong>: 42 layers (30b: 66), hidden 2560 (8b/30b: 4096), 40 heads / 8 kv (8b/30b: 32/8),
+  vocab 100365 (8b/30b: 100355), every entry of <code>layer_types</code> <code>full_attention</code>,
+  <code>num_local_experts: 0</code> with a leftover <code>num_experts_per_tok: 2</code> - i.e. dense, all-attention
+  Granite.</li>
+<li><strong>What it adds</strong>: the model is a <em>stack of LoRA adapters switched per token</em>, not one set of
+  weights. The config carries <code>num_adapters</code>, <code>adapter_names</code>, <code>adapter_ranks</code>,
+  <code>max_lora_rank</code>, <code>lora_target_modules</code>, <code>switch_head_dim</code>, <code>control_token_gain</code>,
+  <code>dual_stream</code>, <code>cross_stream_rank</code>, <code>ms_code_*</code>/<code>ms_memory_gain</code>, <code>asr_*</code> and
+  <code>adapter_token_ids</code>/<code>adapter_substitute_token_ids</code>. Upstream's converter puts that in one
+  sentence (<code>conversion/granite.py</code>: "Dense, all-attention Granite with N per-token embedded
+  LoRA adapters, stacked over the adapter dim with a zero adapter at slot 0 (N = num_adapters +
+  1)") and additionally writes <code>adapter_count</code>, <code>adapter_lora_rank</code>, <code>adapter_token_ids_*</code>,
+  <code>adapter_router_gain</code> and, for <code>ibm-granite</code>'s <code>decision</code> adapter, a <code>granite_switch</code> decision
+  type; <code>num_hidden_layers</code> also counts <em>weightless switch layers</em> that carry no tensors, and
+  the converter has to derive the real block count from the tensor names.</li>
+<li><strong>Why an alias is wrong</strong>: the nearest supported families are <code>granitehybrid</code>
+  (<code>GraniteMoeHybridForCausalLM</code>), <code>granitemoe</code> and <code>granite</code>, and none of their loaders has an
+  adapter stack, a router gain or a switch layer: loading a checkpoint through them would keep
+  one adapter's weights and silently drop the rest, which is the silent-substitution failure
+  this page exists to prevent. Renaming it to <code>granitehybrid</code> would also lose the ASR path.</li>
+<li><strong>Why it is not mapped</strong>: the pinned backend has nothing to map to. At <code>40c4ccb7</code>
+  <code>conversion/granite.py:17-379</code> makes six <code>@ModelBase.register</code> calls covering eight class
+  names (<code>GraniteForCausalLM</code>, <code>GraniteMoeForCausalLM</code>, <code>GraniteMoeSharedForCausalLM</code>,
+  <code>GraniteMoeHybridForCausalLM</code>/<code>BambaForCausalLM</code>,
+  <code>GraniteSpeechForConditionalGeneration</code>, <code>GraniteSpeechPlusForConditionalGeneration</code>,
+  <code>Granite4VisionForConditionalGeneration</code>), <code>src/llama-arch.cpp</code> has <code>granite</code>, <code>granitemoe</code>
+  and <code>granitehybrid</code> but no <code>graniteswitch</code> (nor <code>granite_swa</code>), <code>src/models/</code> has
+  <code>granite.cpp</code>, <code>granite-moe.cpp</code> and <code>granite-hybrid.cpp</code> and no <code>granite-switch.cpp</code>, and
+  <code>gguf-py</code> has no <code>GRANITE_SWITCH</code> at all - as expected, since <code>registry/architectures.json</code>
+  is generated from that tree.</li>
+<li><strong>Where the support is</strong>: upstream <code>ggml-org/llama.cpp</code> <code>157b81fe</code> ("model : Granite-Switch
+  Architecture", #25107, 2026-08-10) registers the class, adds <code>LLM_ARCH_GRANITE_SWITCH</code> /
+  <code>"graniteswitch"</code> and the mapping case. That is <em>older</em> than the pin's tip (2026-10-25), so a
+  fork sync is what brings it, and <code>tools/registry_build.py --check-gaps</code> then fails until this
+  entry records why (<code>mapped_ok</code>) and someone confirms the loaded adapters really switch before
+  the class counts as supported. Reviewed 2026-10-29: <strong>not an alias</strong>. Its
+  <code>registry/significant.json</code> entry carries <code>"watch": "report"</code>, so the census watcher lists new
+  uploads as <code>. REVIEWED</code> instead of filing an issue; remove that field (and record <code>mapped_ok</code>)
+  when the pin gains <code>graniteswitch</code>.</li>
+</ul>
+<h2 id="unverifiable-gated-configs">Unverifiable: gated configs<a class="anchor" href="#unverifiable-gated-configs" title="Permanent link">#</a></h2>
+<p>A gated repository cannot be classified at all: the watcher's listing carries no config for it, so
+the class is unknown and the census counts it as <strong>unverifiable</strong> rather than guessing it. The
+watcher sends a token when one is in the environment. <code>tools/census_watch.py</code>'s <code>hf_token()</code> reads
+<code>HF_TOKEN</code>, then <code>HUGGING_FACE_HUB_TOKEN</code> (the name <code>huggingface_hub</code> writes), and
+<code>request_headers()</code> adds <code>Authorization: Bearer &lt;token&gt;</code> when either is set and non-empty. No token
+<em>file</em> is read: the standard <code>~/.cache/huggingface/token</code> is never consulted, so a token that only
+lives in that file changes nothing - export one of the two variables for the process that runs the
+watch (<code>scripts/census-watch.sh</code> passes its environment through to <code>tools/census_watch.py</code>). With
+neither set, the request is the user agent alone (<code>1bit-census-watch</code>), byte-identical to what the
+watcher always sent, and a gated row stays unverifiable: reported the first time it is seen,
+remembered in the state file, and never an alert, so it does not move the exit code. The header
+goes on the architecture walk's listing pages (<code>hf_get_page</code>) only; the FastFlowLM org listing,
+repo details and release pages (<code>get_json</code>) still send the user agent alone. A rejected token is not
+fatal: a <code>401</code> in <code>hf_get_page</code> sets <code>_AUTH_REJECTED</code>, warns <code>the token was rejected (401);
+continuing without it</code> on stderr, and retries that page anonymously, and the rest of the run stays
+unauthenticated rather than dying - a stale token costs a line of stderr, not the sweep. HF answers
+the listing <code>200</code> even with an invalid Bearer (measured 2026-10-29: <code>GET /api/models</code> returns <code>200</code>
+with a bad token, only <code>GET /api/whoami-v2</code> returns <code>401</code>), so that fallback is defensive: the
+watcher calls no endpoint that distinguishes a valid token from a bad one.</p>
+<p>Long-standing: <code>WaveMatrix/Qwen3-VL-8B-Instruct-GPTQ-Int4</code> is unverifiable on every run.</p>
+<p>From the 2026-10-27 census (engine#619): <code>cestaristudio/granite-switch-4.1-3b-preview</code> - the
+repo listing is gated (<code>Access to model ... is restricted</code>), so with no token in the environment
+the listing carries no config and the row stays <strong>unverifiable</strong> (reported once, remembered, no
+alert), not counted as an uncovered class. The <em>class</em> it would have named is no longer unknown: it
+is IBM's <code>GraniteSwitchForCausalLM</code>, reviewed from <code>ibm-granite</code>'s public repos under
+<code>granite_switch</code> above, which is what the census now reports for that family. A token the repo has
+been granted access to puts the config in the listing and the row is classified like any other -
+<code>!! UNCOVERED</code> only if the pin does not map it; that has not been observed with a working token.</p>
+<p>The 2026-10-22/23 watcher run behind engine#447 listed twelve, all unverifiable for the same
+reason - the watcher sent no token on that run:</p>
+<p><code>Chandangepala/spendai-gemma3-1b</code>,
+<code>DrJohnCode/NebulaText</code>,
+<code>Elevatormusic/DeepSeek-V4.1-Flash-1017-2x-DGX-Spark-TensorFold-2x-Faster</code>,
+<code>ModaLeap/qwen3-4b-instruct-2507-onnx</code>,
+<code>ReadyArt/Wicked-Tutu-31B</code>,
+<code>dimitarpg13/semsimula-ladder-live-owt-d384-l2-attention-potential-rfqk-norc</code>,
+<code>executorch-community/Gemma-3-1B-IT-ExecuTorch-WebGPU</code>,
+<code>gostar77/qwen3.8-flash-next-radiance-q5-w5dn64-bf16ple</code>,
+<code>japanese-data-analyze/JMicro-10M-chat-research-20261018</code>,
+<code>seoan1024/Hanok-LLM</code>,
+<code>tasmaikeni13/algebraic-transformer</code>,
+<code>zendevvv/odoko-gemma3-1b</code>.</p>
+<p>None of them is evidence of an unmapped class: until a token is available they stay in the
+unverifiable count, which <code>docs/registry.md</code> reports separately from mapped and checked.</p>
+<h2 id="if-a-family-is-a-variant">If a family <em>is</em> a variant<a class="anchor" href="#if-a-family-is-a-variant" title="Permanent link">#</a></h2>
+<p>An unmapped class that is a renamed or same-shape sibling is fixed where the backend is: upstream llama.cpp's converter and <code>llama-arch.cpp</code>, or our HRX fork. The registry picks the mapping up at the next pin bump. Verify shape equality before proposing such a mapping: layers, hidden size, heads, experts, and any added config keys. That check is exactly what moved the families above into this file.</p>
+<p>Two classes flagged on 2026-10-14/15 are <strong>variants</strong>, not significant gaps, so they are
+deliberately <em>not</em> in <code>registry/significant.json</code> and keep alerting until a backend registers
+them:</p>
+<ul>
+<li><code>GLMForCausalLM</code> (<code>JUROCLINIC/seguridad</code>) is the all-caps spelling of the Transformers class
+  <code>GlmForCausalLM</code> (<code>model_type: glm</code>), which the pinned fork already maps to <code>chatglm</code>
+  (<code>conversion/chatglm.py</code>: <code>@ModelBase.register("GlmForCausalLM", "ChatGLMModel",
+  "ChatGLMForConditionalGeneration")</code>). The registry lookup is exact, so only the CamelCase
+  string is mapped; the flagged upload is a config-only repo (no weights) that also mis-cases
+  the <code>model_type</code>. The fix is registering the alias in the fork's converter, not an
+  architecture review - and it is only reachable via a pin bump, so it is not silenced here.</li>
+<li><code>MinistralForCausalLM</code> (<code>saidutta69/Ministral-8B-Instruct-heretic</code>) is a Mistral-shaped
+  sibling: <code>model_type: ministral</code>, <code>sliding_window</code> 32768 == <code>max_position_embeddings</code>, and
+  the same <code>layer_types</code> and 36-layer / H=4096 / 32-head / 8-kv shape as its base
+  <code>mistralai/Ministral-8B-Instruct-2410</code>, which publishes <code>MistralForCausalLM</code>/<code>mistral</code>. The
+  pinned fork maps <code>MistralForCausalLM</code> -&gt; <code>llama</code> and <code>Ministral3ForCausalLM</code> -&gt; <code>mistral3</code>
+  but does not register this name (upstream llama.cpp does not either). Same treatment: a
+  converter registration picked up at the next pin bump, so it also keeps alerting rather than
+  being recorded as significant.</li>
+</ul>
+<p>From the 2026-10-27 census (engine#619), plus its 2026-10-29 rerun, four REMOTE-CODE families are
+recorded the same way - read and dispositioned here, deliberately <em>not</em> in
+<code>registry/significant.json</code>, and still what the census will alert on if a native (no <code>auto_map</code>)
+upload of the class appears:</p>
+<ul>
+<li><code>LNewqForConditionalGeneration</code> (<code>crussella0129/LNewq</code>) and <code>Newq1ForConditionalGeneration</code>
+  (<code>crussella0129/Newq1</code>) are <strong>one rename each of the same Qwen3.5-VL wrapper</strong>: <code>model_type:
+  qwen3_5</code>, <code>text_config.model_type</code> <code>qwen3_5_text</code> (32 layers, H 2560, <code>head_dim</code> 256,
+  <code>full_attention_interval</code> 4, vocab 248320) over a <code>vision_config</code> with
+  <code>deepstack_visual_indexes</code>, <code>image_token_id</code> 248056 - the shape the pin already converts under
+  the name <code>Qwen3_5ForConditionalGeneration</code> (<code>conversion/qwen3vl.py:16</code> registers that class and
+  its MoE sibling; <code>registry/architectures.json</code> maps it to <code>qwen35</code>). The only unusual keys are
+  <code>lnewq_steer</code> /
+  <code>newq1_steer</code>, and both repos carry <code>auto_map</code> (<code>AutoModelForImageTextToText</code> and
+  <code>AutoModelForCausalLM</code> -&gt; <code>modeling_lnewq.LNewqForConditionalGeneration</code> /
+  <code>modeling_newq1.Newq1ForConditionalGeneration</code>), i.e. they run their own modelling code. The
+  pinned fork registers neither name, so the class - not the architecture - is what is
+  unmapped, and the fix is one converter registration in the fork (a pin bump), exactly like the
+  two classes above. The census counts one model each. The third name in that batch,
+  <code>NewqForConditionalGeneration</code> (1 model, <code>crussella0129/Newq</code>), is now a gated repo, so its
+  config could not be read on 2026-10-29; it is recorded as the same family name pattern,
+  unverified.</li>
+<li><code>KeuralMoECausalLM</code> (<code>hossain0909/keural-dpo2-final</code>, 24 models from one uploader in
+  <code>registry/census.json</code>) is <strong>not</strong> a rename of anything mapped: <code>model_type: keural</code>,
+  <code>auto_map</code> to <code>configuration_keural.KeuralConfig</code> /
+  <code>modeling_keural.KeuralMoECausalLM</code>, and the config is an MoE decoder the pin has no arch for
+  (24 layers, H 4096, 32 heads / 8 kv, <code>head_dim</code> 128, 8 experts, top-2, <code>sliding_window</code> 512,
+  vocab 131074, plus a <code>keural_step</code> key). No pinned converter or runtime reads that name, so
+  mapping it would be a claim the engine cannot honour. It is left out of significant.json on
+  purpose: it is a remote-code one-off until a second uploader uses it, which is why the census
+  reports it as <code>. REMOTE-CODE</code> and starts alerting at <code>REMOTE_CODE_SPREAD</code> (3) uploaders - that
+  alert is the prompt to review it for a variant shape, not to silence it now.</li>
+</ul>
+<nav class="pager"><a class="prev" href="registry.html"><span>Previous</span>Model registry</a><a class="next" href="moe-streaming.html"><span>Next</span>MoE streaming</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/arch-gaps.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

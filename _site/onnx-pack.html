@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The ONNX pack: weights to Q4NX, our kernels · 1bit engine</title>
+<meta name="description" content="How a plain ONNX graph becomes an NPU pack for the 1bit engine: weights to Q4NX through the runtime&#x27;s own packer, activations int8, one ELF per shape.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="The ONNX pack: weights to Q4NX, our kernels · 1bit engine">
+<meta property="og:description" content="How a plain ONNX graph becomes an NPU pack for the 1bit engine: weights to Q4NX through the runtime&#x27;s own packer, activations int8, one ELF per shape.">
+<link rel="canonical" href="https://1bit.gg/onnx-pack.html">
+<meta property="og:url" content="https://1bit.gg/onnx-pack.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The ONNX pack: weights to Q4NX, our kernels · 1bit engine">
+<meta name="twitter:description" content="How a plain ONNX graph becomes an NPU pack for the 1bit engine: weights to Q4NX through the runtime&#x27;s own packer, activations int8, one ELF per shape.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-10-30">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/onnx-pack.html#article", "headline": "The ONNX pack: weights to Q4NX, matmuls to our kernels, no VitisAI", "description": "How a plain ONNX graph becomes an NPU pack for the 1bit engine: weights to Q4NX through the runtime's own packer, activations int8, one ELF per shape.", "url": "https://1bit.gg/onnx-pack.html", "mainEntityOfPage": "https://1bit.gg/onnx-pack.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-10-30", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html" aria-current="page">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="the-onnx-pack-weights-to-q4nx-matmuls-to-our-kernels-no-vitisai">The ONNX pack: weights to Q4NX, matmuls to our kernels, no VitisAI<a class="anchor" href="#the-onnx-pack-weights-to-q4nx-matmuls-to-our-kernels-no-vitisai" title="Permanent link">#</a></h1>
+<p>Design note for deliverable 4. It answers one question: if a model arrives as a plain ONNX graph,
+what does it take to run it on this NPU without executing a single AMD custom operator?</p>
+<h2 id="what-a-ryzen-ai-pack-is-and-why-we-do-not-execute-one">What a "Ryzen AI pack" is, and why we do not execute one<a class="anchor" href="#what-a-ryzen-ai-pack-is-and-why-we-do-not-execute-one" title="Permanent link">#</a></h2>
+<p>The AMD Ryzen AI toolchain ships prebuilt ONNX packs: a graph whose transformer blocks are replaced
+by nodes in a custom domain (<code>com.amd.*</code>), each one executed by a compiled xclbin through the VitisAI
+execution provider, with weights pre-quantised into that provider's own layout. It is fast and it is
+opaque: the pack decides the quantisation, the kernel, the tiling and the schedule, and the operator
+that runs on the device is a black box the vendor compiles.</p>
+<p>We do not execute those operators. Three concrete reasons, in the order they bind:</p>
+<ol>
+<li><strong>Licence and footprint.</strong> The VitisAI EP arrives in the AMD wheel, which the contract forbids us
+   from linking or shipping. A pack that only runs through <code>com.amd.*</code> nodes therefore cannot run in
+   our binary at all.</li>
+<li><strong>We already own the kernels.</strong> <code>npu/</code> generates and launches the int8 × int8 GEMM that the
+   forward route uses (<code>ONEBIT_NPU</code> lane), with our own quantisation, our own tiling and a layout we
+   can debug with <code>xrt::elf</code> tooling. A vendor pack would replace a measured component with an
+   unmeasured one.</li>
+<li><strong>The graph must stay a graph.</strong> Our plugin EP's value is that ONNX Runtime schedules the graph
+   and <em>our</em> provider takes the matmuls it has a kernel for; everything else stays on the CPU EP.
+   A pack with fused custom nodes removes exactly that composability.</li>
+</ol>
+<p>So the pack we design is the same idea, built from parts we control: <strong>ONNX graph stays plain, weights
+become Q4NX on disk, each matmul shape is bound to a kernel we generated, and the EP is the thing that
+does the binding at run time.</strong></p>
+<h2 id="what-the-graph-gives-us">What the graph gives us<a class="anchor" href="#what-the-graph-gives-us" title="Permanent link">#</a></h2>
+<p>Census of <code>qwen3-0.6b.onnx</code> (from <code>onnx/export_qwen3.py --check</code>, opset 21, ai.onnx domain only,
+float32, seq dynamic):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>MatMul (K, N)</th>
+<th>count</th>
+<th>projection</th>
+<th>kernel today</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1024 × 151936</td>
+<td>1</td>
+<td>lm_head</td>
+<td>none — CPU EP</td>
+</tr>
+<tr>
+<td>1024 × 3072</td>
+<td>56</td>
+<td>gate, up</td>
+<td>none — CPU EP</td>
+</tr>
+<tr>
+<td>3072 × 1024</td>
+<td>28</td>
+<td>down</td>
+<td>none — CPU EP</td>
+</tr>
+<tr>
+<td>1024 × 2048</td>
+<td>28</td>
+<td>q</td>
+<td><code>full_i8_QKV_K1024_N2048_m16.elf</code></td>
+</tr>
+<tr>
+<td>2048 × 1024</td>
+<td>28</td>
+<td>o</td>
+<td>none — CPU EP</td>
+</tr>
+<tr>
+<td>1024 × 1024</td>
+<td>56</td>
+<td>k, v</td>
+<td><code>full_i8_O_K1024_N1024_m16.elf</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>254 MatMul nodes, 6 distinct shapes, zero custom domains. The binding is therefore a table lookup on
+<code>(K, N)</code>, which is exactly what <code>ONEBIT_EP_NPU_ELFS="16x1024x2048=&lt;elf&gt;,16x1024x1024=&lt;elf&gt;"</code> already
+expresses; a shape with no entry returns <code>ORT_NOT_IMPLEMENTED</code>, the EP falls back to the CPU for it,
+and the session still runs. That is why deliverable 4 can be honest about owning 84 of 254 matmuls
+rather than claiming the model.</p>
+<h2 id="the-three-layers-of-the-pack">The three layers of the pack<a class="anchor" href="#the-three-layers-of-the-pack" title="Permanent link">#</a></h2>
+<p><strong>1. Weights: Q4NX on disk, int8 + scales in the kernel's layout.</strong> The on-disk format is already
+Q4NX-family (4-bit blocks with per-block scales, the format <code>npu/q4nx.cpp</code> decodes). At session start
+we bind a weight tensor by pointer identity and call the runtime's own <code>packB</code>, which quantises each
+<em>column</em> to int8 with <code>scale = amax/127</code> and stores the column scales alongside the packed buffer —
+the same function the forward route calls, so the numerics of a packed weight cannot drift from the
+weights the forward route would have used. Packing happens once per (tensor, K, N); the EP caches one
+slot per bound kernel and repacks when the pointer changes.</p>
+<p><strong>2. Activations: per-row int8 with <code>amax/127</code>.</strong> Every matmul input is quantised per row, on the
+device's own scale convention, and the dequant multiplies back <code>C = Cm * ascale[row] * wscale[col]</code>.
+This is the forward route's exact arithmetic; the measured device error on a 1024 × 1024 matmul is
+<code>max_abs 9.893e-02</code> of <code>max|ref| 20.414</code> (rel <code>4.846e-03</code>) against a 2 % gate, so the int8 path is
+inside the tolerance the proof asserts.</p>
+<p><strong>3. Shapes: one ELF per <code>(M, K, N)</code>, generated not fetched.</strong> An ELF is compiled for a fixed tiling
+(<code>_m16</code> here, 16 rows per launch). The pack step is therefore a <em>coverage</em> problem, not a
+compatibility problem: for every <code>(K, N)</code> in the census we either have a generated ELF or we do not,
+and the plan is to generate the missing ones with the existing generator rather than to reshape the
+model.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>shape</th>
+<th>owner today</th>
+<th>next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>q <code>1024×2048</code>, k/v <code>1024×1024</code></td>
+<td>our EP</td>
+<td>done, proven on the device</td>
+</tr>
+<tr>
+<td>o <code>2048×1024</code>, down <code>3072×1024</code></td>
+<td>CPU EP</td>
+<td>generate <code>m16</code> ELFs, same generator</td>
+</tr>
+<tr>
+<td>gate/up <code>1024×3072</code></td>
+<td>CPU EP</td>
+<td>same</td>
+</tr>
+<tr>
+<td>lm_head <code>1024×151936</code></td>
+<td>CPU EP</td>
+<td>needs a vocab-blocked kernel (N far past one ELF); leave on the CPU until the FFN set is proven</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="what-the-pack-does-not-do-deliberately">What the pack does not do, deliberately<a class="anchor" href="#what-the-pack-does-not-do-deliberately" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>No KV cache.</strong> The exported graph re-runs the whole sequence per step, so its tokens/s is that
+  graph's rate and is never compared against a KV-cached server. A cached graph is a different, much
+  larger piece of work; pretending otherwise would put a misleading number in the release notes.</li>
+<li><strong>No fp16, no int4 activations.</strong> The kernel is int8 × int8 → int32; the 4-bit-ness of the
+  checkpoint lives on disk and is a memory-bandwidth story, not a compute one. An int4 tensor-core
+  kernel would need a different ELF, and nothing here blocks that later.</li>
+<li><strong>No vendor operators, ever.</strong> If a shape has no kernel it goes to the CPU EP. That keeps the
+  failure mode boring: a slower session, never a session that refuses to load because a custom domain
+  is missing.</li>
+</ul>
+<h2 id="where-the-numbers-live">Where the numbers live<a class="anchor" href="#where-the-numbers-live" title="Permanent link">#</a></h2>
+<p>The device measurements (tokens/s with our EP on q/k/v vs the CPU-EP control, and KL(forward‖ort)
+against <code>1bit npu-run</code>) belong in <code>~/briefs/TORTEP-STATE.md</code> under deliverable 4, with the exact
+commands. This note is the design; the state file is the evidence.</p>
+<h2 id="a8w8-qdq-the-shape-quark-emits">A8W8 QDQ, the shape Quark emits<a class="anchor" href="#a8w8-qdq-the-shape-quark-emits" title="Permanent link">#</a></h2>
+<p>AMD's Quark ONNX-to-ONNX flow (the 2025 Ryzen AI NPU quantisation article; Linux-only) writes a
+<em>QDQ</em> graph rather than a custom-op graph: every tensor that used to be float becomes</p>
+<pre><code>x_q  --DequantizeLinear(s_x, zp_x)--&gt;  x_dq  \
+                                              MatMul --&gt; y  --QuantizeLinear(s_y, zp_y)--&gt; y_q
+w_q  --DequantizeLinear(s_w, zp_w)--&gt;  w_dq  /
+</code></pre>
+<p>with int8 activations and int8 weights (A8W8), float32 scales, and the same pattern at A16W8, Xint8
+(power-of-two scales), BF16/BFP16, MX4/6/9, MXFP4/MXINT8 and Int4 weight-only, using GPTQ, AdaRound,
+AdaQuant, SmoothQuant or QuaRot to pick the scales. That is the good news: <strong>A8W8 is exactly what our
+device kernel already computes</strong> — int8 × int8 into int32, dequantised by one scale per activation
+row and one per weight column.</p>
+<h3 id="why-it-folds-without-a-new-kernel">Why it folds without a new kernel<a class="anchor" href="#why-it-folds-without-a-new-kernel" title="Permanent link">#</a></h3>
+<p>Our GEMM is <code>C_s32[m][n] = Σ_k a_q[m][k]·w_q[k][n]</code>, dequantised as <code>C = C_s32 · s_a[m] · s_w[n]</code>.
+The QDQ graph dequantises the same product as <code>(s_x·s_w) · C_s32</code> (per-tensor), or <code>s_x[m]·s_w[n] ·
+C_s32</code> (per-axis, which is what Quark emits for weights and what SmoothQuant needs for activations).
+Those are the same expression: our kernel's <code>go_rows</code> already applies <code>Cm·as[m]·gs[n]</code>, so a
+Quark-quantised model maps onto it by <em>feeding</em> the graph's scales instead of deriving them from
+<code>amax/127</code>. Nothing about the kernel changes; what changes is where the two numbers come from.</p>
+<p>Folding the output <code>QuantizeLinear</code> is the same trick one step later: give the readback the scale
+<code>1/s_y</code> and it emits int8 directly (<code>y_q = clamp(round(C/s_y) + zp_y)</code>) instead of float. The
+intermediate float tensor then never exists.</p>
+<h3 id="what-works-today-and-what-does-not">What works today, and what does not<a class="anchor" href="#what-works-today-and-what-does-not" title="Permanent link">#</a></h3>
+<ul>
+<li><strong>Works</strong>: an A8W8 QDQ graph runs on our EP unchanged. <code>onebit_ep_qdq_proof</code> builds exactly that
+  pattern (int8 in / int8 out, <code>DequantizeLinear</code> → <code>MatMul</code> → <code>QuantizeLinear</code>) with the model
+  editor API, and our EP claims the single <code>MatMul</code> out of the four nodes and returns int8 outputs
+  identical to the CPU EP's (<code>worst |d| = 0</code> LSB, no saturation). The <code>DequantizeLinear</code> and
+  <code>QuantizeLinear</code> nodes stay on the CPU EP, which is correct but means the float tensors are still
+  materialised.</li>
+<li><strong>Not done</strong>: claiming the three-node group (<code>DQ, MatMul, Q</code>) as one fused node so the dequantised
+  floats never exist, feeding int8 activations straight into the kernel's input BO (no float
+  quantisation step), per-axis scale plumbing through <code>gemm_f32</code> (it takes one <code>amax/127</code> per row
+  today), and support for the asymmetric zero points Quark can emit. An asymmetric zero point is not
+  free: with <code>zp_x</code> or <code>zp_w</code> non-zero the product gains the correction terms
+  <code>-zp_x·Σ_k w_q[k][n]</code>, <code>-zp_w·Σ_k a_q[m][k]</code> and <code>+K·zp_x·zp_w</code>, so the EP claims only <code>zp = 0</code>
+  until those are folded into the kernel's epilogue.</li>
+<li><strong>Different kernels, not a configuration</strong>: A16W8 needs int16 activations, MX/BFP16 need block
+  scales, and Int4 weight-only is the format our <em>own</em> forward route already stores (Q4NX), so the
+  natural split afterwards is our Q4NX pack for weight-only and the Quark QDQ path for A8W8.</li>
+</ul>
+<p>The proof is deliberately opset-21, domain-only, symmetric and per-tensor: it pins down the claim
+(our EP takes the MatMul inside the pattern and the arithmetic is right) without pretending the fused
+fast path exists yet.</p>
+<nav class="pager"><a class="prev" href="onnx.html"><span>Previous</span>ONNX Runtime</a><a class="next" href="dwarfstar.html"><span>Next</span>DwarfStar</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/onnx-pack.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

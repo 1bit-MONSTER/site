@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where the engine is going: HRX and the NPU · 1bit engine</title>
+<meta name="description" content="Heading to HRX plus the NPU: Laya&#x27;s scorer runs on HRX at 15-16 ms a decision, W4A4 reaches MoE experts, and six GGUF architectures answer on the NPU.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Where the engine is going: HRX and the NPU · 1bit engine">
+<meta property="og:description" content="Heading to HRX plus the NPU: Laya&#x27;s scorer runs on HRX at 15-16 ms a decision, W4A4 reaches MoE experts, and six GGUF architectures answer on the NPU.">
+<link rel="canonical" href="https://1bit.gg/blog-hrx-and-npu-direction.html">
+<meta property="og:url" content="https://1bit.gg/blog-hrx-and-npu-direction.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Where the engine is going: HRX and the NPU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Where the engine is going: HRX and the NPU · 1bit engine">
+<meta name="twitter:description" content="Heading to HRX plus the NPU: Laya&#x27;s scorer runs on HRX at 15-16 ms a decision, W4A4 reaches MoE experts, and six GGUF architectures answer on the NPU.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="Where the engine is going: HRX and the NPU">
+<meta property="article:tag" content="milestone">
+<meta property="article:tag" content="hrx">
+<meta property="article:tag" content="npu">
+<meta property="article:tag" content="laya">
+<meta property="article:tag" content="rocm">
+<meta property="article:published_time" content="2026-09-29">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "BlogPosting", "@id": "https://1bit.gg/blog-hrx-and-npu-direction.html#article", "headline": "Where the engine is going: HRX and the NPU", "description": "Heading to HRX plus the NPU: Laya's scorer runs on HRX at 15-16 ms a decision, W4A4 reaches MoE experts, and six GGUF architectures answer on the NPU.", "url": "https://1bit.gg/blog-hrx-and-npu-direction.html", "mainEntityOfPage": "https://1bit.gg/blog-hrx-and-npu-direction.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-29", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "keywords": "milestone, hrx, npu, laya, rocm"}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="post">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html">Docs</a>
+      <a href="blog.html" aria-current="page">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<article class="art"><div class="container">
+<a class="back" href="blog.html">← all posts</a>
+<div class="art-meta"><time datetime="2026-09-29">2026-09-29</time><span class="tag">milestone</span><span class="tag">hrx</span><span class="tag">npu</span><span class="tag">laya</span><span class="tag">rocm</span></div>
+<h1>Where the engine is going: HRX and the NPU</h1>
+<p class="lead">The engine is heading to AMD's HRX backend, whose kernels we write in Loom, plus the NPU.</p>
+<div class="prose">
+<blockquote>
+<p><strong>Update (2026-10-30):</strong> HRX met the gates of RFC #213 and the Vulkan and ROCm builds were removed (engine #306); every graph node of every model and mode we test runs on HRX with our own HIP kernels, and the NPU engine runs on our own runtime. See <a href="hrx.html">HRX</a> and <a href="npu.html">NPU engine</a>.</p>
+</blockquote>
+<p>A review of the Laya work<sup id="fnref:geramyl"><a class="footnote-ref" href="#fn:geramyl">1</a></sup> put it plainly: we want it on the NPU, a Vulkan version
+already exists, and the stack is HRX + Loom + NPU. That was right, and not only for Laya. Vulkan
+stays the default until HRX meets the gates in
+<a href="https://github.com/1bit-MONSTER/engine/discussions/213">RFC #213</a>: decode within 10% of Vulkan
+on the showcase models, every architecture that runs on Vulkan checked on HRX, and speculative
+decoding, several sequences per batch and vision on HRX. Here is what landed since the last
+posts, and how far HRX already is.</p>
+<h2 id="layas-scorer-runs-on-hrx">Laya's scorer runs on HRX<a class="anchor" href="#layas-scorer-runs-on-hrx" title="Permanent link">#</a></h2>
+<p>Laya classifies each conversation as code, prose, short or a long document, and a measured
+policy picks the device (<a href="blog-laya-routes-by-request-class.html">previous post</a>). The
+classifier is a ModernBERT encoder. It now runs through ggmlc (our fork) on HRX, with Loom kernels
+for what the encoder needs: norms, rotate-half RoPE, GEGLU and the attention scores
+(<a href="https://github.com/1bit-MONSTER/engine/pull/206">#206</a>,
+<a href="https://github.com/1bit-MONSTER/engine/pull/208">#208</a>).</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Scorer</th>
+<th>Accuracy</th>
+<th>Per decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C++ on the CPU</td>
+<td>95.5%</td>
+<td>538 ms</td>
+</tr>
+<tr>
+<td>ggmlc on Vulkan</td>
+<td>95.5%</td>
+<td>24 ms</td>
+</tr>
+<tr>
+<td><strong>ggmlc on HRX</strong></td>
+<td><strong>95.5%</strong></td>
+<td><strong>15-16 ms</strong> (25 ms at 128 tokens)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Through <code>1bit serve --laya</code> that is about 28 ms per request at the median. Routing no longer costs
+a noticeable first-turn delay.</p>
+<h2 id="4-bit-activations-reach-the-moe-experts">4-bit activations reach the MoE experts<a class="anchor" href="#4-bit-activations-reach-the-moe-experts" title="Permanent link">#</a></h2>
+<p>The Hadamard route rotates a model's weights so 4-bit activations lose less. It now covers the
+expert matmuls too (<a href="https://github.com/1bit-MONSTER/engine/pull/199">#199</a>,
+<a href="https://github.com/1bit-MONSTER/engine/pull/201">#201</a>). Qwen3-Coder-30B-A3B, ROCm, rotated Q4_0:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Prompt (pp512)</th>
+<th>Decode</th>
+<th>KLD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>exact 8-bit activations</td>
+<td>1,218</td>
+<td>79.0</td>
+<td>0.048</td>
+</tr>
+<tr>
+<td><strong>4-bit activations, attention and experts</strong></td>
+<td><strong>2,156</strong></td>
+<td>79.2</td>
+<td>0.081</td>
+</tr>
+</tbody>
+</table></div>
+<p>Prompt speed only matters when prompts are long, so <code>tools/e2e_bench.py</code> measures what a user
+waits for: time to first token plus decode, as effective tokens per second
+(<a href="https://github.com/1bit-MONSTER/engine/pull/202">#202</a>). <code>1bit serve --long-model</code> sends
+conversations with 2K or more prompt tokens to the rotated file and shorter ones to the default
+device. On Qwen3-Coder-30B-A3B, 256 tokens out:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Prompt tokens</th>
+<th>Vulkan alone</th>
+<th><code>--long-model</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>512</td>
+<td>70.7</td>
+<td>71.3</td>
+</tr>
+<tr>
+<td>2,048</td>
+<td>52.1</td>
+<td>53.1</td>
+</tr>
+<tr>
+<td>8,192</td>
+<td>20.3</td>
+<td>25.5</td>
+</tr>
+<tr>
+<td>16,384</td>
+<td>8.6</td>
+<td><strong>13.1</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Running rotated files in 1,024-token micro-batches added another 6-10% to prompt speed for free
+(<a href="https://github.com/1bit-MONSTER/engine/pull/205">#205</a>).</p>
+<h2 id="ggufs-on-the-npu-correct-first">GGUFs on the NPU: correct first<a class="anchor" href="#ggufs-on-the-npu-correct-first" title="Permanent link">#</a></h2>
+<p><code>1bit serve -m &lt;gguf&gt; --device npu</code> repacks a GGUF for the NPU and runs it on the per-op forward
+(<a href="https://github.com/1bit-MONSTER/engine/pull/209">#209</a>). Six architectures answer " Paris":
+MiniCPM5-1B, Qwen2.5-7B, Qwen3-Coder-30B-A3B, Qwen3.6-35B-A3B (GDN + MoE), MiniCPM4-8B (LongRoPE
+and its embedding and residual scales) and GLM-4.7-Flash (MLA). Getting there meant
+matching llama.cpp's conventions exactly: rotary pairing, MiniCPM's scales, and the layout of
+GLM's MLA weights. It is not fast yet: 0.006-0.17 tok/s, because the host sequences every
+operation. The next step is the fused path, which the NPU work already has for Qwen3.6-35B-A3B
+(16.3-16.5 tok/s decode through the private add-on).</p>
+<h2 id="dwarfstar-reads-1bp-packages">DwarfStar reads 1BP packages<a class="anchor" href="#dwarfstar-reads-1bp-packages" title="Permanent link">#</a></h2>
+<p>DwarfStar now comes from our fork, which reads 1BP packages: a GGUF's tensors and metadata,
+aligned for streaming (<a href="https://github.com/1bit-MONSTER/engine/pull/196">#196</a>).
+<code>gguf_to_1bp.py</code> converts a local GGUF or one on Hugging Face through range requests, and
+<code>1bit serve</code> recognises a <code>.1bp</code> by its first bytes. DeepSeek V4 Flash Q2, converted straight from
+Hugging Face, gives the same answers and token counts as its GGUF.</p>
+<h2 id="hrx-so-far">HRX so far<a class="anchor" href="#hrx-so-far" title="Permanent link">#</a></h2>
+<p>The gates in RFC #213 are measured, not assumed. On ZAYA1-8B, Vulkan decodes at 93 tok/s and
+HRX at 47.9. On long prompts, HRX already prefills faster than Vulkan: handing an 8K prompt's
+prefill to HRX cuts a Qwen2.5-7B request by 26%. The decode-split race that made HRX unreliable
+is fixed (<a href="https://github.com/1bit-MONSTER/engine/issues/123">#123</a>), and its multi-pass output
+step got 15-22% faster on long contexts (<a href="https://github.com/1bit-MONSTER/engine/pull/180">#180</a>).
+Each gate that closes gets its own post.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:geramyl">
+<p>The review came from <a href="https://github.com/Geramy">geramyL</a>, a moderator on Lemonade's Discord. Thank you.&#160;<a class="footnote-backref" href="#fnref:geramyl" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+</div>
+<nav class="pager"><a class="prev" href="blog-every-node-on-hrx.html"><span>Newer</span>Every node on the GPU: local LLMs on Strix Halo in Lemonade</a><a class="next" href="blog-qwen38-27b-dflash2-and-hadamard.html"><span>Older</span>Qwen3.8-27B at 45.7 tok/s: DFlash2 in 1bit serve, and 4-bit activations with a Hadamard rotation</a></nav>
+</div></article>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

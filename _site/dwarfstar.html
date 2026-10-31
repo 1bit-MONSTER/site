@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DwarfStar: large MoE models with SSD experts · 1bit engine</title>
+<meta name="description" content="DwarfStar (antirez/ds4) in the 1bit engine: DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next in their own GGUFs, with expert streaming from the SSD.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="DwarfStar: large MoE models with SSD experts · 1bit engine">
+<meta property="og:description" content="DwarfStar (antirez/ds4) in the 1bit engine: DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next in their own GGUFs, with expert streaming from the SSD.">
+<link rel="canonical" href="https://1bit.gg/dwarfstar.html">
+<meta property="og:url" content="https://1bit.gg/dwarfstar.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DwarfStar: large MoE models with SSD experts · 1bit engine">
+<meta name="twitter:description" content="DwarfStar (antirez/ds4) in the 1bit engine: DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next in their own GGUFs, with expert streaming from the SSD.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-26">
+<meta property="article:modified_time" content="2026-10-18">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/dwarfstar.html#article", "headline": "DwarfStar", "description": "DwarfStar (antirez/ds4) in the 1bit engine: DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next in their own GGUFs, with expert streaming from the SSD.", "url": "https://1bit.gg/dwarfstar.html", "mainEntityOfPage": "https://1bit.gg/dwarfstar.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-26", "dateModified": "2026-10-18", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html" aria-current="page">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="dwarfstar">DwarfStar<a class="anchor" href="#dwarfstar" title="Permanent link">#</a></h1>
+<p><a href="https://github.com/antirez/ds4">DwarfStar</a> (<code>antirez/ds4</code>, MIT) is a native
+inference engine written for a few large MoE models: DeepSeek V4 Flash (and V4.1
+Flash and PRO on bigger machines), GLM 5.2/5.3 Flash and Qwen3.8-Flash-Next. It has
+its own kernels for Metal, CUDA and ROCm (the engine builds only its HIP backend), runs Strix Halo (<code>gfx1151</code>) as a first-class
+target, and can stream routed experts from the SSD. It is not a general GGUF runner:
+it loads its own GGUF layouts (<code>antirez/deepseek-v4-gguf</code>,
+<code>antirez/deepseek-v4.1-flash-gguf</code>, and the others its <code>download_model.sh</code> lists), and
+llama.cpp cannot load those.</p>
+<p><code>1bit serve --device ds4 -m &lt;DwarfStar .gguf&gt;</code> runs its <code>ds4-server</code> as the model's
+backend, behind the same OpenAI API as every other device. The engine builds our fork,
+<a href="https://github.com/1bit-MONSTER/ds4">1bit-MONSTER/ds4</a>, which also reads 1BP packages
+(<a href="#1bp-packages">below</a>).</p>
+<h2 id="build">Build<a class="anchor" href="#build" title="Permanent link">#</a></h2>
+<p><code>third_party/ds4</code> pins our fork's <code>1bit/main</code>: upstream <code>antirez/ds4</code> main plus the
+commits we carry (1BP packages). When upstream main moves, <code>.github/workflows/bump-ds4.yml</code>
+merges it into <code>1bit/main</code>, the way the Lemonade fork's sync merges an upstream release, tags
+the old tip <code>ds4-main-&lt;sha12&gt;</code> so the old pin stays reachable, and opens a PR moving the
+submodule. The merge keeps the old pin an ancestor of the new one, which is what the engine's
+pin check requires. A conflict stops the bump for a hand merge.</p>
+<pre><code>git submodule update --init --depth 1 third_party/ds4
+cmake -B build -G Ninja -DONEBIT_DS4=ON        # HIP (gfx1151) only
+cmake --build build
+</code></pre>
+<p><code>scripts/build-ds4.sh &lt;prefix&gt;</code> does the work: it builds a copy of the
+source under <code>&lt;prefix&gt;/src/hip</code> (DwarfStar builds in its tree; the submodule
+stays clean) and puts <code>ds4-server</code>, <code>ds4</code> and <code>ds4-bench</code> in <code>&lt;prefix&gt;/hip</code>.
+<code>DS4_TEST=1</code> then runs DwarfStar's model-free routed-MoE test on the GPU.</p>
+<p><strong>HIP (Strix Halo)</strong> needs HIP, hipBLAS, hipBLASLt, rocBLAS, rocWMMA and hipCUB. The
+script takes <code>ROCM_PATH</code>, else TheRock's SDK
+(<code>/opt/rocm-therock/lib/python3*/site-packages/_rocm_sdk_devel</code>), else <code>/opt/rocm</code>.
+It passes that SDK's <code>include/</code> with <code>-isystem</code>: clang otherwise searches it after
+<code>/usr/include</code>, and a distro HIP there (another version) shadows TheRock's headers
+and the build fails (<code>use of undeclared identifier '__ocml_exp10_f32'</code>).</p>
+<h2 id="serving">Serving<a class="anchor" href="#serving" title="Permanent link">#</a></h2>
+<pre><code>1bit serve --device ds4 -m ~/models/ds4/DeepSeek-V4-Flash-IQ2XXS-w2Q2K-AProjQ8-SExpQ8-OutQ8-chat-v2-imatrix-0731.gguf --ctx-size 8192
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th><code>1bit serve</code></th>
+<th><code>ds4-server</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-m FILE</code></td>
+<td><code>-m FILE</code></td>
+</tr>
+<tr>
+<td><code>--ctx-size N</code></td>
+<td><code>--ctx N</code></td>
+</tr>
+<tr>
+<td><code>--ssd-streaming</code></td>
+<td><code>--ssd-streaming</code>: routed experts from the SSD instead of full residency (GLM 5.x needs it on 128 GB)</td>
+</tr>
+<tr>
+<td><code>--ds4 PATH</code></td>
+<td>a different <code>ds4-server</code> (else <code>$ONEBIT_DS4</code>, else this build's, else <code>ds4-server</code> on PATH)</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>serve</code> has no flag for ds4's expert-cache size (<code>--ssd-streaming-cache-experts N|NGB</code>): it passes only
+<code>--ssd-streaming</code>, so <code>ds4-server</code> sizes the cache itself from the GPU's recommended working set (69 GiB,
+76 GiB planned with the resident weights, on a 128 GB Strix Halo). To run under a set memory budget, start
+<code>ds4-server</code> with the flag yourself and point <code>serve</code> at it with <code>--ds4</code>.</p>
+<p><code>ds4-server</code> opens its port only after the model has loaded, so <code>1bit serve</code> waits
+for its <code>/v1/models</code> (it has no <code>/health</code>). <code>--parallel</code> and <code>--mtp</code> are llama.cpp
+options and are refused on <code>ds4</code>; DwarfStar has its own batching
+(<code>--batched-session</code>) and MTP/DSpark drafting, which <code>serve</code> does not expose yet.</p>
+<p>Memory: the resident DeepSeek V4 Flash Q2 needs about 81 GiB plus runtime buffers,
+and the GPU must see that much (<code>amdgpu.gttsize</code> / <code>ttm.pages_limit</code>, DwarfStar's
+<a href="https://github.com/antirez/ds4/blob/main/docs/STRIX_HALO.md">STRIX_HALO.md</a>).</p>
+<h2 id="1bp-packages">1BP packages<a class="anchor" href="#1bp-packages" title="Permanent link">#</a></h2>
+<p>At the pin of 2026-10-17 (<code>5b013dc1bb75</code>, upstream <code>fc80bd695da7</code> plus our 1BP v5 work: reader,
+converter and checker), DeepSeek V4 Flash Q2 was run on Strix Halo from its GGUF and from its 1BP
+package, against the previous pin (<code>a7f2e1eaf36c</code>): three fixed prompts at temperature 0, two reps
+each, gave <strong>identical answers and token counts in every pairing</strong> (new vs old and GGUF vs package),
+and <code>1bit serve -m &lt;model&gt;.1bp</code> still routes a package to <code>ds4</code> by itself. Both pins ran it with
+<code>--ssd-streaming</code> and a 32 GB expert cache, because the model does not fit resident beside the box's
+other services.</p>
+<p>Our fork reads 1BP v5, 1bit-MONSTER's model package: one memory-mappable file with the 1BP
+header and tensor index, the model's metadata (encoded as GGUF's key/value section) and
+64-byte-aligned weights. The format is in
+<a href="https://github.com/1bit-MONSTER/ds4/blob/1bit/main/docs/1BP.md">docs/1BP.md</a> of the fork.
+The converter copies a GGUF's metadata byte for byte and carries every tensor in its GGUF
+block format, so a package runs exactly as its GGUF:</p>
+<pre><code>python third_party/ds4/gguf-tools/gguf_to_1bp.py hf://antirez/deepseek-v4-gguf@f71f23d5/DeepSeek-V4-Flash-IQ2XXS-w2Q2K-AProjQ8-SExpQ8-OutQ8-chat-v2-imatrix-0731.gguf DeepSeek-V4-Flash-Q2.1bp
+1bit serve -m DeepSeek-V4-Flash-Q2.1bp --ctx-size 8192
+</code></pre>
+<p>An <code>hf://</code> source is read with HTTP range requests, so the GGUF never has to be on disk.
+<code>1bit serve</code> recognises a package by its first four bytes and serves it on <code>ds4</code> (with
+<code>--device auto</code> too). <code>gguf-tools/check_1bp.py &lt;gguf&gt; &lt;1bp&gt;</code> compares a package with its GGUF.</p>
+<p>Checked on Strix Halo: DeepSeek V4 Flash Q2 (1,328 tensors, 62 metadata keys, 80.76 GiB of
+weights), converted from <code>hf://</code> at the revision above, gives the same answers and
+completion-token counts as its GGUF for three prompts at temperature 0 (256 tokens each).
+Qwen3-0.6B Q4_K_M's package passes <code>check_1bp.py</code>: all 310 tensors and 32 metadata keys
+identical.</p>
+<p>1BP's own tile formats (Q4NX, TQ2 and the others the 1BP header defines) do not run in
+DwarfStar yet: a package with one is refused with the tensor's name.</p>
+<h2 id="verified-strix-halo-ds4-0aaea5a238fb-therock-rocm">Verified (Strix Halo, ds4 <code>0aaea5a238fb</code>, TheRock ROCm)<a class="anchor" href="#verified-strix-halo-ds4-0aaea5a238fb-therock-rocm" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DS4_TEST=1 scripts/build-ds4.sh build/ds4</code></td>
+<td>builds; routed-MoE MXFP4 test PASS (0 failures at 128 and 512 tokens, variants bitwise OK)</td>
+</tr>
+<tr>
+<td><code>-DONEBIT_DS4=ON</code> engine build</td>
+<td>builds; ctest 7/7</td>
+</tr>
+<tr>
+<td><code>1bit serve --device ds4 -m &lt;missing file&gt;</code></td>
+<td>DwarfStar's "cannot open model", then serve exits: backend did not become ready</td>
+</tr>
+<tr>
+<td><code>--ssd-streaming</code> with another device</td>
+<td>refused</td>
+</tr>
+<tr>
+<td>DeepSeek V4 Flash Q2 (<code>antirez/deepseek-v4-gguf</code> rev <code>f71f23d5</code>, <code>...-IQ2XXS-w2Q2K-AProjQ8-SExpQ8-OutQ8-chat-v2-imatrix-0731.gguf</code>, 81 GiB) through <code>1bit serve --device ds4 --ctx-size 8192</code></td>
+<td>"The capital of France is Paris.", a working ISO-8601 parser, a correct B-tree walkthrough; decode <strong>14.8 tok/s</strong> (DwarfStar's own log, steady over 256 tokens); first prompt 6.7 s cold, then ~0.5 s</td>
+</tr>
+</tbody>
+</table></div>
+<nav class="pager"><a class="prev" href="onnx-pack.html"><span>Previous</span>ONNX pack</a><a class="next" href="laya.html"><span>Next</span>Laya router</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/dwarfstar.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

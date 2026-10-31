@@ -95,7 +95,7 @@ TAGLINE = ("One binary to rule them all: model-agnostic local LLM inference on t
            "Boot a stick and it serves.")
 # The home page's search title (without the " · 1bit engine" suffix) and description. Keep the
 # description <= DESCRIPTION_MAX characters and update it with each milestone (README.md, docs/hrx.md).
-HOME_TITLE = "Local LLM inference on AMD Ryzen AI MAX+ 395"
+HOME_TITLE = "Strix Halo local LLM: Ryzen AI MAX+ 395, Linux"
 HOME_DESCRIPTION = ("1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside "
                     "Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.")
 HOME_KEYWORDS = ("model-agnostic LLM inference, local LLM, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, HIP kernels, XDNA 2 NPU, live USB, 1bit OS, "
@@ -118,7 +118,7 @@ PAGE_META = {
      'Notes from building the 1bit engine on AMD Strix Halo: measured results on HRX and our HIP kernels, the NPU engine, speculative decoding and quantization.'),
     'serve': ('1bit serve: the OpenAI-compatible API',
      '1bit serve runs the engine behind one OpenAI-compatible API inside Lemonade: devices, model loading, strict GPU placement, --parallel, --mtp, --dflash, --laya.'),
-    'lemonade': ('Lemonade: the onebit backend',
+    'lemonade': ('Lemonade Server backend: the onebit recipe',
      "How the 1bit engine runs inside AMD's Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA."),
     'releases': ('Releases: packages, 1bit OS, checklist',
      "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist."),
@@ -130,9 +130,11 @@ PAGE_META = {
      'The hardware gate runs every HRX pin change and hw-gate PR on a Strix Halo box before merge: kernel tests, known answers, KLD against the release pin.'),
     'architecture': ('How the 1bit engine is built',
      "The technical map: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, DwarfStar, Laya, the hardware gate and the kernel."),
-    'hrx': ('HRX on the Radeon 8060S iGPU',
+    'onnx-pack': ('The ONNX pack: weights to Q4NX, our kernels',
+     "How a plain ONNX graph becomes an NPU pack for the 1bit engine: weights to Q4NX through the runtime's own packer, activations int8, one ELF per shape."),
+    'hrx': ('HRX llama.cpp on the Radeon 8060S iGPU',
      "HRX, AMD's HIP Runtime Extended, with our own HIP kernels on the Radeon 8060S iGPU: pinned sources, quant coverage, MTP and DFlash2, ternary Bonsai, BitNet."),
-    'npu': ('NPU engine on the XDNA 2 NPU',
+    'npu': ('AMD NPU on Linux: the XDNA 2 NPU engine',
      "The engine's NPU route on the Ryzen AI MAX+ 395's XDNA 2 NPU: our own runtime with full-ELF kernel sets, what matches the reference today, and measured numbers."),
     'hybrid': ('Hybrid: NPU prefill, HRX decode',
      '1bit serve --device hybrid processes the prompt on one device and generates on another: a prefill provider fills the KV cache, the HRX llama-server decodes.'),
@@ -161,16 +163,16 @@ PAGE_META = {
 }
 
 # top bar: (label, page name or absolute URL)
-TOP = [("Engine", "overview"), ("Docs", "docs"), ("Blog", "blog"), ("Benchmarks", WIKI)]
+TOP = [("Engine", "overview"), ("Docs", "docs"), ("Blog", "blog"), ("Benchmarks", "models")]
 
 # docs sidebar groups: (title, [(doc name, label)])
 NAV = [
     ("Start", [("serve", "1bit serve"), ("models", "Models measured"), ("lemonade", "Lemonade"), ("releases", "Releases"),
                ("bench", "How we measure"), ("recipes", "Recipes"), ("hw-gate", "Hardware gate")]),
-    ("Devices", [("hrx", "HRX"), ("npu", "NPU engine"), ("onnx", "ONNX Runtime"), ("dwarfstar", "DwarfStar")]),
+    ("Devices", [("hrx", "HRX"), ("npu", "NPU engine"), ("hybrid", "Hybrid"), ("onnx", "ONNX Runtime"), ("onnx-pack", "ONNX pack"), ("dwarfstar", "DwarfStar")]),
     ("Components", [("laya", "Laya router"), ("pm", "Project Manager"), ("registry", "Model registry"),
                     ("arch-gaps", "Architecture gaps"), ("moe-streaming", "MoE streaming"), ("tokenizers", "Tokenizers")]),
-    ("Project", [("architecture", "How the engine is built"), ("PORTING", "Porting map")]),
+    ("Project", [("architecture", "How the engine is built"), ("kernel", "Linux kernel"), ("npu-leaderboard", "NPU leaderboard"), ("PORTING", "Porting map")]),
 ]
 
 
@@ -230,6 +232,8 @@ def rewrite_links(text, src, docs, labels):
             if path_label:
                 label = labels.get(resolved.stem) or title_of(docs[resolved.stem].read_text())
             return f"[{label}]({resolved.stem}.html{frag})"
+        if rel.startswith("docs/") and rel.endswith(".md"):
+            sys.exit(f"link to a doc that does not exist: {rel} (from {here})")
         kind = "tree" if resolved.is_dir() else "blob"
         return f"[{label}]({REPO}/{kind}/main/{rel}{raw_frag})"
 
@@ -306,7 +310,8 @@ ORG = {"@type": "Organization", "@id": ORG_ID, "name": "1bit engine", "url": SIT
 
 
 def jsonld_graph(*nodes):
-    return {"@context": "https://schema.org", "@graph": list(nodes)}
+    # Organization and WebSite ride on every page so publisher/isPartOf @id references resolve in-page
+    return {"@context": "https://schema.org", "@graph": [ORG, website_node(), *nodes]}
 
 
 def website_node():
@@ -425,6 +430,7 @@ def seo_head(name, title, description, og_type, jsonld, noindex, image=None, ima
             f'<meta name="twitter:image" content="{image}">',
             f'<meta name="twitter:image:alt" content="{esc(image_alt)}">']
     if dates:
+        tags += [f'<meta property="article:tag" content="{esc(t)}">' for t in (dates[2] if len(dates) > 2 else [])]
         tags += [f'<meta property="article:published_time" content="{dates[0]}">',
                  f'<meta property="article:modified_time" content="{dates[1]}">',
                  '<meta property="article:author" content="bong-water-water-bong">']
@@ -685,7 +691,7 @@ class Site:
                     "</div></article>")
             modified = max(date, last_commit_date(src))
             self.write(name, (seo_title or title) + SUFFIX, main, "post", "blog", summary, og_type="article",
-                       lastmod=modified, image=image, image_alt=title, dates=(date, modified),
+                       lastmod=modified, image=image, image_alt=title, dates=(date, modified, tags),
                        jsonld=jsonld_graph(article_node("BlogPosting", name, title, meta_description(summary), date, modified,
                                                         image, ", ".join(tags))))
             rows.append((date, name, title, plain(lead), tags, self.md(lead + "\n\n" + body, src), summary))
@@ -695,7 +701,7 @@ class Site:
             f"<h3>{html.escape(t)}</h3><p>{html.escape(clip(s, 320))}</p></div></a>" for d, n, t, s, _, _, _ in rows)
         main = ('<section class="section"><div class="container hero-center hero-narrow">\n'
                 '<p class="eyebrow">Blog · field notes</p>\n'
-                "<h1>How the engine actually gets built.</h1>\n"
+                "<h1>Build notes: local LLMs on AMD Strix Halo</h1>\n"
                 '<p class="lead">Notes on the work: what we port, what we measure, what we ship.</p>\n'
                 "</div></section>\n"
                 '<section class="section"><div class="container">\n'
@@ -714,12 +720,12 @@ class Site:
             return d + "T00:00:00Z"
         entries = "".join(
             f"<entry><title>{html.escape(t)}</title><link href=\"{SITE}{n}.html\"/><id>{SITE}{n}.html</id>"
-            f"<updated>{stamp(d)}</updated><summary>{html.escape(sm)}</summary>"
+            f"<published>{stamp(d)}</published><updated>{stamp(d)}</updated><summary>{html.escape(sm)}</summary>"
             + "".join(f'<category term="{html.escape(x, quote=True)}"/>' for x in tags) +
             f"<content type=\"html\">{html.escape(b)}</content></entry>" for d, n, t, s, tags, b, sm in rows)
         (self.out / "feed.xml").write_text(
             '<?xml version="1.0" encoding="utf-8"?>\n<feed xmlns="http://www.w3.org/2005/Atom">'
-            f'<title>1bit engine</title><link href="{SITE}"/><link rel="self" href="{SITE}feed.xml"/><id>{SITE}</id>'
+            f'<title>1bit engine blog</title><link href="{SITE}"/><link rel="self" href="{SITE}feed.xml"/><id>{SITE}</id>'
             f"<updated>{stamp(rows[0][0])}</updated><author><name>bong-water-water-bong</name></author>{entries}</feed>\n")
         return rows
 
@@ -753,14 +759,14 @@ class Site:
         cards = [card("overview.html", "Engine", "What the engine is, what runs where, and who it is built on.", "engine"),
                  card("docs.html", "Docs", "Every device, every component, and how to run them.", "docs"),
                  card("blog.html", "Blog", "The build log: what moved over, what got faster, what broke.", "blog"),
-                 card(WIKI, "Benchmarks", "Measured, not projected. Every number with how it was taken.", "wiki")]
+                 card("models.html", "Benchmarks", "Measured, not projected. Every number with how it was taken.", "wiki")]
         cards += [card(f"{n}.html", l, clip(first_paragraph(self.docs[n].read_text()), 120), n)
                   for _, items in self.groups for n, l in items]
         mark = ('<svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/>'
                 '<rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/>'
                 '<rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>')
         main = ('<section class="section hero-center"><div class="container">\n'
-                f"<h1>{mark}1bit engine</h1>\n"
+                f"<h1>{mark}1bit engine: local LLMs on Strix Halo</h1>\n"
                 f'<p class="lead">{html.escape(TAGLINE)}</p>\n'
                 '<div class="cta-row"><a class="btn btn-primary" href="serve.html">Get started&nbsp;→</a>'
                 '<a class="btn btn-ghost" href="overview.html">Meet the engine&nbsp;→</a></div>\n'
@@ -770,7 +776,7 @@ class Site:
                 f'<div class="site-grid">{"".join(cards)}</div>\n</div></section>')
         self.write("index", HOME_TITLE + SUFFIX, main, "home", "", description=HOME_DESCRIPTION,
                    lastmod=max(last_commit_date(ROOT / "tools" / "site.py"), self.posts_modified()),
-                   jsonld=jsonld_graph(ORG, website_node(), software_node()))
+                   jsonld=jsonld_graph(software_node()))
 
     # ── 404 ───────────────────────────────────────────────────────────
     def not_found(self):

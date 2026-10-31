@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Models measured on a Ryzen AI MAX+ 395 · 1bit engine</title>
+<meta name="description" content="Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Models measured on a Ryzen AI MAX+ 395 · 1bit engine">
+<meta property="og:description" content="Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.">
+<link rel="canonical" href="https://1bit.gg/models.html">
+<meta property="og:url" content="https://1bit.gg/models.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Models measured on a Ryzen AI MAX+ 395 · 1bit engine">
+<meta name="twitter:description" content="Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-10-30">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/models.html#article", "headline": "Models measured on a Ryzen AI MAX+ 395", "description": "Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.", "url": "https://1bit.gg/models.html", "mainEntityOfPage": "https://1bit.gg/models.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-10-30", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html" aria-current="page">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="models-measured-on-a-ryzen-ai-max-395">Models measured on a Ryzen AI MAX+ 395<a class="anchor" href="#models-measured-on-a-ryzen-ai-max-395" title="Permanent link">#</a></h1>
+<p>The models the engine is checked against, with the number each one measured on the Strix Halo box
+at the current pins. One row is one model file on one route; the standard each number was taken in
+is in <a href="bench.html">How we measure</a>, and the routes are described in <a href="hrx.html">HRX</a> and <a href="npu.html">NPU engine</a>.
+Every ggml weight type runs on HRX, including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ
+formats.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>model</th>
+<th>file, route</th>
+<th>measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen3.8-27B</td>
+<td>UD-Q4_K_XL, HRX</td>
+<td>decode 36.0 tok/s with MTP on code prompts; 56.6 tok/s with the DFlash2 drafter</td>
+</tr>
+<tr>
+<td>Qwen3.8-Flash-Next (MoE)</td>
+<td>HRX</td>
+<td>prefill 287 tok/s, decode 24.0 tok/s</td>
+</tr>
+<tr>
+<td>Zyphra ZAYA1-8B</td>
+<td>Q4_K_M, HRX</td>
+<td>decode 157 tok/s</td>
+</tr>
+<tr>
+<td>PrismML Ternary-Bonsai-2-27B</td>
+<td>PQ2_0, 6.7 GiB, HRX</td>
+<td>decode 43.3 tok/s with MTP</td>
+</tr>
+<tr>
+<td>Microsoft BitNet b1.58 2B-4T</td>
+<td>TQ2_0 ternary GGUF (TQ1_0 runs too), 1.11 GiB, 2.06 bits per weight, HRX</td>
+<td>end to end on the Radeon 8060S, no CPU fallback; decode tg128 123.4 tok/s after the TQ2_0 load-time repack onto the packed-ternary decode kernel (101.6 before it, same binary); perplexity 102.42 on HRX vs 102.56 on the CPU, same file</td>
+</tr>
+<tr>
+<td>Qwen3-0.6B</td>
+<td>NPU route</td>
+<td>decode 88.6 tok/s in the release gate</td>
+</tr>
+<tr>
+<td>gpt-oss-20b</td>
+<td>MXFP4, HRX</td>
+<td>runs on HRX</td>
+</tr>
+</tbody>
+</table></div>
+<p>The numbers move with the pins; a row changes when its measurement is retaken. The Lemonade
+release the engine runs inside is the weekly pin in <code>third_party/lemonade</code> (<a href="lemonade.html">Lemonade</a>).</p>
+<nav class="pager"><a class="prev" href="serve.html"><span>Previous</span>1bit serve</a><a class="next" href="lemonade.html"><span>Next</span>Lemonade</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/models.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>
