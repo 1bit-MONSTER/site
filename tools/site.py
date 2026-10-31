@@ -129,7 +129,7 @@ PAGE_META = {
     'hw-gate': ('HRX hardware gate on Strix Halo',
      'The hardware gate runs every HRX pin change and hw-gate PR on a Strix Halo box before merge: kernel tests, known answers, KLD against the release pin.'),
     'architecture': ('How the 1bit engine is built',
-     "The technical map: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, DwarfStar, Laya, the hardware gate, the kernel, the direction."),
+     "The technical map: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, DwarfStar, Laya, the hardware gate and the kernel."),
     'hrx': ('HRX on the Radeon 8060S iGPU',
      "HRX, AMD's HIP Runtime Extended, with our own HIP kernels on the Radeon 8060S iGPU: pinned sources, quant coverage, MTP and DFlash2, ternary Bonsai, BitNet."),
     'npu': ('NPU engine on the XDNA 2 NPU',
