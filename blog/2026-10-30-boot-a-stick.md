@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 tags: 1bit-os, live-usb, lemonade, strix-halo, ryzen-ai-max-395, local-llm, getting-started
-title: Boot a stick
-summary: The simplest way to run local LLMs on a Ryzen AI MAX+ 395: write the 1bit OS image to a USB stick, boot it with Secure Boot on, and Lemonade is serving on the GPU and the NPU. One command installs it to the disk.
+title: Boot a USB stick: local LLMs on Strix Halo
+summary: Write the 1bit OS image to a USB stick, boot a Ryzen AI MAX+ 395 with Secure Boot on, and Lemonade serves local LLMs on the GPU and NPU. One command installs.
 
 # Boot a stick
 

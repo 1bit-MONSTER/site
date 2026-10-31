@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 tags: npu, xdna2, hrx, hybrid, strix-halo, measurement, amd-npu-linux
-title: The GPU and the NPU at the same time, measured
-summary: A report said running the Radeon iGPU and the XDNA 2 NPU together could hang a Strix Halo box or corrupt NPU results while the fabric clock changes. Forty reps say it does not; a busy GPU costs the NPU about 13 % of its weight stream, and nothing else.
+title: GPU and NPU at once on Strix Halo, measured
+summary: Forty reps say the Radeon iGPU and the XDNA 2 NPU run together on Strix Halo with no hang and no corruption; a busy GPU costs the NPU about 13 % of its stream.
 
 # The GPU and the NPU at the same time, measured
 

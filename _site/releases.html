@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Releases: packages, 1bit OS, checklist · 1bit engine</title>
+<meta name="description" content="The 1bit engine&#x27;s releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Releases: packages, 1bit OS, checklist · 1bit engine">
+<meta property="og:description" content="The 1bit engine&#x27;s releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist.">
+<link rel="canonical" href="https://1bit.gg/releases.html">
+<meta property="og:url" content="https://1bit.gg/releases.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Releases: packages, 1bit OS, checklist · 1bit engine">
+<meta name="twitter:description" content="The 1bit engine&#x27;s releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-26">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/releases.html#article", "headline": "Releases", "description": "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist.", "url": "https://1bit.gg/releases.html", "mainEntityOfPage": "https://1bit.gg/releases.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-26", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html" aria-current="page">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="releases">Releases<a class="anchor" href="#releases" title="Permanent link">#</a></h1>
+<p>The first release goes out when every item on the release checklist is done; it is not published
+yet.</p>
+<p>1bit engine is pinned upstream: every backend it builds is a submodule at a fixed commit
+(<code>third_party/</code>), and the <code>bump-*</code> workflows open a PR whenever an upstream moves. The engine
+runs inside Lemonade, which releases on Fridays. The release run (<code>scripts/weekly.sh</code>) rebuilds
+everything from scratch at the current pins, so each release carries that week's upstreams.</p>
+<p>Releases are tagged <code>v&lt;ISO year&gt;.&lt;ISO week&gt;</code> (<code>v2026.40</code>), like Lemonade's <code>2026.39.1</code>; a second
+release in the same week gets <code>.1</code>.</p>
+<h2 id="v202643-candidate-23-oct">v2026.43 (candidate, 23 Oct)<a class="anchor" href="#v202643-candidate-23-oct" title="Permanent link">#</a></h2>
+<p>Built from <code>main</code> by the release run; <strong>nothing is tagged or published yet</strong> — the owner publishes.
+The run records the artifacts, their checksums and every check's log beside the candidate build, and
+the package rows below are filled from that record and are marked <em>pending</em> until it exists.</p>
+<p>Release sha and pins (the submodules this candidate is built from):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>component</th>
+<th>pin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>engine</td>
+<td><code>7871c71d</code> (main when the last release-blocking PR merged; a later merge today re-runs only the stages it touches, and the run's record carries the final sha)</td>
+</tr>
+<tr>
+<td>llama.cpp (HRX fork)</td>
+<td><code>851fa6c8d8f2</code></td>
+</tr>
+<tr>
+<td>hrx-system</td>
+<td><code>82804197bcbe</code></td>
+</tr>
+<tr>
+<td>Lemonade (fork)</td>
+<td><code>27abcc24da99</code></td>
+</tr>
+<tr>
+<td>private kernel add-on (HIP)</td>
+<td><code>744bd713d968</code></td>
+</tr>
+<tr>
+<td>private NPU kernel set</td>
+<td><code>17ed5be7a28a</code></td>
+</tr>
+<tr>
+<td>private NPU runtime</td>
+<td><code>ce9fa59adf95</code></td>
+</tr>
+<tr>
+<td>Laya</td>
+<td>source <code>6f0496f797dc</code>, model <code>7b928d828b7b</code></td>
+</tr>
+<tr>
+<td>amdxdna (out-of-tree NPU driver)</td>
+<td><code>526c608197</code></td>
+</tr>
+<tr>
+<td>DwarfStar / tokenizers</td>
+<td><code>5b013dc1bb</code> / <code>3012770722</code></td>
+</tr>
+</tbody>
+</table></div>
+<div class="table"><table>
+<thead>
+<tr>
+<th>artifact</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lemonade-onebit-v2026.43-linux-x86_64.tar.zst</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td><code>1bit-os-v2026.43.img.zst</code>, <code>1bit-os-v2026.43.efi</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td><code>binary-drop-v2026.43.tar.zst</code></td>
+<td>pending</td>
+</tr>
+<tr>
+<td><code>changes.json</code>, <code>SHA256SUMS</code></td>
+<td>pending</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table"><table>
+<thead>
+<tr>
+<th>check</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>weekly.sh build test package</code> at the pins above</td>
+<td>pending</td>
+</tr>
+<tr>
+<td><code>package_checks</code> (the packaging's own leak scan: no plaintext NPU artifacts, no private symbols)</td>
+<td>pending</td>
+</tr>
+<tr>
+<td><code>1bit check</code> from the packed tarball on a clean prefix</td>
+<td>pending</td>
+</tr>
+<tr>
+<td>hardware gate, all phases (ops, fa-decode-q8, kat, kld, needle, placement, <strong>npu</strong>)</td>
+<td>pending</td>
+</tr>
+<tr>
+<td>OS image VMTEST (<code>os/mini/vmtest.sh</code>)</td>
+<td>pending</td>
+</tr>
+<tr>
+<td>binary drop built from a clean tree with no private parts</td>
+<td>pending</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="what-moved-since-the-last-rehearsal-18-oct">What moved since the last rehearsal (18 Oct)<a class="anchor" href="#what-moved-since-the-last-rehearsal-18-oct" title="Permanent link">#</a></h3>
+<p>Every line is a merged PR; the numbers are measured, and the ones measured on Strix Halo carry the
+power state they were taken in. <strong>lemonade bench standard</strong> = Lemonade's own CI benchmark (reload
+before every run); <strong>ours</strong> = our sampler/batched standard (see the table legend in
+the auto-opt database).</p>
+<p><strong>HRX speed (ours).</strong> Qwen3.8-27B UD-Q4_K_XL with MTP, greedy 256-token chats: <strong>36.0 / 26.8 / 29.9
+tok/s</strong> on code / prose / short, from 25.9 / 20.5 / 21.9 before the speculative verify pass was
+reworked — the step it took is 121 ms to 88 ms per step (<code>#487</code>). Decode without MTP stays 12.2 tok/s.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>change</th>
+<th>PR</th>
+<th>measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>speculative verify pass rework</td>
+<td><code>#487</code></td>
+<td>27B <code>--mtp</code> <strong>+31–39 %</strong></td>
+</tr>
+<tr>
+<td>batched MoE decode</td>
+<td><code>#521</code>, <code>#526</code></td>
+<td>pin <code>744bd713d968</code>: batching pays from five tokens per window; the batched cells below were measured one pin earlier (90 W cap, PCM pad (23 Oct))</td>
+</tr>
+<tr>
+<td>decode attention for gated attention at long context</td>
+<td><code>#500</code></td>
+<td>Qwen3.5-4B 32K decode <strong>23.7 → 47.1 tok/s</strong>; 27B <strong>7.5 → 11.0</strong></td>
+</tr>
+<tr>
+<td>MoE formats for Qwen3.8-Flash-Next</td>
+<td><code>#494</code></td>
+<td><strong>5.1 → 26 tok/s</strong>, 50 with MTP</td>
+</tr>
+<tr>
+<td>HIP prompt flash attention, causal block skipping</td>
+<td><code>#491</code></td>
+<td>Qwen3-4B pp4096 <strong>+45 %</strong></td>
+</tr>
+<tr>
+<td>m128 prefill tiles + raster groups</td>
+<td><code>#490</code></td>
+<td>27B prefill <strong>+1.6…2.5 %</strong></td>
+</tr>
+<tr>
+<td>query-chunk prompt FA, ROPE token chunks, int4 SwiGLU opt-in</td>
+<td><code>#493</code></td>
+<td>27B KLD base re-recorded; 27B runs <code>-ub 4096</code></td>
+</tr>
+<tr>
+<td>a second warm-up at load builds the small-batch weight layout</td>
+<td><code>#498</code></td>
+<td>27B chat-short TTFT <strong>2.64 → 0.80 s</strong></td>
+</tr>
+<tr>
+<td>warm the backend before the first client request</td>
+<td><code>#492</code></td>
+<td>removes the 5–23 % slower first request</td>
+</tr>
+<tr>
+<td>MTP drafts with the model's own head on HRX by default</td>
+<td><code>#495</code></td>
+<td><code>--print-backend</code> carries the warm-up</td>
+</tr>
+<tr>
+<td><code>--precise</code>: a follow-up turn bitwise identical to a cold run</td>
+<td><code>#504</code></td>
+<td>identity, not speed</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Batched, ours standard</strong> (N concurrent 256-token chat requests, <code>-c 8192</code> per slot, median of 3,
+<strong>90 W cap, PCM pad (23 Oct)</strong>), aggregate tok/s at N=8: Qwen3.8-27B <strong>50.7</strong> (2.08x N=1, with the
+model's own MTP draft), Qwen3-Coder-30B-A3B <strong>138.1</strong> (1.64x), Qwen3.5-4B <strong>194.3</strong> (3.39x). Single
+stream in the same cells: Coder-30B 84.2, 27B 24.3 (MTP on; 12.2 without), Qwen3.5-4B 57.3. Lemonade's
+Vulkan build reaches 245.7 on Coder-30B at N=8 in the same run — that gap is batching headroom, not a
+model result, and it is the next speed row.</p>
+<p><strong>Correctness and placement.</strong> Strict device placement is the default: a graph with any node off HRX
+refuses to load, and the hardware gate fails the same condition (<code>#482</code>, <code>#473</code>, <code>#442</code>). The census
+closes <strong>43 of 43</strong> configurations with 0 nodes off the GPU and one graph split (<code>#476</code>, <code>#480</code>,
+<code>#481</code>), the gate now covers q8_0 KV rows, a mixed K/V flash-attention case, an MoE model, an IQ
+quant and a second needle (<code>#474</code>, <code>#477</code>, <code>#484</code>), and the KLD bases were re-recorded at the release
+pin (<code>#456</code>). <code>#315</code> is <strong>resolved</strong>: the CWSR-on soak passed 37 arms over 9 h 03 min with 0 faults
+(<code>#518</code>), after the CWSR save area moved into GTT (<code>#454</code>) and <code>hrx-system</code> gained its
+<code>HRX_ALLOW_NO_SVM</code> gate (<code>#455</code>). A lost GPU now exits the server instead of serving from a broken
+context (<code>#466</code>), allocation safety bounds the program cache and poisons a device after a fault
+(<code>#486</code>), and the ZAYA1-8B NaN re-check closed on <strong>120 fresh loads, 0 NaN</strong> at the current pins
+(<code>#433</code>).</p>
+<p><strong>NPU (sealed).</strong> The gate gained an NPU phase and the packages carry <strong>only the sealed kernel
+sets</strong> — a plaintext artifact fails the packaging check, and the launcher refuses an unsealed one
+(<code>#503</code>, <code>#505</code>, <code>#509</code>, <code>#512</code>). The 0.6B gate phase measures <strong>90.33 tok/s</strong>; the OS image proves
+<code>amd_pmf</code> sensors and the NPU from the booted image (<code>#517</code>, <code>#523</code>). The runtime's public header and
+prebuilt-library build are in the tree (<code>#467</code>, <code>#479</code>, <code>#469</code>).</p>
+<p><strong>Lemonade.</strong> One hop for GGUFs: Lemonade starts the engine's <code>llama-server</code> directly, no shim
+(<code>#475</code>, fork <code>#15</code>), the engine's own warm-ups are sent in order (<code>#492</code>, fork <code>#16</code>, <code>#17</code>), and
+the Ubuntu 26.04 PPA's <code>lemond</code> runs our HRX server unchanged (<code>#483</code>). Synced to upstream <code>#3771</code>
+(fork <code>#21</code>, <code>#520</code>). The catalog has <strong>22 HRX entries, each proven on the box</strong> — strict placement,
+one request in role, <code>lemonade bench ... chat-short</code> — and 3 NPU entries (fork <code>#19</code>, <code>#20</code>, <code>#23</code>);
+chat-short spans 43.4 (Qwen3-8B) to 330.7 tok/s (Qwen3-0.6B), 0 faults in 16 holds.</p>
+<p><strong>1bit OS.</strong> The image carries the sealed NPU sets and the new Lemonade (<code>#512</code>, <code>#523</code>), the UKI is
+signed with the enrolled MOK so a stick boots with Secure Boot on (<code>#513</code>), the USB4 v2 / Thunderbolt
+stack is loaded (<code>#514</code>), and <code>amd_pmf</code> sensors come up from the booted image (<code>#517</code>). The install
+step is not in this candidate (branch <code>1bit/os-install</code>).</p>
+<p><strong>Tooling.</strong> <code>scripts/gpu-hold</code>: a fair FIFO GPU queue, used by the hardware gate and the release
+runs, which honours the box's thermal brake and cools down after a hot hold (<code>#501</code>, <code>#502</code>). Census
+and pins kept current daily (<code>#506</code>, <code>#524</code>), and the kernel is now a written runbook with a
+rehearsal at <code>v7.3</code> and linux-next <code>next-20261022</code> (<code>#525</code>).</p>
+<h2 id="what-a-release-carries">What a release carries<a class="anchor" href="#what-a-release-carries" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>file</th>
+<th>what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lemonade-onebit-&lt;tag&gt;-linux-x86_64.tar.zst</code></td>
+<td>Lemonade (<code>lemond</code>, <code>lemonade</code>, its web app) from our fork with the onebit recipe, and the engine in <code>1bit/</code>: <code>1bit</code> and every backend: HRX (and the CPU, from the same llama-server), DwarfStar, and the NPU engine's runtime (the NPU route is in progress, <a href="#the-npu-engine">below</a>). No Vulkan or ROCm llama.cpp since RFC #213 stage 3</td>
+</tr>
+<tr>
+<td><code>1bit-os-&lt;tag&gt;.img.zst</code>, <code>1bit-os-&lt;tag&gt;.efi</code></td>
+<td>1bit OS, a Lemonade appliance with the engine as a bootable USB image (<a href="https://github.com/1bit-MONSTER/engine/blob/main/os/README.md">os/README.md</a>)</td>
+</tr>
+<tr>
+<td><code>changes.json</code>, <code>SHA256SUMS</code></td>
+<td>what moved upstream since the last release, as data; checksums</td>
+</tr>
+</tbody>
+</table></div>
+<p>The engine is embedded in Lemonade, so it ships only inside those two: there is no standalone
+engine tarball and no Windows package (Lemonade has its own Windows build). On the GPU the engine
+is pure HRX with HIP kernels: no Vulkan, ROCm backend, Metal, ZINC or CUDA. Lemonade serves those
+with its own backends.</p>
+<p>The engine in <code>1bit/</code> keeps the build tree's layout (<code>scripts/package-linux.sh</code>): <code>1bit</code> finds each
+backend at the same path relative to itself as in the build (<code>app/built_path.h</code>), and every program
+finds its libraries beside itself. Unpack the package anywhere and start Lemonade through
+<code>lemond-onebit</code>, which points Lemonade's onebit backend at the packaged <code>1bit</code>
+(<code>LEMONADE_ONEBIT_BIN</code>):</p>
+<pre><code class="language-sh">tar --zstd -xf lemonade-onebit-v2026.40-linux-x86_64.tar.zst
+lemonade-onebit-v2026.40/lemond-onebit           # lemond with the onebit recipe on the packaged engine
+</code></pre>
+<p>The builds target Strix Halo: the llama.cpp backends are built with <code>GGML_NATIVE</code> on its Zen 5. HRX needs TheRock in
+<code>/opt/rocm-therock</code>; the NPU needs the <code>amdxdna</code> kernel driver. The closed NPU add-ons
+(<a href="npu.html#add-on-routes">NPU engine</a>) are never in a release.</p>
+<h3 id="the-npu-engine">The NPU engine<a class="anchor" href="#the-npu-engine" title="Permanent link">#</a></h3>
+<p>The release is the HRX runtime with our HIP kernels and the NPU engine, all inside Lemonade. The
+release carries the NPU runtime, compiled into <code>1bit</code>, and the <code>onebit</code> recipe's <code>npu</code> backend.
+The NPU kernels are closed too: they ship as sealed artifacts that <code>1bit</code> verifies and opens in
+memory at load, failing cleanly on a
+wrong key with no network callback of any kind; a lifted kernel file is ciphertext and does not run
+(<a href="npu.html">NPU engine</a>). The release package carries them, and serves dense Qwen3 (0.6B, 1.7B, 4B)
+on the NPU.</p>
+<p><code>scripts/weekly.sh</code> packs them by default (<code>WEEKLY_NPU_KERNELS=0</code> builds without): the sealed
+kernel sets go beside <code>1bit</code> in <code>npu/kernels</code>, the build loads sealed kernels only
+(<code>ONEBIT_NPU_RELEASE</code>), the <code>lemond-onebit</code> launcher sets <code>ONEBIT_KCRYPT_REQUIRE_SEALED=1</code>, and the package checks refuse a plaintext kernel,
+an ELF for anything but the host, a symbol table in <code>1bit</code>, or a private source name in it. The
+release machine holds the kernel key in <code>ONEBIT_NPU_KEY_DIR</code> (default <code>~/.config/1bit-npu-key</code>).</p>
+<p>Sealing is confidentiality; each set is signed too (#574). Before a set is packed it gets
+<code>manifest.json</code> - every file the set ships, with the sha256 of its ciphertext - and <code>manifest.sig</code>,
+Ed25519 over that manifest by the release signing key (<code>tools/seal_manifest.py write &lt;set&gt; --key
+&lt;release key&gt;</code>, <code>ONEBIT_SEAL_KEY</code>). Packaging requires both: <code>scripts/package-linux.sh</code> and the
+weekly <code>package_checks</code> refuse a set without them or a manifest that does not match the files
+packed, and verify the signatures when <code>ONEBIT_SEAL_PUB</code> names the release public key.
+<code>1bit-release-check</code> proves the same on a written stick, so a set that was re-sealed or swapped
+fails the checks even though it still opens.</p>
+<h3 id="private-components">Private components<a class="anchor" href="#private-components" title="Permanent link">#</a></h3>
+<p>Two components of the release binaries are proprietary and compiled in; their source is not in
+this repository or in any release. They ship under the <a href="https://github.com/1bit-MONSTER/engine/blob/main/LICENSE-BINARY">1bit Binary License</a>:
+anyone may use them for any purpose, including commercial use, and pass on exact unmodified
+copies with the license and notices; modifying them, reverse engineering them (except where the law
+expressly allows it) and removing notices are not allowed. The third-party code inside them is listed
+with its licenses in <a href="https://github.com/1bit-MONSTER/engine/blob/main/NOTICE-BINARY">NOTICE-BINARY</a>. Every release package and the 1bit OS image
+carry both files beside the engine's <code>LICENSE</code> and <code>NOTICE</code>:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Compiled into</th>
+<th>Pin</th>
+<th>Build option</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The 1bit NPU runtime (<a href="npu.html#the-runtime">NPU engine</a>)</td>
+<td><code>1bit</code> (static)</td>
+<td><code>config/npu-runtime.config</code></td>
+<td><code>ONEBIT_NPU_RT_DIR</code> (or a prebuilt <code>ONEBIT_NPU_RT_LIB</code>)</td>
+</tr>
+<tr>
+<td>The private HIP kernels for HRX (<a href="hrx.html">HRX</a>, "Private HIP kernels")</td>
+<td><code>hrx/llama/bin/libggml-hrx.so</code> (code objects)</td>
+<td><code>config/gpu-kernels.config</code></td>
+<td><code>ONEBIT_GPU_PRIVATE</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The build stage fetches each with <code>scripts/fetch-private.sh &lt;pin&gt; &lt;dir&gt;</code>: the pinned path at the
+pinned commit only, with the release machine's <code>gh</code> login (read access to the private
+repositories). The run stops if either cannot be fetched or is not at its pinned sha. Move a pin
+by hand, after the NPU check or the HRX checks on Strix Halo.</p>
+<h3 id="the-public-binary-drop">The public binary drop<a class="anchor" href="#the-public-binary-drop" title="Permanent link">#</a></h3>
+<p>A source build outside the org has no private HIP kernels and no private NPU runtime, so it cannot
+compile those parts itself. <code>scripts/make-binary-drop.sh &lt;engine checkout&gt; &lt;out dir&gt;</code> packs them
+already compiled, for one engine pin, as <code>binary-drop-&lt;version&gt;.tar.zst</code> + <code>SHA256SUMS</code>:</p>
+<pre><code>binary-drop-&lt;version&gt;/
+  hrx/llama/bin/        llama-server, llama-bench and the libraries beside them, libggml-hrx.so
+                        with the private HIP kernels compiled in
+  npu/libnpu_rt_api.a   the NPU runtime behind the engine's public npu/npu_rt_api.h
+  npu/include/          npu_rt_api.h (the engine's own public header)
+  LICENSE-BINARY NOTICE-BINARY LICENSE NOTICE
+  MANIFEST              the pins below, the build host, the compilers, sha256 of every file
+</code></pre>
+<p>It takes the HRX tree from a release build (<code>--build &lt;dir&gt;</code>, packed the way <code>package-linux.sh</code>
+packs it: the same <code>scripts/pack-elf.sh</code> steps copy the libraries it loads beside it, set RUNPATH
+to <code>$ORIGIN</code> and strip it) or from an already packed release (<code>--from-package &lt;tar.zst&gt;</code>), and the NPU library either prebuilt (<code>--npu-lib</code>) or built from the
+pinned private sources (<code>--npu-rt &lt;dir&gt;</code>, its <code>build-api-lib.sh</code>). It then runs the same class of
+checks the release package runs: the NPU runtime compiled in, the kernels really are compiled in, no source files,
+nothing named like the private sources, both binary licenses present, every library found. It publishes nothing; the
+orchestrator publishes the tarball and adds its line to <code>config/binary-drop.config</code>.</p>
+<p>To build against a drop, point CMake at it — a directory or the tarball's URL:</p>
+<pre><code>cmake -B build -DONEBIT_HRX=ON -DONEBIT_NPU=ON -DONEBIT_BINARY_DROP=/path/to/binary-drop-&lt;version&gt;
+# or -DONEBIT_BINARY_DROP=https://…/binary-drop-&lt;version&gt;.tar.zst
+</code></pre>
+<p>A URL is only accepted when <code>config/binary-drop.config</code> pins its sha256 for the engine commit being
+built (<code>drop=&lt;engine sha&gt; &lt;version&gt; &lt;sha256&gt;</code>); <code>file(DOWNLOAD)</code> refuses a body that does not match.
+A directory is verified against its <code>MANIFEST</code> — every file's sha256, and the engine commit it was
+built from — and a mismatch, or a drop built for another commit, stops the configure. With a drop in
+place, <code>ONEBIT_GPU_PRIVATE</code> and <code>ONEBIT_NPU_RT_DIR</code> are not needed and not used: the build links
+<code>hrx/llama/bin/llama-server</code> and <code>npu/libnpu_rt_api.a</code> from the drop, and does not build llama.cpp,
+so the <code>llama.cpp</code> and <code>hrx-system</code> submodules are not required either. HRX still needs TheRock's
+HSA runtime on the machine that runs it.</p>
+<p>The NPU engine's runtime is compiled into <code>1bit</code>; no packed program needs a separate NPU runtime
+library. <code>scripts/package-linux.sh</code> strips every packed program and library (<code>strip
+--strip-unneeded</code>) and makes each find its libraries beside itself (<code>$ORIGIN</code>, <code>scripts/pack-elf.sh</code>),
+with LLVM's OpenMP runtime (<code>libomp.so</code>, which the HRX llama.cpp libraries link when TheRock's
+amdclang builds them; credited in <code>NOTICE-BINARY</code>) packed in <code>hrx/llama/bin</code>. After packing the engine tarball the package stage checks
+(<code>logs/package-checks.log</code>; a failure stops the release):</p>
+<ul>
+<li><strong>Self-contained NPU runtime:</strong> for the build's <code>1bit</code> and every program and library in the
+  tarball, no separate NPU runtime library is needed or packed.</li>
+<li><strong>Kernels in:</strong> the packed <code>libggml-hrx.so</code> exports the add-on's <code>ggml_hrx_hip_addon_register</code>.</li>
+<li><strong>No source:</strong> no source file (<code>.hip</code>, <code>.c</code>, <code>.cc</code>, <code>.cpp</code>, <code>.cxx</code>, <code>.h</code>, <code>.hpp</code>, <code>.inc</code>, <code>.cu</code>,
+  <code>.cmake</code>) and no file named like one of the private checkouts' files. The three public GGUF-on-NPU
+  helper scripts are the stated exception: <code>scripts/repack_gguf.py</code>, its declared-scale guard
+  <code>scripts/check_repack_config.py</code> and the lane packer <code>tools/gguf_to_q4nx.py</code> are the engine's own
+  Apache-2.0 source, published in this repository, and a packed install cannot serve a GGUF on the
+  NPU without them (<a href="npu.html#from-a-gguf">NPU engine</a>). The check fails if a tarball carrying the NPU
+  kernels is missing any of the three.</li>
+<li><strong>Licensed:</strong> <code>LICENSE</code>, <code>NOTICE</code>, <code>LICENSE-BINARY</code> and <code>NOTICE-BINARY</code> are in the tarball.</li>
+<li><strong>Libraries found:</strong> <code>ldd</code> (with <code>ROCR_VISIBLE_DEVICES=-1</code>) finds every library each packed
+  program and library needs, except the TheRock runtime the package documents (HIP, hipBLAS(Lt),
+  rocBLAS, HSA, which DwarfStar links).</li>
+<li><strong>Links inside:</strong> every symlink in the engine tarball and in the Lemonade + onebit tarball is
+  relative and resolves inside the package (<code>pack_outside_links</code>); the <code>libggml*.so</code> -&gt;
+  <code>.so.0</code> links stay links. Lemonade's build links its web app's KaTeX fonts to the build
+  machine's <code>/usr/share/fonts/truetype/katex</code>; the package stage and <code>os/mini/mkimage.sh</code> copy
+  every link that points out of the tree as a file (<code>pack_localize_links</code>, <code>scripts/pack-elf.sh</code>).</li>
+<li><strong>Web app:</strong> the Lemonade + onebit tarball carries Lemonade's web app
+  (<code>bin/resources/web-app/index.html</code>), the UI <code>lemond</code> serves at <code>/</code>, as 1bit OS does.</li>
+</ul>
+<p><code>SHA256SUMS</code> is written again by the release stage, after <code>changes.json</code>, so it covers every file.</p>
+<p>To exercise only the private builds and the packaging without releasing, on Strix Halo:</p>
+<pre><code class="language-sh">WEEKLY_DRY_RUN=1 WEEKLY_TAG=rehearsal-private scripts/weekly.sh ~/.cache/1bit-weekly build package
+</code></pre>
+<h2 id="the-release-run">The release run<a class="anchor" href="#the-release-run" title="Permanent link">#</a></h2>
+<p><code>scripts/weekly.sh &lt;workdir&gt;</code> on Strix Halo, in stages:</p>
+<ol>
+<li><strong>bumps</strong>: each open <code>bump-*</code> PR is merged onto <code>main</code> locally, built with every backend, and
+   tested: <code>ctest</code> (with the <code>serve</code> end-to-end tests on Qwen3-0.6B) plus the check that bump needs,
+   below. A PR that passes is brought up to date, waits for CI, and is merged. One that fails stays
+   open, and the release lists it as held back.</li>
+<li><strong>build</strong> and <strong>test</strong>: <code>main</code> at the merged pins, the same way.</li>
+<li><strong>package</strong>: the two packages above. <code>scripts/package-linux.sh</code> packs the engine first; its
+   tarball goes into the Lemonade + onebit package as <code>1bit/</code>, not into the release on its own.</li>
+<li><strong>release</strong>: <code>tools/weekly_changes.py</code> lists, for every pin that moved since the last release,
+   the upstream commits (authors, PRs) and releases in between; that becomes the release notes and
+   <code>changes.json</code>, and <code>gh release create</code> publishes it all.</li>
+</ol>
+<p><code>WEEKLY_DRY_RUN=1</code> merges and publishes nothing; stages can be run one at a time
+(<code>scripts/weekly.sh ~/.cache/1bit-weekly build test</code>).</p>
+<p>Before the first stage runs, <code>weekly.sh</code> checks what the machine must have (the 2026-10-19
+rehearsal found these only after the build) and stops with a message naming what is missing:</p>
+<ul>
+<li><strong>bumps, build:</strong> TheRock in <code>/opt/rocm-therock</code>, or <code>-DONEBIT_HRX_TOOLCHAIN=&lt;dir&gt;</code> in
+  <code>WEEKLY_CMAKE_ARGS</code>; <code>hipcc</code> for DwarfStar, in TheRock or <code>/opt/rocm</code>, or <code>ROCM_PATH</code>.</li>
+<li><strong>package:</strong> <code>patchelf</code> (<code>scripts/package-linux.sh</code>); <code>node</code> and <code>npm</code> for Lemonade's web app
+  (<code>LEMONADE_WEB_APP=1 scripts/build-lemonade.sh</code>; its <code>npm ci</code> needs the network); a readable kernel image for 1bit OS,
+  <code>/boot/vmlinuz-$(uname -r)</code> or <code>VMLINUZ=&lt;copy&gt;</code> (Ubuntu's <code>/boot/vmlinuz-*</code> is root-only).
+  Which kernel that image should carry, and how a new one is built, signed and gated before it is
+  allowed on the box, is <a href="kernel.html">Linux kernel</a>.
+  The image's licences step copies from the submodules of the run's own checkout (<code>&lt;workdir&gt;/src</code>,
+  checked out by the build stage), so run <code>os/mini/mkimage.sh</code> from there, not from a plain
+  worktree without submodules.</li>
+</ul>
+<h3 id="bumps">Bumps<a class="anchor" href="#bumps" title="Permanent link">#</a></h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>PR</th>
+<th>check beyond build + ctest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bump-lemonade/*</code></td>
+<td>Lemonade's LLM suite through the onebit recipe on HRX (<a href="lemonade.html">Lemonade</a>)</td>
+</tr>
+<tr>
+<td><code>bump-laya/*</code></td>
+<td><code>tests/laya_route_e2e.sh</code> on the pinned checkpoint</td>
+</tr>
+<tr>
+<td><code>bump-ds4/*</code></td>
+<td>DwarfStar's routed-MoE test (<code>DS4_TEST=1 scripts/build-ds4.sh</code>)</td>
+</tr>
+<tr>
+<td><code>bump-hrx/*</code></td>
+<td>every <code>hrx</code> row of <code>registry/check_models.tsv</code> through <code>tools/registry_check.py</code> (serve end to end per architecture, ZAYA1 and the Qwen MoE models included); any FAIL holds the bump</td>
+</tr>
+<tr>
+<td><code>bump-xdna/*</code>, <code>bump-tokenizers/*</code></td>
+<td>covered by build + ctest (serve end to end on each device); the xdna-driver pin is the <code>amdxdna</code> kernel driver, which the release does not build: check it on Strix Halo with the module loaded (<a href="npu.html">NPU engine</a>, "The XDNA driver")</td>
+</tr>
+</tbody>
+</table></div>
+<p>A pin bump raised <strong>by hand</strong> (rather than by one of those workflows) has to do what the workflow does, or the
+gates above silently do not apply to it (engine#672):</p>
+<ul>
+<li><strong>branch it <code>bump-&lt;name&gt;/&lt;sha&gt;</code></strong> or add the <code>hw-gate</code> label - <code>hw-gate.yml</code> runs on <code>bump-hrx/*</code> or on that label
+  (it reads <code>hw_gate: skipping</code> otherwise, which looks like a pass), and <code>scripts/weekly.sh</code>'s <code>bumps</code> stage only picks
+  up <code>bump-*</code> heads, so a differently named branch is invisible to the Sunday run as well;</li>
+<li><strong>carry the data derived from the pinned backends</strong>: <code>registry/architectures.json</code> is generated
+  (<code>tools/registry_build.py</code> with the submodules at their pins), and a class that starts being mapped needs its reviewed
+  entry in <code>registry/significant.json</code> (<code>mapped_ok</code>, or <code>--check-gaps</code> refuses it) plus its expectation in
+  <code>tests/census_watch_test.py</code> updated - otherwise <code>registry_pins</code> and <code>census_watch</code> fail at the new pin (engine#672:
+  DeepSeek-V4.1-Flash went from "reviewed report-only" to mapped);</li>
+<li>run the checks in the table above, plus <code>hw-gate</code> (see <a href="hw-gate.html">Hardware gate</a>, "When it runs").</li>
+</ul>
+<p>Before the build, every bump also checks that each pin it moves is on the branch <code>.gitmodules</code>
+names for that submodule (GitHub's compare API: the branch equals or contains the pin). A pin off
+its branch is held: the shallow clones follow the branch and cannot fetch it, and GitHub may drop
+an unreferenced commit.</p>
+<h2 id="the-announcement">The announcement<a class="anchor" href="#the-announcement" title="Permanent link">#</a></h2>
+<p>After the release, the 1bit engine Discord gets a new post in #announcements, written from
+<code>changes.json</code> in the layout of Lemonade's release posts: what the week brings, the notable upstream
+changes with credit to their authors, the rest as a list, and the downloads (the two packages
+above). Then two lists written
+straight from the data: <strong>New models</strong> (repos published under our Hugging Face org, models added to
+Lemonade's catalog, architectures the registry gained or that gained a backend) and <strong>Updates</strong> (every
+upstream as pinned in the release, with its latest release and changelog). Each release gets its own post, and earlier ones stay.</p>
+<nav class="pager"><a class="prev" href="lemonade.html"><span>Previous</span>Lemonade</a><a class="next" href="bench.html"><span>Next</span>How we measure</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/releases.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

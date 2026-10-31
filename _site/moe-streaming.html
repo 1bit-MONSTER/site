@@ -1,0 +1,1764 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoE expert streaming from NVMe · 1bit engine</title>
+<meta name="description" content="Running mixture-of-experts models larger than Strix Halo&#x27;s 128 GB: only the experts a token routes to are read, through an expert cache and --moe-slots.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="MoE expert streaming from NVMe · 1bit engine">
+<meta property="og:description" content="Running mixture-of-experts models larger than Strix Halo&#x27;s 128 GB: only the experts a token routes to are read, through an expert cache and --moe-slots.">
+<link rel="canonical" href="https://1bit.gg/moe-streaming.html">
+<meta property="og:url" content="https://1bit.gg/moe-streaming.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MoE expert streaming from NVMe · 1bit engine">
+<meta name="twitter:description" content="Running mixture-of-experts models larger than Strix Halo&#x27;s 128 GB: only the experts a token routes to are read, through an expert cache and --moe-slots.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-25">
+<meta property="article:modified_time" content="2026-10-28">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/moe-streaming.html#article", "headline": "MoE streaming from NVMe", "description": "Running mixture-of-experts models larger than Strix Halo's 128 GB: only the experts a token routes to are read, through an expert cache and --moe-slots.", "url": "https://1bit.gg/moe-streaming.html", "mainEntityOfPage": "https://1bit.gg/moe-streaming.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-25", "dateModified": "2026-10-28", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html" aria-current="page">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="moe-streaming-from-nvme">MoE streaming from NVMe<a class="anchor" href="#moe-streaming-from-nvme" title="Permanent link">#</a></h1>
+<p>The goal: run mixture-of-experts models larger than Strix Halo's 128 GB. Only the experts a
+token routes to are needed. The hot ones stay in RAM, and the rest come from the NVMe drive
+as the router asks for them. The work splits three ways:
+- the dense layers (attention, shared experts, embeddings) on the GPU (HRX; Vulkan in the
+  measurements below);
+- the routed experts wherever they run fastest: NPU (native int8 x int4) or GPU;
+- the NVMe feeding the cache.</p>
+<p>This page holds the measurements, the expert cache (<code>moe/</code>, <code>1bit moe-cache</code>), streaming in
+decode (<code>1bit serve --moe-slots</code>) and the
+tools that produced them (<code>tools/moe_trace.cpp</code>, <code>moe_policy.cpp</code>, <code>moe_expert_bench.cpp</code>).</p>
+<p><strong>Status (RFC #213 stage 3).</strong> <code>--moe-slots</code> is kept: the option, its
+<code>--moe-subst</code> / <code>--moe-prefetch</code> companions and serve's code for them stay. The streamer itself
+lives in the llama.cpp Vulkan pin (<code>1bit/moe-stream</code>), which the engine no longer builds, so a
+build without it refuses <code>--moe-slots</code> with "not available in this build". It moves to HRX
+together with Qwen3.8-Flash-Next (<code>qwen4exp</code>); serve's HRX path for it sits behind
+<code>ONEBIT_MOE_STREAMING_HRX</code> until the HRX llama.cpp reads <code>ONEBIT_MOE_FILE</code> / <code>ONEBIT_MOE_SLOTS</code>.
+The <code>moe/</code> library and <code>1bit moe-cache</code> are unaffected. The measurements below were taken on
+Vulkan0 before the removal and are kept as the record.</p>
+<h2 id="what-one-token-needs">What one token needs<a class="anchor" href="#what-one-token-needs" title="Permanent link">#</a></h2>
+<p>Qwen3.8-Flash-Next (<code>qwen4exp</code>) UD-Q4_K_XL, from its GGUF metadata:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>layers</td>
+<td>48</td>
+</tr>
+<tr>
+<td>experts per layer / routed per token</td>
+<td>512 / 10 (+ 1 shared)</td>
+</tr>
+<tr>
+<td>routed expert weights</td>
+<td>71.7 GiB, 3.06 MiB per expert per layer</td>
+</tr>
+<tr>
+<td>per-layer token embeddings</td>
+<td>26.8 GiB (llama.cpp's <code>--lazy-mode</code> already reads their rows on demand)</td>
+</tr>
+<tr>
+<td>everything else</td>
+<td>4.9 GiB</td>
+</tr>
+</tbody>
+</table></div>
+<p>A token reads 48 × 10 × 3.06 MiB = 1.47 GB of routed experts. The shared weights stay
+resident.</p>
+<h2 id="the-drive">The drive<a class="anchor" href="#the-drive" title="Permanent link">#</a></h2>
+<p>Strix Halo's NVMe (YMTC PC41Q 2 TB), <code>O_DIRECT</code> reads from a model file:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>read</th>
+<th>throughput</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sequential, 16 MiB</td>
+<td>4.91 GB/s</td>
+</tr>
+<tr>
+<td>random, 3 MiB (one expert), one at a time</td>
+<td>3.62 GB/s (0.87 ms each)</td>
+</tr>
+<tr>
+<td>random, 3 MiB, 8 in flight</td>
+<td>3.87 GB/s</td>
+</tr>
+</tbody>
+</table></div>
+<p>With nothing cached, 1.47 GB per token at about 3.7 GB/s caps decode at about 2.5 tok/s. So
+the cache decides the speed.</p>
+<p>On 2026-09-26, with other tenants active (load average 6-9), the same drive gave 1.2-4.2
+GB/s for random 1-3 MiB reads, 8 in flight, depending on the moment. Every measurement below
+that reads the drive carries that spread.</p>
+<h2 id="how-often-experts-repeat">How often experts repeat<a class="anchor" href="#how-often-experts-repeat" title="Permanent link">#</a></h2>
+<p><code>tools/moe_trace.cpp</code> records each token's routed experts per layer, then replays them
+through an LRU cache per layer. The cache is warmed by the prompt, and the hit rate counts
+decode tokens only. Greedy decode, 300 tokens (Qwen3.6: 400), on Vulkan:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>experts cached per layer</th>
+<th>Flash-Next, prose</th>
+<th>Flash-Next, code</th>
+<th>Qwen3.6-35B-A3B, code (of 256)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>64</td>
+<td>68.1%</td>
+<td>69.6%</td>
+<td>82.5%</td>
+</tr>
+<tr>
+<td>128</td>
+<td>85.7%</td>
+<td>84.5%</td>
+<td>93.8%</td>
+</tr>
+<tr>
+<td>192</td>
+<td>92.2%</td>
+<td>91.4%</td>
+<td>97.4%</td>
+</tr>
+<tr>
+<td>256</td>
+<td>94.5%</td>
+<td>94.5%</td>
+<td>all</td>
+</tr>
+<tr>
+<td>384</td>
+<td>96.5%</td>
+<td>97.7%</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>For Flash-Next, the per-token read from the drive and the ceiling that sets are:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>cache</th>
+<th>RAM for experts</th>
+<th>misses</th>
+<th>read per token</th>
+<th>NVMe ceiling</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>128 / layer</td>
+<td>18.4 GiB</td>
+<td>~15%</td>
+<td>~0.22 GB</td>
+<td>~17 tok/s</td>
+</tr>
+<tr>
+<td>192 / layer</td>
+<td>27.5 GiB</td>
+<td>~8%</td>
+<td>~0.12 GB</td>
+<td>~31 tok/s</td>
+</tr>
+<tr>
+<td>256 / layer</td>
+<td>36.7 GiB</td>
+<td>~5.5%</td>
+<td>~0.08 GB</td>
+<td>~46 tok/s</td>
+</tr>
+</tbody>
+</table></div>
+<p>These are ceilings from the drive alone, before compute, and from two prompts. The next
+sections add traces, compare policies and measure the real cache.</p>
+<h2 id="more-traces-three-families-three-kinds-of-use">More traces: three families, three kinds of use<a class="anchor" href="#more-traces-three-families-three-kinds-of-use" title="Permanent link">#</a></h2>
+<p><code>tools/moe_trace.cpp --chat</code> runs a conversation through the model's chat template and
+records every token's routed experts per layer. Prompt and decoded tokens are marked
+separately. All traces use greedy decoding on Vulkan with the engine's llama.cpp pin
+(2026-09-25), in three shapes:
+- <strong>code:</strong> one coding request, then 400 tokens;
+- <strong>chat:</strong> six user turns on unrelated topics, up to 256 reply tokens each;
+- <strong>long:</strong> about 30,000 tokens of the engine's own docs, a question, then 400 tokens.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>model</th>
+<th>family</th>
+<th>layers</th>
+<th>experts / routed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen3-Coder-30B-A3B Q4_K_M</td>
+<td>qwen3moe</td>
+<td>48</td>
+<td>128 / 8</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B-A3B UD-Q5_K_XL</td>
+<td>qwen35moe (DeltaNet hybrid)</td>
+<td>40</td>
+<td>256 / 8</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash Q4_K_M</td>
+<td>deepseek2 (MLA, sigmoid router)</td>
+<td>47 (46 MoE)</td>
+<td>64 / 4 + shared</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>tools/moe_policy.cpp</code> replays a trace through several cache policies. Prompt tokens warm
+the cache, and only decode tokens count.
+- <strong>lru, lfu, slru:</strong> one cache per layer (slru is segmented: 20% probation).
+- <strong>g-lru, g-lfu:</strong> one budget shared by all layers (g-lfu halves its counts every 64 tokens).
+- <strong>opt:</strong> Belady's policy, which evicts the expert used furthest in the future. It needs
+  the future, so it is the bound.</p>
+<p>Decode hit rate with a cache of a quarter and of half of each layer's experts:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>trace</th>
+<th>cache / layer</th>
+<th>lru</th>
+<th>lfu</th>
+<th>slru</th>
+<th>g-lru</th>
+<th>g-lfu</th>
+<th>opt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coder-30B code</td>
+<td>32 of 128</td>
+<td>68.4</td>
+<td>65.6</td>
+<td>66.9</td>
+<td>68.2</td>
+<td>68.1</td>
+<td>83.5</td>
+</tr>
+<tr>
+<td></td>
+<td>64</td>
+<td>87.8</td>
+<td>88.5</td>
+<td>88.1</td>
+<td>89.3</td>
+<td>90.4</td>
+<td>94.9</td>
+</tr>
+<tr>
+<td>Coder-30B chat</td>
+<td>32</td>
+<td>85.2</td>
+<td>73.3</td>
+<td>85.7</td>
+<td>86.2</td>
+<td>83.9</td>
+<td>93.0</td>
+</tr>
+<tr>
+<td></td>
+<td>64</td>
+<td>95.8</td>
+<td>92.8</td>
+<td>96.2</td>
+<td>96.5</td>
+<td>96.2</td>
+<td>98.6</td>
+</tr>
+<tr>
+<td>Coder-30B long</td>
+<td>32</td>
+<td>80.3</td>
+<td>81.4</td>
+<td>81.1</td>
+<td>81.3</td>
+<td>82.0</td>
+<td>90.8</td>
+</tr>
+<tr>
+<td></td>
+<td>64</td>
+<td>95.0</td>
+<td>95.6</td>
+<td>95.3</td>
+<td>96.3</td>
+<td>96.5</td>
+<td>98.3</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B code</td>
+<td>64 of 256</td>
+<td>80.5</td>
+<td>78.7</td>
+<td>80.8</td>
+<td>82.0</td>
+<td>81.1</td>
+<td>91.0</td>
+</tr>
+<tr>
+<td></td>
+<td>128</td>
+<td>92.6</td>
+<td>92.2</td>
+<td>91.3</td>
+<td>94.0</td>
+<td>94.1</td>
+<td>97.1</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B chat</td>
+<td>64</td>
+<td>79.9</td>
+<td>66.1</td>
+<td>80.3</td>
+<td>80.5</td>
+<td>78.1</td>
+<td>90.8</td>
+</tr>
+<tr>
+<td></td>
+<td>128</td>
+<td>91.7</td>
+<td>88.5</td>
+<td>92.2</td>
+<td>93.1</td>
+<td>93.6</td>
+<td>97.7</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B long</td>
+<td>64</td>
+<td>79.0</td>
+<td>77.4</td>
+<td>80.5</td>
+<td>79.2</td>
+<td>79.1</td>
+<td>89.5</td>
+</tr>
+<tr>
+<td></td>
+<td>128</td>
+<td>92.4</td>
+<td>92.6</td>
+<td>92.8</td>
+<td>94.2</td>
+<td>93.8</td>
+<td>96.8</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash code</td>
+<td>16 of 64</td>
+<td>63.7</td>
+<td>62.3</td>
+<td>63.1</td>
+<td>64.0</td>
+<td>65.2</td>
+<td>80.1</td>
+</tr>
+<tr>
+<td></td>
+<td>32</td>
+<td>83.7</td>
+<td>84.1</td>
+<td>83.2</td>
+<td>85.1</td>
+<td>86.5</td>
+<td>92.9</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash chat</td>
+<td>16</td>
+<td>65.0</td>
+<td>52.6</td>
+<td>65.0</td>
+<td>65.8</td>
+<td>63.5</td>
+<td>81.6</td>
+</tr>
+<tr>
+<td></td>
+<td>32</td>
+<td>85.2</td>
+<td>80.0</td>
+<td>85.6</td>
+<td>87.1</td>
+<td>86.6</td>
+<td>94.1</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash long</td>
+<td>16</td>
+<td>59.7</td>
+<td>61.0</td>
+<td>60.2</td>
+<td>60.2</td>
+<td>63.0</td>
+<td>78.2</td>
+</tr>
+<tr>
+<td></td>
+<td>32</td>
+<td>81.2</td>
+<td>83.9</td>
+<td>83.4</td>
+<td>82.5</td>
+<td>85.1</td>
+<td>92.5</td>
+</tr>
+</tbody>
+</table></div>
+<p>What the traces show:
+- <strong>One budget shared across layers</strong> (g-lru) is the best simple policy, or within a point
+  of it, on every trace. Some layers need more slots than others, and a shared budget gives
+  them those slots.
+- <strong>LFU fails on chat.</strong> A new topic makes last topic's counts stale: Coder chat at 32 per
+  layer is 73.3% against 85.2% for LRU, and Qwen3.6 chat at 64 is 66.1% against 79.9%.
+  Frequency with decay (g-lfu) recovers most of it, and is marginally the best on long
+  context and at half-size caches.
+- <strong>Chat and long context repeat experts more than a single request.</strong> Coder at 32 per
+  layer: code 68%, long 80%, chat 85%.
+- <strong>The bound is 5-16 points higher</strong> at quarter-size caches, so a smarter policy still has
+  room. The traces are kept, so any policy can be tried on the same data.</p>
+<h3 id="classic-policies-dont-close-the-gap">Classic policies don't close the gap<a class="anchor" href="#classic-policies-dont-close-the-gap" title="Permanent link">#</a></h3>
+<p>Three scan- and frequency-aware policies from storage caching, each over the shared budget
+(<code>tools/moe_policy.cpp</code>): ARC (adapts between a recency and a frequency list, with ghost
+lists), LRU-2 (evicts the expert whose second-to-last use is oldest), and W-TinyLFU as in
+Caffeine (a 1% or 10% LRU window; an expert leaving it enters the main cache only if it was
+used more often than the main cache's victim). Decode hit rate:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>trace</th>
+<th>cache / layer</th>
+<th>g-lru</th>
+<th>g-arc</th>
+<th>g-lru2</th>
+<th>g-tlfu 1%</th>
+<th>g-tlfu 10%</th>
+<th>opt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coder-30B code</td>
+<td>16</td>
+<td>48.8</td>
+<td>49.2</td>
+<td>47.9</td>
+<td>46.6</td>
+<td>44.6</td>
+<td>68.8</td>
+</tr>
+<tr>
+<td></td>
+<td>32</td>
+<td>68.2</td>
+<td>67.2</td>
+<td>66.6</td>
+<td>65.8</td>
+<td>65.8</td>
+<td>83.5</td>
+</tr>
+<tr>
+<td>Coder-30B long</td>
+<td>16</td>
+<td>56.9</td>
+<td>57.8</td>
+<td>59.0</td>
+<td>58.0</td>
+<td>55.1</td>
+<td>76.5</td>
+</tr>
+<tr>
+<td>Flash-Next chat</td>
+<td>32</td>
+<td>55.4</td>
+<td>55.0</td>
+<td>51.9</td>
+<td>44.4</td>
+<td>42.6</td>
+<td>72.8</td>
+</tr>
+<tr>
+<td>Flash-Next code</td>
+<td>16</td>
+<td>39.6</td>
+<td>41.3</td>
+<td>42.0</td>
+<td>39.1</td>
+<td>37.5</td>
+<td>61.0</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B chat</td>
+<td>64</td>
+<td>80.5</td>
+<td>80.8</td>
+<td>80.2</td>
+<td>67.6</td>
+<td>75.0</td>
+<td>90.8</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash long</td>
+<td>32</td>
+<td>82.5</td>
+<td>82.5</td>
+<td>83.8</td>
+<td>82.6</td>
+<td>84.5</td>
+<td>92.5</td>
+</tr>
+</tbody>
+</table></div>
+<p>Across all 12 traces at 16, 32 and 64 per layer, none is more than 2.4 points above the
+shared LRU, and W-TinyLFU is up to 13 points below it (Qwen3.6 chat at 64). Routing has little
+popularity beyond recency for a frequency filter to use; the missing 7-22 points are in the
+future routes, which only a predictor can see.</p>
+<h3 id="predicting-the-next-layers-experts">Predicting the next layer's experts<a class="anchor" href="#predicting-the-next-layers-experts" title="Permanent link">#</a></h3>
+<p>A trace also records a gate-ahead prediction for every decoded token. It applies layer l's
+router (with layer l's FFN norm, and GLM's selection bias) to the output of layer l-1: the
+engine has that vector while layer l's attention runs. The two-ahead prediction does the
+same from layer l-2's output, one layer earlier.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>trace</th>
+<th>routing predicted (top-k)</th>
+<th>misses covered, top-k</th>
+<th>two-ahead: predicted</th>
+<th>two-ahead: misses covered</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coder-30B code / chat / long (32)</td>
+<td>87.3 / 89.9 / 89.1%</td>
+<td>84.0 / 84.1 / 83.0%</td>
+<td>79.8 / 83.9 / 83.4%</td>
+<td>71.4 / 70.3 / 70.0%</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B code / chat / long (64)</td>
+<td>83.6 / 83.5 / 82.5%</td>
+<td>74.1 / 76.5 / 75.2%</td>
+<td>75.7 / 75.6 / 74.3%</td>
+<td>57.4 / 60.5 / 59.3%</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash code / chat / long (16)</td>
+<td>86.2 / 87.5 / 83.1%</td>
+<td>82.2 / 85.2 / 81.1%</td>
+<td>74.2 / 77.1 / 71.2%</td>
+<td>63.1 / 69.0 / 65.1%</td>
+</tr>
+</tbody>
+</table></div>
+<p>Predicting 2 x top-k covers 93-98% of misses, but reads 5-10 times as many experts that are
+never used. Predictors that need only the trace (the previous token's experts,
+co-occurrence with the previous layer) cover under 30%.</p>
+<h3 id="the-next-layers-own-block-flash-next-untested-on-device">The next layer's own block (Flash-Next; untested on device)<a class="anchor" href="#the-next-layers-own-block-flash-next-untested-on-device" title="Permanent link">#</a></h3>
+<p>The gate-ahead predictor above does not fit Qwen3.8-Flash-Next: its layers keep four 2560-wide
+residual streams (hyper-connections), so layer l+1's router input is l+1's own mixer applied to
+the residual <em>after</em> layer l's MoE, and applying l+1's router to layer l's FFN input mixes
+through the wrong weights. The measured result is in "Flash-Next, streamed" below: right about
+two times in three, and a loss on a drive that is already the limit.</p>
+<p>The predictor that does fit runs layer l+1's own token-mixer block on the current residual,
+before layer l's MoE output exists: l+1's PLE injection, its attention or DeltaNet block, its
+combine, then its FFN mixer and its router. Only the ranking of the router logits is used, and
+more candidates than the layer routes to are kept so the near misses are read too. The output of
+the model does not change: the block only decides which experts a prefetch reads, and whatever a
+token really routes to is still waited for.</p>
+<p>State writes of that speculative pass are suppressed where the exact pass would read them: the
+DeltaNet recurrent state and the conv histories are written into scratch tensors, and an
+attention successor needs nothing, because the exact block rewrites the same cache cell before
+anything reads it. The speculative nodes are also left out of the fused-op manifest, so they
+cannot make a fused dispatch claim the wrong tensor.</p>
+<p><code>--moe-predict off|router|block</code> (env <code>ONEBIT_MOE_PREDICT</code>) selects it, and takes effect with
+<code>--moe-prefetch 1</code> once the HRX llama.cpp runs the streamer; <code>router</code> keeps the cheap
+residual-only form for comparison. <code>ONEBIT_MOE_PREDICT_DEPTH</code>, <code>_MARGIN</code> (read a deeper candidate
+only while its logit is within the given distance of the best one), <code>_MIN</code>, <code>_LAYERS</code> and
+<code>_OUT</code> (a trace of predictions and the routing that was really used) tune and measure it, and
+<code>ONEBIT_MOE_PREDICT_STATS=1</code> prints the hit rate per layer when the process exits.</p>
+<p>The graph side is <code>src/onebit-moe-predict.*</code> plus one hook in the <code>qwen4exp</code> graph in the
+llama.cpp pin, and it is <strong>untested on device</strong>: the predictor, its readback and the hit-rate
+table are built and unit-tested host-side (<code>tests/test-onebit-moe-predict.cpp</code>), and the
+prefetch consumer (the streamer's in-graph op) is the step that needs the GPU lane.</p>
+<h2 id="the-expert-cache-in-the-engine">The expert cache in the engine<a class="anchor" href="#the-expert-cache-in-the-engine" title="Permanent link">#</a></h2>
+<p><code>moe/</code> holds the cache (Linux only, built into <code>1bit</code> as <code>ONEBIT_MOE</code>):
+- <strong><code>gguf_index</code></strong> reads a GGUF header, including every shard of a split file, and finds each
+  routed expert's bytes: <code>blk.N.ffn_{gate,up,down}_exps.weight</code>, one slice per expert.
+- <strong><code>expert_cache</code></strong> keeps experts in pinned slots. One <code>mmap</code> region is locked with <code>mlock</code>.
+  Each list of slots (one per layer, or one per size class) keeps one packed array per part:
+  part k of slot i is at <code>part_off[k] + i * part_bytes[k]</code>. That is the layout of a ggml expert
+  tensor with as many experts as slots, so a GPU can compute on the slots directly.
+  <code>O_DIRECT</code> reads land in each reader thread's aligned bounce buffer and are copied into place.
+    - Misses are read with <code>O_DIRECT</code>, straight from the drive into the slot, by a pool of
+    reader threads, so several reads are in flight. Demand reads go ahead of prefetches.
+    - <code>acquire(layer, experts)</code> blocks until the experts are resident and pins them until
+    <code>release</code>. <code>prefetch(layer, experts)</code> only queues reads.
+    - Eviction is LRU, over one budget shared by all layers (the replays favour it) or per layer.
+    - Slots come in size classes. Unsloth's UD quants use bigger types for some layers' experts,
+    so layers are grouped by the byte sizes of their experts' parts, and each group gets its
+    own slots (same share of experts per layer). Flash-Next's 9,216 slots pinned 34.4 GiB with
+    one slot size and 27.0 GiB with size classes. Packing the parts brings Coder-30B's 1,536
+    slots from 4.4 to 4.1 GiB.
+- <strong><code>1bit moe-cache</code></strong> replays a trace through the cache against the real model file, with
+  real reads. Compute is simulated per layer:
+    1. at the layer's start, the prefetch is issued (lookahead 1: this layer's gate-ahead
+     prediction; lookahead 2: the next layer's two-ahead prediction);
+    2. attention runs (<code>--attn-frac</code> of the layer's compute time);
+    3. <code>acquire</code> loads the routed experts, stalling on any read still in flight;
+    4. the experts compute (the rest of the layer's time).</p>
+<p>It prints the decode rate the drive and cache allow, the stall per token, hits, prefetch
+  hits, demand misses, wasted prefetches and bytes read.</p>
+<h3 id="what-the-cache-delivers">What the cache delivers<a class="anchor" href="#what-the-cache-delivers" title="Permanent link">#</a></h3>
+<p><code>1bit moe-cache</code> sweep, 2026-09-25/26:
+- <strong>Traces:</strong> all nine, 120 decode tokens each, the cache warmed by the last 64 prompt tokens.
+- <strong>Compute per token:</strong> the model's Vulkan0 decode rate with every expert resident. That is
+  12.1 ms for Coder-30B, 21 ms for Qwen3.6-35B and 14.1 ms for GLM, split half before and half
+  after the experts are needed.
+- <strong>Box:</strong> Strix Halo was shared, with a load average of 6-9, other tenants' GPU servers, and
+  18 GB of their memory swapped out. A run can only be slowed by that, so the table takes the
+  better of two runs.
+- <strong>Noise:</strong> small caches still vary by up to about 30% between runs, so the table shows the
+  operating point that matters, 75% of the experts in RAM.
+- <strong>Drive ceiling:</strong> <code>moe_policy</code> computes it from the trace alone, with the shared LRU's
+  misses at 3.7 GB/s. It is free of noise, and it covers the whole trace, so the cache is
+  warmer than in the sweep's 120 tokens.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>decode tok/s, 75% of experts in RAM</th>
+<th>trace</th>
+<th>no prefetch</th>
+<th>gate-ahead</th>
+<th>two-ahead</th>
+<th>drive ceiling, serial</th>
+<th>drive ceiling, overlapped</th>
+<th>all resident</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coder-30B, 4,608 slots (13.2 GiB)</td>
+<td>code</td>
+<td>28.8</td>
+<td>32.1</td>
+<td><strong>33.9</strong></td>
+<td>53.3</td>
+<td>82.6</td>
+<td>82.6</td>
+</tr>
+<tr>
+<td></td>
+<td>chat</td>
+<td>45.3</td>
+<td>46.6</td>
+<td><strong>48.4</strong></td>
+<td>58.1</td>
+<td>82.6</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>long</td>
+<td>24.6</td>
+<td>28.2</td>
+<td><strong>31.6</strong></td>
+<td>61.4</td>
+<td>82.6</td>
+<td></td>
+</tr>
+<tr>
+<td>Qwen3.6-35B UD-Q5, 7,680 slots (≈16.5 GiB)</td>
+<td>code</td>
+<td>30.3</td>
+<td><strong>33.2</strong></td>
+<td>31.8</td>
+<td>37.4</td>
+<td>47.6</td>
+<td>47.6</td>
+</tr>
+<tr>
+<td></td>
+<td>chat</td>
+<td>35.3</td>
+<td>37.4</td>
+<td><strong>39.3</strong></td>
+<td>36.5</td>
+<td>47.6</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>long</td>
+<td>33.4</td>
+<td>35.8</td>
+<td><strong>37.6</strong></td>
+<td>40.0</td>
+<td>47.6</td>
+<td></td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash, 2,208 slots (≈12.6 GiB)</td>
+<td>code</td>
+<td>25.6</td>
+<td>30.2</td>
+<td><strong>38.3</strong></td>
+<td>37.9</td>
+<td>70.9</td>
+<td>70.9</td>
+</tr>
+<tr>
+<td></td>
+<td>chat</td>
+<td>38.6</td>
+<td>39.6</td>
+<td><strong>39.6</strong></td>
+<td>39.3</td>
+<td>70.9</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>long</td>
+<td>28.7</td>
+<td>26.8</td>
+<td><strong>32.9</strong></td>
+<td>37.3</td>
+<td>70.9</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>What the sweep shows:
+- <strong>Prefetch pays at a large cache.</strong> Two layers ahead is the best mode, or ties it, on 8 of
+  9 traces: 5-50% over no prefetch. It turns demand misses (2.6-6.2%) into prefetch hits
+  and leaves 0.7-2.5% of reads on the critical path. It reads 10-50% more bytes, so it only
+  pays when the drive has slack.
+- <strong>Prefetch hurts at small caches.</strong> At 25-50% of experts in RAM, the drive is the limit.
+  Prefetch adds bytes (10-30% of its reads are wasted) and pushes out experts that were still
+  needed. Two layers ahead predicts worse but gives a whole layer of lead, while one ahead
+  gives only half of a layer's compute, about 0.1 ms: less than one 3 MiB read (0.9 ms).
+- <strong>The cache decides the speed.</strong> Coder-30B chat goes from 15-18 tok/s with 25% of experts
+  (4.4 GiB) to 45-48 with 75% (13.2 GiB). The all-resident rate (93 tok/s) needs all
+  17.3 GiB.
+- <strong>Reads come in 3-6 MiB units at 3-3.9 GB/s.</strong> Four to sixteen reads in flight make no
+  measurable difference on this drive.</p>
+<h2 id="the-three-way-split-measured">The three-way split, measured<a class="anchor" href="#the-three-way-split-measured" title="Permanent link">#</a></h2>
+<p>Each MoE layer runs its attention and shared part (dense), then its routed experts. Batch-1
+decode is serial across layers, so a split only pays if the experts' device is faster than
+the dense device would be. On Strix Halo every device reads the same LPDDR5X, so the
+question is which one reads weights fastest.</p>
+<p><strong>The expert block alone.</strong> <code>tools/moe_expert_bench.cpp</code> times one layer's routed experts for
+one decode token: gate and up MUL_MAT_ID, SwiGLU, then down. It uses the model's real layer-10
+weights and fresh random top-k experts every run (median of 40). The NPU row comes from the
+closed-source Qwen3.6-35B NPU route's on-device stage profile (2026-09-24). That route
+requantizes to q4_1, and its block includes the shared expert.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>expert block per layer</th>
+<th>Vulkan0</th>
+<th>HRX0</th>
+<th>CPU (32 threads)</th>
+<th>NPU</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coder-30B Q4_K, top-8 (21.2 MB)</td>
+<td>0.137 ms, 155 GB/s</td>
+<td>0.511 ms, 42 GB/s</td>
+<td>0.337 ms, 63 GB/s</td>
+<td></td>
+</tr>
+<tr>
+<td>Qwen3.6-35B UD-Q5_K_XL, top-8 (18.4 MB)</td>
+<td>0.136 ms, 135 GB/s</td>
+<td>0.432 ms, 43 GB/s</td>
+<td>0.287 ms, 64 GB/s</td>
+<td></td>
+</tr>
+<tr>
+<td>Qwen3.6-35B Q8_0, top-8 (26.7 MB)</td>
+<td>0.156 ms, 171 GB/s</td>
+<td>0.366 ms, 73 GB/s</td>
+<td>0.322 ms, 83 GB/s</td>
+<td>0.459 ms, 39 GB/s (q4_1 + shared, 17.9 MB)</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash Q4_K/Q6_K, top-4 (24.5 MB)</td>
+<td>0.155 ms, 158 GB/s</td>
+<td>0.540 ms, 45 GB/s</td>
+<td>0.369 ms, 66 GB/s</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>HRX0 runs Qwen MoE layers through fused router and FFN dispatches in a real model, so its
+standalone number understates it for Qwen. In whole models, HRX0 decodes Coder-30B at 90.5
+tok/s against Vulkan0's 92.4.</p>
+<p><strong>Whole models, split both ways.</strong> <code>llama-bench -fa 1 -n 64 -r 3</code>, pin 96f6b89. The routed
+expert tensors go to a second device with <code>-ot exps=&lt;device&gt;</code>, and everything else stays on
+the first (<code>-ts 1/0</code>):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>decode tok/s</th>
+<th>all Vulkan0</th>
+<th>all HRX0</th>
+<th>dense HRX0, experts Vulkan0</th>
+<th>dense Vulkan0, experts HRX0</th>
+<th>dense Vulkan0, experts CPU</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen3-Coder-30B Q4_K_M</td>
+<td><strong>92.4</strong></td>
+<td>90.5</td>
+<td>fails (#108)</td>
+<td>27.0</td>
+<td>43.5</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B UD-Q5_K_XL</td>
+<td><strong>52.9</strong></td>
+<td>31.5</td>
+<td>fails (#108)</td>
+<td>25.5</td>
+<td>30.2</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash Q4_K_M</td>
+<td><strong>71.1</strong></td>
+<td>22.1</td>
+<td>25.2</td>
+<td>25.9</td>
+<td>36.0</td>
+</tr>
+</tbody>
+</table></div>
+<p>Every split loses to one GPU device. Each layer hands its activations to the other device and
+back, and the other device reads experts no faster than Vulkan0. The NPU reads experts at
+39-45 GB/s (the 35B route's MoE waves run at 80-84% of its ~53-56 GB/s streaming peak).
+Vulkan0 reads them at 135-171 GB/s. So for batch-1 decode:
+- the experts belong on Vulkan0;
+- HRX0 is an alternative for the whole model, not for half of it;
+- the NPU is worth using for a second model running at the same time, not for half of this
+  one. On 2026-09-24, once both were loaded, the 35B NPU route decoded at 11.0 tok/s (11.1
+  solo) while a Vulkan decode ran at about 50. That is roughly 61 tok/s across two
+  independent streams, with no visible interference.</p>
+<p>Dense on HRX0 with the experts elsewhere fails for Qwen MoE models: HRX's fused Qwen router
+assumes the experts are on HRX0 too (#108). GLM, whose sigmoid router is not fused, runs.</p>
+<h2 id="the-sweet-spot-per-model">The sweet spot per model<a class="anchor" href="#the-sweet-spot-per-model" title="Permanent link">#</a></h2>
+<p>Four axes: quantization (quality against speed), split, cache size (the RAM given to
+experts; the rest streams from the drive) and MTP.
+- <strong>Quality:</strong> KL divergence of each quant's token distribution from Q8_0's, and how often
+  its top token matches, over 40 chunks of 512 tokens (Unsloth's UD quants, measured
+  2026-09-24).
+- <strong>Speed:</strong> Vulkan0 decode (tg64) and prompt (pp512), <code>llama-bench -fa 1 -r 3</code>.
+- Quants that are not on the box (the drive has 18 GB free) show sizes and quality only.
+  Decode speed does not follow file size closely enough to estimate it: Qwen3.6-35B's Q8_0 is
+  39% larger than its UD-Q5_K_XL, yet only 5-10% slower.</p>
+<p><strong>Qwen3-Coder-30B-A3B</strong> (48 layers, 128 experts, top-8)</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>quant</th>
+<th>GiB</th>
+<th>KLD vs Q8_0</th>
+<th>same top token</th>
+<th>decode tok/s</th>
+<th>prompt tok/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UD-Q2_K_XL</td>
+<td>10.98</td>
+<td>0.113</td>
+<td>87.1%</td>
+<td>not on disk</td>
+<td></td>
+</tr>
+<tr>
+<td>UD-Q3_K_XL</td>
+<td>12.86</td>
+<td>0.058</td>
+<td>90.4%</td>
+<td>not on disk</td>
+<td></td>
+</tr>
+<tr>
+<td>UD-Q4_K_XL</td>
+<td>16.45</td>
+<td>0.027</td>
+<td>93.4%</td>
+<td>not on disk</td>
+<td></td>
+</tr>
+<tr>
+<td>Q4_K_M</td>
+<td>17.28</td>
+<td>not measured</td>
+<td></td>
+<td><strong>92.4-93.1</strong></td>
+<td>1290</td>
+</tr>
+<tr>
+<td>UD-Q5_K_XL</td>
+<td>20.25</td>
+<td>0.012</td>
+<td>95.6%</td>
+<td>75.3</td>
+<td>1052</td>
+</tr>
+<tr>
+<td>TQ2_0 (ternary)</td>
+<td>7.6</td>
+<td>not measured</td>
+<td></td>
+<td>29.5 (no fast ternary path on Vulkan)</td>
+<td>129</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Qwen3.6-35B-A3B</strong> (40 layers, 30 DeltaNet + 10 attention, 256 experts, top-8)</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>quant</th>
+<th>GiB</th>
+<th>KLD vs Q8_0</th>
+<th>same top token</th>
+<th>decode tok/s</th>
+<th>prompt tok/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UD-Q2_K_XL</td>
+<td>11.45</td>
+<td>0.113</td>
+<td>85.8%</td>
+<td>not on disk</td>
+<td></td>
+</tr>
+<tr>
+<td>UD-Q3_K_XL</td>
+<td>15.69</td>
+<td>0.045</td>
+<td>90.8%</td>
+<td>not on disk</td>
+<td></td>
+</tr>
+<tr>
+<td>UD-Q4_K_XL</td>
+<td>20.82</td>
+<td>0.014</td>
+<td>94.6%</td>
+<td>not on disk</td>
+<td></td>
+</tr>
+<tr>
+<td>UD-Q5_K_XL</td>
+<td>24.77</td>
+<td>0.009</td>
+<td>95.8%</td>
+<td><strong>52.3-52.9</strong></td>
+<td>889</td>
+</tr>
+<tr>
+<td>Q8_0</td>
+<td>34.37</td>
+<td>reference</td>
+<td></td>
+<td>47.9-49.8</td>
+<td>1269 (2026-09-24)</td>
+</tr>
+<tr>
+<td>NPU route (closed source, q4_1)</td>
+<td></td>
+<td>parity vs fp64</td>
+<td></td>
+<td>16.3-16.5</td>
+<td>~21</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>GLM-4.7-Flash</strong> (47 layers, MLA, 64 experts, top-4 + shared): Q4_K_M only, 71.0-71.1 tok/s decode
+on Vulkan0 and 22.1-22.4 on HRX0. No other quant is on the box, so there is no quality axis.</p>
+<p><strong>Split:</strong> all on Vulkan0 for every model (see the three-way split). HRX0 is the whole-model
+alternative for Coder-30B (90.5 tok/s).</p>
+<p><strong>MTP:</strong> Unsloth ships no MTP head for these three models. Qwen3.8-Flash-Next has one. With
+its UD-Q4_K_XL fully resident and the MTP head drafting 3 tokens, Vulkan decodes at 40-49 tok/s
+against 25-26 without (2026-09-24, on Unsloth's <code>qwen4exp/mtp</code> branch; engine #110 carries the
+upstream MTP fix). With MTP, each verification step routes several tokens at once, so a layer
+needs the union of their experts. The Flash-Next section below measures what that costs a
+streamed cache.</p>
+<h3 id="the-picks">The picks<a class="anchor" href="#the-picks" title="Permanent link">#</a></h3>
+<p>On Strix Halo with the whole box, every model here fits in RAM, so the pick is the fastest
+quant whose quality is acceptable, all on Vulkan0. When the RAM must be shared (other models
+resident, as in a fleet), the cache sets the speed:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>model</th>
+<th>whole box</th>
+<th>decode tok/s</th>
+<th>quality (KLD vs Q8_0)</th>
+<th>experts in RAM (75%) + two-ahead prefetch</th>
+<th>decode tok/s, measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen3-Coder-30B-A3B</td>
+<td>Q4_K_M, all on Vulkan0</td>
+<td>92-93</td>
+<td>UD-Q4_K_XL: 0.027 at a similar size</td>
+<td>13.2 GiB of 17.5 GiB</td>
+<td>32-48 (code 34, chat 48, long 32)</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B-A3B</td>
+<td><strong>UD-Q5_K_XL</strong>, all on Vulkan0 (faster than Q8_0 at nearly its quality)</td>
+<td>52-53</td>
+<td>0.009</td>
+<td>≈16.5 GiB of ≈21.9 GiB</td>
+<td>32-39</td>
+</tr>
+<tr>
+<td>GLM-4.7-Flash</td>
+<td>Q4_K_M, all on Vulkan0</td>
+<td>71</td>
+<td>no other quant measured</td>
+<td>≈12.6 GiB of ≈16.8 GiB</td>
+<td>33-40</td>
+</tr>
+<tr>
+<td>Qwen3.8-Flash-Next</td>
+<td>UD-Q4_K_XL + MTP n = 3, resident on Vulkan (about 77 GiB)</td>
+<td>40-49</td>
+<td></td>
+<td>27.5 GiB of 71.7 GiB (27.0 GiB pinned)</td>
+<td>7-12 on this drive (ceiling 24-34 at 3.7 GB/s)</td>
+</tr>
+</tbody>
+</table></div>
+<p>MTP is available only for Flash-Next, and it is worth it both ways: 1.6-1.9 times resident,
+and it leaves the drive's reads per token unchanged when streamed.</p>
+<h2 id="qwen38-flash-next-the-model-that-needs-streaming">Qwen3.8-Flash-Next: the model that needs streaming<a class="anchor" href="#qwen38-flash-next-the-model-that-needs-streaming" title="Permanent link">#</a></h2>
+<p>Flash-Next UD-Q4_K_XL is 111 GB: 71.7 GiB of routed experts, 26.8 GiB of per-layer token
+embeddings and 4.9 GiB of everything else. It has 48 layers of 512 experts, 10 routed per
+token, at 3.06 MiB each. With the whole box to itself it fits (about 77 GiB resident, with the
+embeddings read lazily). On a box shared with other models it does not.</p>
+<p>Traces: <code>MOE_CPU_EXPS=1</code> keeps the experts in the memory-mapped file on the CPU, so tracing needs no
+free memory for them, with the dense part on Vulkan0 (llama.cpp with <code>qwen4exp</code>, e71b805).
+Its layers mix four 2560-wide residual streams (hyper-connections), so the gate-ahead
+predictor does not apply yet, and these traces carry routes only.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>decode hit rate</th>
+<th>cache / layer (GiB)</th>
+<th>lru</th>
+<th>g-lru</th>
+<th>g-lfu</th>
+<th>slru</th>
+<th>opt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>code</td>
+<td>128 (18.4)</td>
+<td>85.9</td>
+<td>87.5</td>
+<td>87.1</td>
+<td>84.2</td>
+<td>93.3</td>
+</tr>
+<tr>
+<td></td>
+<td>192 (27.5)</td>
+<td>91.7</td>
+<td>92.8</td>
+<td>92.5</td>
+<td>89.4</td>
+<td>96.9</td>
+</tr>
+<tr>
+<td></td>
+<td>256 (36.7)</td>
+<td>94.5</td>
+<td>95.1</td>
+<td>94.3</td>
+<td>91.4</td>
+<td>98.9</td>
+</tr>
+<tr>
+<td></td>
+<td>384 (55.1)</td>
+<td>97.5</td>
+<td>97.6</td>
+<td>96.9</td>
+<td>92.6</td>
+<td>99.8</td>
+</tr>
+<tr>
+<td>chat (6 turns)</td>
+<td>128</td>
+<td>82.6</td>
+<td>84.1</td>
+<td>84.0</td>
+<td>83.8</td>
+<td>93.2</td>
+</tr>
+<tr>
+<td></td>
+<td>192</td>
+<td>88.7</td>
+<td>89.9</td>
+<td>92.1</td>
+<td>90.9</td>
+<td>96.4</td>
+</tr>
+<tr>
+<td></td>
+<td>256</td>
+<td>91.9</td>
+<td>92.3</td>
+<td>94.9</td>
+<td>94.3</td>
+<td>97.4</td>
+</tr>
+<tr>
+<td></td>
+<td>384</td>
+<td>96.8</td>
+<td>97.2</td>
+<td>97.5</td>
+<td>96.8</td>
+<td>98.4</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>MTP costs the drive nothing extra.</strong> A verification step routes the draft window, n + 1 = 4
+tokens, and advances by the accepted ones (2.2 assumed, from the measured 40-49 against 25-26
+tok/s). Replayed through the shared LRU, the reads per generated token are the same with and
+without MTP, within 0.5%, at every cache size, because each token's experts are read once
+either way. MTP groups them into steps of 2.2 times as many reads, which keeps more reads in
+flight. So MTP lowers the compute per token and leaves the drive term unchanged.</p>
+<p>Drive ceilings (shared LRU, 3.7 GB/s), compute 38.5 ms per token without MTP (26 tok/s
+resident) and 22 ms with it (45.5 tok/s):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>cache / layer</th>
+<th>reads per token, code / chat</th>
+<th>no MTP, overlapped</th>
+<th>MTP, serial</th>
+<th>MTP, overlapped</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>128 (18.4 GiB)</td>
+<td>193 / 244 MB</td>
+<td>19.2 / 15.2</td>
+<td>13.5 / 11.4</td>
+<td>19.2 / 15.2</td>
+</tr>
+<tr>
+<td>192 (27.5 GiB)</td>
+<td>110 / 156 MB</td>
+<td>26.0 / 23.7</td>
+<td>19.3 / 15.6</td>
+<td>33.5 / 23.7</td>
+</tr>
+<tr>
+<td>256 (36.7 GiB)</td>
+<td>76 / 119 MB</td>
+<td>26.0 / 26.0</td>
+<td>23.6 / 18.5</td>
+<td>45.5 / 31.2</td>
+</tr>
+<tr>
+<td>384 (55.1 GiB)</td>
+<td>37 / 43 MB</td>
+<td>26.0 / 26.0</td>
+<td>31.3 / 29.8</td>
+<td>45.5 / 45.5</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Measured on the drive</strong> (<code>1bit moe-cache</code>, chat and long traces, 192 per layer = 9,216
+slots: 27.5 GiB of experts in 34.4 GiB of pinned slots. At the time, every slot was sized for
+the largest layer's expert. Size classes (below) now pin 27.0 GiB for the same slots):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>mode</th>
+<th>compute per token</th>
+<th>decode tok/s</th>
+<th>stall per token</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>no prefetch (reads on demand)</td>
+<td>38.5 ms / 22 ms (MTP)</td>
+<td>7.3-7.7 / 8.3-8.8 (2.4 in one later run)</td>
+<td>91-99 ms (412 ms in that run)</td>
+</tr>
+<tr>
+<td>oracle: every layer's experts queued when a token starts</td>
+<td>38.5 ms / 22 ms</td>
+<td>10.2-11.2 / 10.7-11.5</td>
+<td>51-71 ms</td>
+</tr>
+<tr>
+<td>oracle, compute ~0 (the cache's read path alone)</td>
+<td></td>
+<td>8.9-9.8</td>
+<td>102-112 ms</td>
+</tr>
+</tbody>
+</table></div>
+<p>This is far below the ceilings above, for two reasons:
+- <strong>The drive was slower than its fresh-box figure.</strong> Random 1 MiB reads, 8 in flight, gave
+  3.5 GB/s at one point in the session and 1.2-3.2 GB/s later, with the drive at 53 °C (limit 82)
+  and the box's load average at 6-9 from other tenants. Paired runs (raw reads, the cache, raw
+  reads again) put the cache's read path at the drive's rate of the moment. The cache is not
+  the bottleneck.
+- <strong>Reads on demand are latency-bound.</strong> A layer misses 1-2 of its 10 experts (3 reads of
+  about 1 MiB each: gate, up, down). They go in flight together, then compute waits. At that
+  depth each read pays the drive's latency under load. With the oracle, all of a token's reads
+  are in flight together: 1.4-4.8 times faster, from the same bytes.</p>
+<p>So the design point for Flash-Next is <strong>queue many layers' reads at once</strong>. That needs
+predictions several layers ahead: its gate-ahead predictor, then two- and three-ahead. MTP's
+bigger steps help the same way, and a quieter drive helps most.</p>
+<h2 id="running-these-measurements-safely">Running these measurements safely<a class="anchor" href="#running-these-measurements-safely" title="Permanent link">#</a></h2>
+<p>A model larger than free memory must never be loaded blind. llama.cpp's CPU backend copies
+quantized weights into anonymous memory (repacking), so <code>n_gpu_layers=0</code> doesn't stream from
+the file. On 2026-09-25 that OOM-killed other services on the box. On Strix Halo, GPU
+allocations also escape cgroup memory limits. So every big run goes through
+<code>scripts/mem-guard.sh &lt;floor GB&gt; &lt;cmd&gt;</code>, which kills the run itself when <code>MemAvailable</code> falls
+below the floor.</p>
+<h2 id="streaming-in-the-inference-path">Streaming in the inference path<a class="anchor" href="#streaming-in-the-inference-path" title="Permanent link">#</a></h2>
+<p><code>1bit serve --moe-slots N</code> (docs/serve.md) streamed the routed experts of each MoE layer from
+the model file while it decoded (not in this build; see Status above). The llama.cpp Vulkan pin (fork PR #19, <code>1bit/moe-stream</code>)
+does the work, driven by environment variables that <code>serve</code> sets (<code>ONEBIT_MOE_FILE</code>,
+<code>ONEBIT_MOE_SLOTS</code>; <code>src/llama-moe-stream.h</code> lists the rest). The expert tensors load on the
+CPU memory-mapped (<code>-ot exps=CPU --no-host --no-repack --load-mode mmap</code>), so their pages are
+read only when a prompt batch touches them. Batches of up to 8 tokens (decode) use the slots;
+prompts keep the mapped path.</p>
+<p>All three flags are needed. With <code>-ot exps=CPU</code> alone, llama.cpp puts the experts in a pinned
+Vulkan host buffer (Coder-30B: 16.9 GiB of RAM); <code>--no-host</code> alone gets a CPU repack (12.7
+GiB); and this build's default load mode reads the file into memory. With all three, the
+experts are a <code>CPU_Mapped</code> buffer and the process holds 259 MiB of anonymous memory. <code>1bit
+serve --moe-slots</code> passes all three. Before 2026-09-26 it passed only <code>-ot exps=CPU</code>, so the
+streamed runs below also held a full RAM copy of the experts. Decode never used that copy, so
+the speeds hold, but the memory saving did not.</p>
+<ul>
+<li><strong>GPU mode</strong> (the default): each layer's slots live in a Vulkan device buffer the host
+  maps, packed as expert tensors. A CPU op pins the batch's experts, reads the misses with
+  <code>O_DIRECT</code>, and turns their ids into slot indices; the regular MUL_MAT_ID then runs on the
+  GPU over the slots. A first version imported pinned host memory instead
+  (<code>buffer_from_host_ptr</code>); the GPU reads that at about 1 GB/s, and it decoded 0.1-0.3 tok/s.</li>
+<li><strong>CPU mode</strong> (<code>ONEBIT_MOE_DEVICE=cpu</code>): three custom ops (pin, gate/up/SwiGLU, down) on the
+  CPU's dot kernels.</li>
+<li><strong>Correctness</strong> (Qwen3-Coder-30B Q4_K_M, perplexity over 2 x 512 tokens): GPU mode gives
+  exactly the all-Vulkan numbers, 21.1029 with 1-token batches and 20.9475 with 4-token
+  batches.</li>
+</ul>
+<p>Decode speed, Qwen3-Coder-30B-A3B Q4_K_M (48 layers x 128 experts = 6,144; <code>llama-bench</code>
+<code>-n 64</code>, 5 repetitions, warm ones; the first repetition starts from empty slots):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Setup</th>
+<th>tok/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>all on Vulkan0 (resident)</td>
+<td>79-91</td>
+</tr>
+<tr>
+<td>experts on the CPU (a pinned host copy, see above)</td>
+<td>25-43</td>
+</tr>
+<tr>
+<td>streamed, 4,608 slots (75%)</td>
+<td>28-38 (12 cold)</td>
+</tr>
+<tr>
+<td>streamed, 3,072 slots (50%)</td>
+<td>17-22</td>
+</tr>
+<tr>
+<td>streamed, 1,536 slots (25%)</td>
+<td>8-10</td>
+</tr>
+</tbody>
+</table></div>
+<p>Through <code>1bit serve</code> (a 128-token chat answer, three requests): 18.9, then 28.3 and 27.1 tok/s
+at 4,608 slots; 7.1, 6.6 and 6.0 at 1,536. The answers match the resident model's. With the
+prefetch moved off the decode path (below), 4,608 slots gives 17.1, then 38.9 and 39.0.</p>
+<p>A model that fits in memory decodes fastest resident. Streaming is for the ones that don't:
+at a quarter of the experts in memory, Coder-30B still decodes 8-10 tok/s.</p>
+<h3 id="where-streamed-decode-spends-its-time">Where streamed decode spends its time<a class="anchor" href="#where-streamed-decode-spends-its-time" title="Permanent link">#</a></h3>
+<p><code>ONEBIT_MOE_STATS=1</code> prints, at exit, the time spent in the remap op, the part of it spent
+waiting for reads, and the time between one layer's remap and the next (the GPU's work plus
+the round trip to the host). Coder-30B, <code>-n 64 -r 4</code>, per MoE layer (the numbers include the
+cold first repetition):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Slots, prefetch depth</th>
+<th>Warm tok/s</th>
+<th>In remap (waiting)</th>
+<th>Between remaps</th>
+<th>Demand misses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6,144, off</td>
+<td>48-53</td>
+<td>0.36 ms (0.36)</td>
+<td>0.37 ms</td>
+<td>4.8% (the cold fill)</td>
+</tr>
+<tr>
+<td>4,608, off</td>
+<td>42</td>
+<td>0.41 (0.40)</td>
+<td>0.37</td>
+<td>5.4%</td>
+</tr>
+<tr>
+<td>4,608, 1</td>
+<td>43.5-43.8</td>
+<td>0.34 (0.34)</td>
+<td>0.37</td>
+<td>1.3% (+4.4% prefetched)</td>
+</tr>
+<tr>
+<td>4,608, 2</td>
+<td>43.0-44.8</td>
+<td>0.30 (0.30)</td>
+<td>0.38</td>
+<td>1.1%</td>
+</tr>
+<tr>
+<td>1,536, off</td>
+<td>9.6-10.5</td>
+<td>1.59 (1.58)</td>
+<td>0.59</td>
+<td>22.9%</td>
+</tr>
+<tr>
+<td>1,536, 1</td>
+<td>9.2-10.2</td>
+<td>1.68 (1.67)</td>
+<td>0.61</td>
+<td>7.0% (+18.7%)</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>The round trip caps streamed decode.</strong> 0.37 ms between remaps x 48 layers is 17.6 ms per
+  token, about 57 tok/s, against 12.5 ms (80 tok/s) resident. Each layer's routed ids go to the
+  host and its slot indices come back before the expert matmuls can run.</li>
+<li><strong>Prefetch now pays a little.</strong> Its router scoring first ran inside the remap op, scalar, at
+  about 0.15 ms per layer: prefetch cost 4,608 slots a third of its speed (28 against 42
+  tok/s). A worker thread now scores the next <code>ONEBIT_MOE_PREFETCH</code> layers (default 1) off the
+  decode path.</li>
+<li><strong>At 1,536 slots the drive is the limit.</strong> About 88 misses x 2.1 MB per token is 185 MB, and
+  at 10 tok/s that is about 2 GB/s through <code>O_DIRECT</code> on a drive shared with other tenants. More
+  reads in flight (<code>ONEBIT_MOE_IO</code> 4 to 32) didn't help, and prefetch trades demand misses for
+  wasted reads (80 against 61 GiB over the run). What helps here is reading fewer bytes: a
+  better hit rate (item 2 below) or smaller experts.</li>
+</ul>
+<h3 id="routing-that-prefers-resident-experts">Routing that prefers resident experts<a class="anchor" href="#routing-that-prefers-resident-experts" title="Permanent link">#</a></h3>
+<p>Since no eviction policy recovers the misses, the other lever is the router itself. With
+<code>ONEBIT_MOE_SUBST=r</code> (<code>1bit serve --moe-subst r</code>), a streamed layer picks its experts with a CPU
+op in place of the top-k: when a chosen expert is not resident, the best resident expert among
+the router's next k choices takes its place, if it scores at least r times as high. The
+routing weights are then the substitute's own. The op also pins the chosen experts and writes
+their slot indices, in place of the remap op, so a layer still syncs with the host once (98
+graph splits for Coder-30B with or without it; a first version with separate ops had 194).</p>
+<p>Qwen3-Coder-30B Q4_K_M, KL divergence against the all-Vulkan logits (<code>llama-perplexity
+--kl-divergence</code>, 2 x 512 tokens, batch 1, prefetch on):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Slots</th>
+<th>r</th>
+<th>Experts replaced</th>
+<th>Drive reads</th>
+<th>KLD</th>
+<th>Same top token</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1,536</td>
+<td>off</td>
+<td></td>
+<td>290 GiB</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>1,536</td>
+<td>0.5</td>
+<td>5.7%</td>
+<td>232 GiB</td>
+<td>0.012</td>
+<td>96.7%</td>
+</tr>
+<tr>
+<td>1,536</td>
+<td>0.25</td>
+<td>6.3%</td>
+<td>227 GiB</td>
+<td>0.031</td>
+<td>94.7%</td>
+</tr>
+<tr>
+<td>1,536</td>
+<td>0.1</td>
+<td>6.5%</td>
+<td>226 GiB</td>
+<td>0.060</td>
+<td>91.4%</td>
+</tr>
+<tr>
+<td>3,072</td>
+<td>off</td>
+<td></td>
+<td>79 GiB</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>3,072</td>
+<td>0.5</td>
+<td>2.2%</td>
+<td>58 GiB</td>
+<td>0.0076</td>
+<td>97.3%</td>
+</tr>
+<tr>
+<td>3,072</td>
+<td>0.25</td>
+<td>2.6%</td>
+<td>55 GiB</td>
+<td>0.016</td>
+<td>96.1%</td>
+</tr>
+<tr>
+<td>3,072</td>
+<td>0.1</td>
+<td>2.6%</td>
+<td>55 GiB</td>
+<td>0.028</td>
+<td>94.7%</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>r = 0.5 is the setting.</strong> Below it, reads hardly fall further while the divergence doubles
+  at each step.</li>
+<li><strong>What's left is prefetch.</strong> At 1,536 slots, demand misses fall from 6.8% to 1.5% of the
+  routed experts. Most of the remaining reads are the gate-ahead prefetch's, and a prefetched
+  expert counts as resident.</li>
+<li><strong>Decode</strong> (<code>llama-bench -n 64</code>, warm repetitions, off and 0.5 interleaved over two rounds):
+  1,536 slots 8.7-11.9 tok/s against 7.9-10.1, and 3,072 slots 18.9-26.0 against 16.1-21.4.
+  On a slower moment of the shared drive, 1,536 slots gave 8.0-12.4 against 6.0-8.7: the
+  slower the drive, the more it gains (10-35%). At 4,608 slots, it makes no difference.</li>
+</ul>
+<h3 id="flash-next-streamed">Flash-Next, streamed<a class="anchor" href="#flash-next-streamed" title="Permanent link">#</a></h3>
+<p>Qwen3.8-Flash-Next UD-Q4_K_XL (111 GB: 71.7 GiB of routed experts, 24,576 of them; 26.8 GiB of
+per-layer token embeddings) runs with 4.6 GiB on the GPU plus the expert slots. The experts and
+the per-layer embedding table stay file-backed (<code>-ot exps=CPU,per_layer_token_embd=CPU --no-host
+--no-repack --load-mode mmap</code>, which <code>1bit serve --moe-slots</code> passes). The gate-ahead prefetch
+is off: its predictor does not fit this model's hyper-connections (Next, item 3).</p>
+<p>Decode is timed as a batch-1 <code>llama-perplexity</code> pass over 512 tokens (every step a decode step).
+KL divergence is against the exact streamed run, which equals the model, since streaming is
+bit-exact. Exact and substituted runs were interleaved on the shared box:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Slots (share)</th>
+<th>Routing</th>
+<th>tok/s</th>
+<th>Misses</th>
+<th>Read / 512 tokens</th>
+<th>KLD</th>
+<th>Same top token</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4,608 (19%)</td>
+<td>exact</td>
+<td>3.5-3.7</td>
+<td>22.0%</td>
+<td>157 GiB</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>4,608</td>
+<td>r 0.9</td>
+<td>4.1</td>
+<td>18.8%</td>
+<td>134 GiB</td>
+<td>0.028</td>
+<td>94.5%</td>
+</tr>
+<tr>
+<td>4,608</td>
+<td>r 0.5</td>
+<td>6.8</td>
+<td>9.0%</td>
+<td>64 GiB</td>
+<td>0.075</td>
+<td>90.2%</td>
+</tr>
+<tr>
+<td>9,216 (38%)</td>
+<td>exact</td>
+<td>5.4-6.2</td>
+<td>9.5%</td>
+<td>68 GiB</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>9,216</td>
+<td>r 0.9</td>
+<td>6.3-6.5</td>
+<td>7.9%</td>
+<td>57 GiB</td>
+<td>0.015</td>
+<td>95.7%</td>
+</tr>
+<tr>
+<td>9,216</td>
+<td>r 0.5</td>
+<td>6.9</td>
+<td>4.5%</td>
+<td>32 GiB</td>
+<td>0.072</td>
+<td>86.7%</td>
+</tr>
+</tbody>
+</table></div>
+<p>(Reads include filling the slots from cold: about 13 GiB at 4,608 slots, 27 GiB at 9,216.)
+Perplexity of the exact runs: 11.32.</p>
+<ul>
+<li><strong>A model larger than the box's free memory decodes at 3.5-6 tok/s exactly</strong>, from 18-32
+  GiB of GPU memory in all, instead of the 77 GiB it needs resident (40-49 tok/s with MTP).</li>
+<li><strong>Substitution costs far more here than on Coder-30B.</strong> At r 0.5 the KL divergence is 0.07
+  (Coder: 0.008-0.012): a token spreads over 10 of 512 experts, and a stand-in differs more
+  from the expert it replaces. r 0.9 keeps it at 0.015-0.028 for a 5-15% gain. Use r 0.9 or
+  none on this model.</li>
+<li><strong>The drive is the limit.</strong> At 4,608 slots, 4.0 ms per layer goes to waiting for reads
+  against 1.7 ms of everything else.</li>
+</ul>
+<p><strong>Prefetch makes it worse.</strong> On Flash-Next, the gate-ahead predictor (router l+1 applied to
+layer l's 2560-wide FFN input) is right about two times in three, but every wrong guess costs a
+read from a drive that is already the limit. At 4,608 slots, depth 1 took 247 s per pass
+against 133 s without (240 against 157 GiB read), and depth 2 took 253 s. Keep
+<code>ONEBIT_MOE_PREFETCH=0</code> on this model.</p>
+<p><strong>Reads in flight matter more than prefetch.</strong> <code>ONEBIT_MOE_STATS</code> times every read. With whole
+expert parts (about 1 MiB) and 8 reader threads, a layer's misses make only 6-7 reads, and each
+1 MiB <code>pread</code> took 4.5-4.8 ms: about 1.8 GB/s, from a drive that gives 3.4 GB/s at that depth
+when the box is idle (<code>rdtest</code>: 3.2-4.1 GB/s idle, 1.3-2.9 under the other tenants' load).
+Reading parts in 256 KiB chunks with 16 threads keeps the queue deep (the streamer's default
+since fork PR #23; <code>ONEBIT_MOE_CHUNK_KB</code>, <code>ONEBIT_MOE_IO</code>):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flash-Next, 4,608 slots</th>
+<th>s / pass (two rounds)</th>
+<th>pread per read</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8 threads, whole parts</td>
+<td>174, 177</td>
+<td>4.5-4.8 ms (1 MiB)</td>
+</tr>
+<tr>
+<td>16 threads, 256 KiB</td>
+<td>143, 151</td>
+<td>2.0 ms</td>
+</tr>
+<tr>
+<td>16 threads, 512 KiB</td>
+<td>152, 149</td>
+<td>3.2 ms</td>
+</tr>
+<tr>
+<td>32 threads, 256 KiB</td>
+<td>157, 205</td>
+<td>3.4-4.9 ms</td>
+</tr>
+</tbody>
+</table></div>
+<p>That is 14-18% faster, with perplexity unchanged in all 8 runs. The rounds ran at load 7-22,
+which is why the baseline here is slower than the 133-145 s above. On Coder-30B at 1,536 slots
+the change is within the noise (four rounds, 6.7 against 7.0 tok/s).</p>
+<h2 id="next">Next<a class="anchor" href="#next" title="Permanent link">#</a></h2>
+<ol start="0">
+<li><strong>Prompts through the slots.</strong> A batch above <code>ONEBIT_MOE_MAX_BATCH</code> (8) runs its experts on the
+   CPU from the mapped file: Flash-Next prompts went at 0.4-0.8 tok/s through <code>serve</code>. Candidates:
+   cap llama-server's ubatch at the streamed batch size, or stream larger batches when the
+   layer's slots hold all their experts. (Measuring it was interrupted: the Flash-Next files were
+   removed from the box on 2026-09-26.)</li>
+<li><strong>Fewer host round trips.</strong> The remap per layer caps streamed decode at about 57 tok/s on
+   Coder-30B ("Where streamed decode spends its time"). 6,144 slots (every expert) runs
+   erratically on the shared box.</li>
+<li><strong>A better stand-in than the router's next choice.</strong> On Flash-Next, r 0.5 costs a KL divergence
+   of 0.07 ("Flash-Next, streamed"). Candidates: weighing a stand-in by how often it co-occurs
+   with the missing expert, or reading only the missing expert's most-weighted rows.</li>
+<li><strong>Flash-Next's prediction.</strong> Its layers keep four 2560-wide residual streams
+   (hyper-connections), so the predictor needs that model's mixing step before the router. Built
+   as the next layer's own block ("The next layer's own block", above); it needs a device run to
+   rate it and the streamer to consume it.</li>
+<li><strong>The quants not on the box</strong> (UD-Q2/Q3/Q4_K_XL): their decode speed, once there is room
+   on the drive.</li>
+</ol>
+<nav class="pager"><a class="prev" href="arch-gaps.html"><span>Previous</span>Architecture gaps</a><a class="next" href="tokenizers.html"><span>Next</span>Tokenizers</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/moe-streaming.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

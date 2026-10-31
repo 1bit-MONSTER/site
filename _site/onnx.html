@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ONNX Runtime GenAI models · 1bit engine</title>
+<meta name="description" content="1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="ONNX Runtime GenAI models · 1bit engine">
+<meta property="og:description" content="1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.">
+<link rel="canonical" href="https://1bit.gg/onnx.html">
+<meta property="og:url" content="https://1bit.gg/onnx.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ONNX Runtime GenAI models · 1bit engine">
+<meta name="twitter:description" content="1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-25">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/onnx.html#article", "headline": "ONNX Runtime in-process", "description": "1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.", "url": "https://1bit.gg/onnx.html", "mainEntityOfPage": "https://1bit.gg/onnx.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-25", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html" aria-current="page">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="onnx-runtime-in-process">ONNX Runtime in-process<a class="anchor" href="#onnx-runtime-in-process" title="Permanent link">#</a></h1>
+<p><code>-DONEBIT_ORT=ON</code> links the distribution's ONNX Runtime into <code>1bit</code> and builds two things on top of
+it: the <code>1bit ort-info</code> probe, which reports the pin and the execution providers this binary really
+has, and <code>libonebit_ep.so</code>, a <strong>plugin execution provider</strong> that ORT loads by path at run time and
+that runs the graph's matmuls through the engine's own kernels.</p>
+<p>It is off by default, and CI builds without it: it needs the <code>libonnxruntime</code> dev package, and
+nothing else in the engine depends on ONNX Runtime. ONNX Runtime is not modified, and the only
+constants this repository uses are the ones its public headers declare.</p>
+<h2 id="the-pin">The pin<a class="anchor" href="#the-pin" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>what</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>package</td>
+<td>Ubuntu 26.04 <code>libonnxruntime1.23</code> + <code>libonnxruntime-dev</code>, <code>1.23.2+dfsg-6ubuntu1</code></td>
+</tr>
+<tr>
+<td>library</td>
+<td><code>/usr/lib/x86_64-linux-gnu/libonnxruntime.so.1.23.2</code></td>
+</tr>
+<tr>
+<td>sha256</td>
+<td><code>9c8f6112e9dcf09ed4e621a1d0a7b6ba49575c7d09f27a652d24a22c8564b13c</code></td>
+</tr>
+<tr>
+<td>OrtApi</td>
+<td><code>v23</code>, negotiated with <code>OrtGetApiBase()-&gt;GetApi(ORT_API_VERSION)</code></td>
+</tr>
+<tr>
+<td>pkg-config</td>
+<td><code>libonnxruntime</code> (<code>-I/usr/include/onnxruntime -lonnxruntime</code>)</td>
+</tr>
+<tr>
+<td>licence</td>
+<td>MIT, recorded in <code>NOTICE</code> (linked at build time, never redistributed)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The pin is a contract, not a preference: the plugin EP hands ORT a vtable of C function pointers
+whose layout is fixed by <code>ORT_API_VERSION</code>, so a host built for another version would call through
+the wrong offsets instead of failing. <code>1bit ort-info</code> prints both numbers, and the version the
+headers compile against is checked against the version the loaded library serves.</p>
+<h2 id="building-it">Building it<a class="anchor" href="#building-it" title="Permanent link">#</a></h2>
+<pre><code class="language-bash">sudo apt install libonnxruntime-dev        # 1.23.2 on 26.04
+cmake -S . -B build -DONEBIT_ORT=ON
+cmake --build build -j&quot;$(nproc)&quot;
+./build/1bit ort-info
+</code></pre>
+<p>That adds <code>onnx/</code> to the build: the probe, <code>libonebit_ep.so</code>, and the two tests below. The build
+compiles against ORT 1.23's headers, so <code>-DONEBIT_ORT=OFF</code> produces a binary with no ORT symbols at
+all — the option is a compile-time switch, not a runtime one.</p>
+<h2 id="1bit-ort-info"><code>1bit ort-info</code><a class="anchor" href="#1bit-ort-info" title="Permanent link">#</a></h2>
+<pre><code class="language-text">onebit ort-info
+  ortv    : 1.23.2
+  api     : v23 (compile-time ORT_API_VERSION, negotiated above)
+  lib     : /usr/lib/x86_64-linux-gnu/libonnxruntime.so.1.23
+  builtin : 3
+            [0] DnnlExecutionProvider
+            [1] XnnpackExecutionProvider
+            [2] CPUExecutionProvider
+  eproster: 1 (partition order; first EP gets the node, no tie-break)
+            [0] CPUExecutionProvider  vendor=Microsoft  device=CPU
+</code></pre>
+<p>The two lists answer different questions. <code>builtin</code> is what is compiled into the <code>.so</code> the loader
+found — a distribution build carries DNNL and XNNPACK as well as the CPU EP, so "the CPU EP is the
+only provider" is not an assumption this build may make. <code>eproster</code> is the <code>OrtEpDevice</code> roster, and
+its order <strong>is</strong> the partition order: ORT offers a node to each provider in turn and the first one
+that returns a kernel gets it, with no tie-break. That is why every integration in this repository
+registers its own provider first and the CPU EP last.</p>
+<h2 id="the-plugin-ep">The plugin EP<a class="anchor" href="#the-plugin-ep" title="Permanent link">#</a></h2>
+<p><code>libonebit_ep.so</code> is a shared object ORT loads by path:</p>
+<pre><code class="language-c">api-&gt;RegisterExecutionProviderLibrary(env, &quot;onebit_ep&quot;, &quot;/path/to/libonebit_ep.so&quot;);
+</code></pre>
+<p>Registration must happen before the session is created; <code>GetEpDevices</code> then returns one
+<code>OrtEpDevice</code> per hardware device the factory offers, and the caller appends them in the order it
+wants nodes partitioned. Unregistering invalidates those handles.</p>
+<p>What it claims today, and the four edges ORT enforces on any plugin:</p>
+<ul>
+<li><strong>Ops.</strong> <code>ONEBIT_EP_OPS</code> (default <code>MatMul</code>). The rest of the target list — <code>Gemm</code>, <code>Add</code>,
+  <code>Softmax</code>, <code>LayerNormalization</code>, <code>RMSNorm</code>, <code>Gather</code> — lands one at a time; anything unclaimed is
+  offered to the next provider, so a graph never becomes unrunnable because of this EP.</li>
+<li><strong>Precision and rank.</strong> float32 only, rank 2 or 3 (<code>ORT_NOT_IMPLEMENTED</code> otherwise). No sync
+  streams yet: an execution stream request fails cleanly rather than pretending.</li>
+<li><strong>Data transfer must be non-null.</strong> ORT calls through the vtable unconditionally, so a null
+  <code>CreateDataTransfer</code> is a call to address 0. The allocator must be <code>OrtDeviceAllocator</code> and
+  256-byte aligned — MLAS loads assume it, and an arena allocator is refused by name.</li>
+<li><strong>Teardown.</strong> <code>ReleaseEpFactory</code> returns an <code>OrtStatus*</code> even though it "cannot fail"; ORT
+  dereferences the result when it unloads the library, so returning void crashes at <code>ReleaseEnv</code>,
+  long after the run that looked fine.</li>
+</ul>
+<h3 id="matmul-on-the-npu">MatMul on the NPU<a class="anchor" href="#matmul-on-the-npu" title="Permanent link">#</a></h3>
+<p>With <code>-DONEBIT_EP_NPU=ON</code> and <code>-DONEBIT_NPU_RT_DIR=&lt;dir with npu_rt.cpp and npu_rt_api.cpp&gt;</code>, the
+same MatMul kernel calls the NPU through the forward route's <code>I8Ctx</code> — the same weight packer and
+the same activation quantiser the NPU lane uses (<code>packB</code>, per-row <code>amax/127</code>, readback and dequant
+by <code>ascales[m] * group_scales[l][n]</code>), so a device result is comparable with the forward route's.
+<code>docs/npu.md</code> covers the runtime and what ships in a release; the kernels are built one ELF per
+projection shape, and the ELF names its own geometry, which is why the shape is configuration rather
+than something the EP infers:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ONEBIT_EP_NPU_ELF</code></td>
+<td>the full-ELF kernel for this K and N (e.g. <code>full_i8_O_K1024_N1024_m16.elf</code>)</td>
+</tr>
+<tr>
+<td><code>ONEBIT_EP_NPU_M</code>, <code>_K</code>, <code>_N</code></td>
+<td>the design dims that ELF was built for; a MatMul of another shape falls back to the host</td>
+</tr>
+<tr>
+<td><code>ONEBIT_EP_TRACE=1</code></td>
+<td>append one line per callback to <code>/tmp/onebit_ep_trace.&lt;pid&gt;.log</code> — the ownership evidence the tests read</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The device lock.</strong> The NPU is shared, and the rule is that a plugin never evicts the owner's
+serve. The EP takes <code>/tmp/1bit-npu-device.lock</code> with <code>flock(2)</code> <strong>non-blocking</strong> and holds it for the
+life of the process; when the lock is held it does not queue — it reports <code>device busy</code> and runs the
+matmul on the host instead, because an inference session must not block on another process. The open
+itself matches <code>app/npu_device_lock.h</code> (engine#640): the fixed path, <code>O_CREAT|O_RDONLY|O_NOFOLLOW</code>
+at 0644, since a read fd is enough for <code>flock</code> and the path is not something an environment variable
+may name. The difference is only the contention policy — that helper queues by default, this one
+always gives up.</p>
+<h3 id="numerics">Numerics<a class="anchor" href="#numerics" title="Permanent link">#</a></h3>
+<p>The two backends are held to different tolerances, because they compute different things: the host
+path is float32 and must match the CPU EP to <code>1e-5</code> relative; the device path is int8 by int8 into
+int32, and is held to <code>2e-2</code> of the result's magnitude. The proof prints which backend it got, so a
+silent fall back cannot be mistaken for a device pass.</p>
+<h2 id="qwen3-06b">Qwen3-0.6B<a class="anchor" href="#qwen3-06b" title="Permanent link">#</a></h2>
+<p>The first real model through this path is Qwen3-0.6B, exported by <code>onnx/export_qwen3.py</code> into a plain
+graph — opset 20, ai.onnx domain only, float32, <code>input_ids</code>/<code>attention_mask</code> int64 <code>[1, seq]</code> in and
+<code>logits</code> float32 <code>[1, seq, vocab]</code> out, weights in one external-data sidecar. Attention is exported
+with <code>attn_implementation="eager"</code> on purpose: a fused/SDPA attention block hides the matmuls inside
+an op our EP does not claim, and then there is nothing to schedule.</p>
+<pre><code class="language-sh">python3 onnx/export_qwen3.py --model-dir ~/models/Qwen3-0.6B-hf --out ~/models/qwen3-0.6b.onnx --check
+1bit ort-run --model ~/models/qwen3-0.6b.onnx --ep ./libonebit_ep.so --ids &quot;9707 11 1879&quot; -n 8 \
+             --dump-logits /tmp/ort-logits
+python3 onnx/compare_logits.py --forward /tmp/fwd-logits --ort /tmp/ort-logits
+</code></pre>
+<p><code>--check</code> prints the operator census and every distinct <code>MatMul</code> <code>(K, N)</code> in the graph, which is both
+the EP's binding table and the coverage picture: 254 <code>MatMul</code> nodes in six shapes, of which this
+engine's kernels cover <code>1024 x 2048</code> (q) and <code>1024 x 1024</code> (k, v) — 84 nodes — and the rest stay on
+the CPU EP. <code>ort-run</code> therefore reports what it actually did: an EP-on-NPU run and an
+<code>ONEBIT_EP_OPS=none</code> control on the same graph, both with the CPU EP last.</p>
+<p>The graph keeps no KV cache, so one decoding step re-runs the whole sequence: the tokens/s it prints
+is that graph's rate, and it is not comparable to a KV-cached server. The comparison that matters is
+against the forward route on the same token ids, which is what <code>compare_logits.py</code> does — per-step
+KL(forward || ort) in nats plus top-1 agreement, over the two logits dumps
+(<code>decode_logits_idx&lt;N&gt;.bin</code> from <code>1bit npu-run --dump-logits</code>, <code>logits_&lt;N&gt;.bin</code> from <code>ort-run</code>). The
+measurements themselves are recorded in the state file for the deliverable, and the pack design they
+feed is in <a href="onnx-pack.html">ONNX pack</a>.</p>
+<h3 id="two-engines-in-one-session">Two engines in one session<a class="anchor" href="#two-engines-in-one-session" title="Permanent link">#</a></h3>
+<p>The NPU EP is not the only accelerator worth registering. <code>1bit ort-run</code> takes <code>--ep</code> once per
+library and applies them <strong>in the order given</strong>, with the CPU EP always last:</p>
+<pre><code class="language-bash"># our NPU EP first, a GPU EP (HIP/ROCM plugin, when one is installed) second, CPU last
+1bit ort-run --model qwen3-0.6b.onnx \
+    --ep ./libonebit_ep.so --ep /path/to/libhip_ep.so --ids &quot;9707 11 1879 374&quot; -n 16
+</code></pre>
+<p>Order is priority, and the two engines cover different halves of the same graph: the NPU takes the
+projection shapes it has an ELF for, the GPU EP takes what it supports, the CPU EP mops up. Two
+rules make this work, and one of them is a bug we hit:</p>
+<ul>
+<li>each library is appended with its own <code>SessionOptionsAppendExecutionProvider_V2</code> call — the API
+  rejects a single call whose device list mixes two EPs (<code>All OrtEpDevice values in ep_devices must
+  have the same execution provider</code>);</li>
+<li>an EP must claim only what it can actually run. Our EP claims a MatMul only when both operands are
+  float32 with rank 2 or 3, and with <code>ONEBIT_EP_NPU</code> only for <code>(K, N)</code> shapes an ELF is configured
+  for <strong>and</strong> only while the device lock is ours. Claiming wider turned a graph that ran at
+  13 tokens/s on the CPU EP into one that ran at 0.18 tokens/s on our naive host kernel, and, before
+  the rank check, into a graph that refused to run at all (<code>only rank-2 and rank-3 MatMul are
+  supported yet</code> on a rank-4 attention matmul).</li>
+</ul>
+<h3 id="quantised-graphs-quark-a8w8-qdq">Quantised graphs (Quark A8W8 QDQ)<a class="anchor" href="#quantised-graphs-quark-a8w8-qdq" title="Permanent link">#</a></h3>
+<p>A Quark-quantised ONNX model is a <em>QDQ</em> graph (<code>DequantizeLinear</code> → <code>MatMul</code> → <code>QuantizeLinear</code> with
+int8 tensors and float32 scales), and the <code>MatMul</code> inside it is the same int8 × int8 → int32 product
+our device kernel already computes. Such a graph runs on the EP unchanged today — the EP takes that
+<code>MatMul</code> and the surrounding <code>DequantizeLinear</code>/<code>QuantizeLinear</code> stay on the CPU EP — and the folding
+that removes the intermediate float tensors is designed in
+<a href="onnx-pack.html#a8w8-qdq-the-shape-quark-emits">ONNX pack</a>. <code>ctest -R onebit_ep_qdq_proof</code> checks the
+pattern end to end and requires int8-identical output.</p>
+<h2 id="verifying">Verifying<a class="anchor" href="#verifying" title="Permanent link">#</a></h2>
+<pre><code class="language-bash">cmake -S . -B build -DONEBIT_ORT=ON &amp;&amp; cmake --build build -j &amp;&amp; ctest --test-dir build -R &quot;ort_info|onebit_ep&quot;
+</code></pre>
+<p>Three tests, each proving a different claim:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>test</th>
+<th>proves</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ort_info</code></td>
+<td>the binary negotiated OrtApi v23 and can list its EP roster</td>
+</tr>
+<tr>
+<td><code>onebit_ep_proof</code></td>
+<td>a two-node graph (<code>MatMul</code> then <code>Relu</code>) built in memory through the Model Editor API runs with the plugin EP registered first and the CPU EP last, our EP takes the <code>MatMul</code> (the trace has a <code>matmul</code> line, which only <code>Compute</code> can write), and the result matches the CPU EP</td>
+</tr>
+<tr>
+<td><code>onebit_ep_proof_cpu_fallback</code></td>
+<td>with <code>ONEBIT_EP_OPS=none</code> the same graph is partitioned to the CPU EP (<code>claimed=0</code>), so the match above cannot come from the CPU running both sessions</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>onebit_npu_gemm_probe</code> (NPU builds only) is registered as a fourth test and <strong>skips</strong> when the
+device is busy rather than failing someone else's run.</p>
+<h2 id="status">Status<a class="anchor" href="#status" title="Permanent link">#</a></h2>
+<p>The host path is done: it is what the tests assert, and it needs no hardware. The NPU path is
+proven on XDNA 2 as well — the ELF loads, ORT hands the EP the <code>MatMul</code>, the kernel runs on the
+device, and three consecutive runs give the same answer inside the int8 tolerance:
+<code>max_abs = 9.893e-02</code> against <code>max|ref| = 20.414</code> (rel <code>4.846e-03</code>, gate <code>2e-2</code>), with the probe's
+scale fit at <code>0.9999</code>. What is <em>not</em> done is coverage: an ELF exists per <code>(M, K, N)</code>, so on a real
+model the EP takes the shapes it has a kernel for and the CPU EP takes the rest (for Qwen3-0.6B that
+is q, k and v). The device backend is still off by default and is not part of any release, because
+enabling it on a box where another process owns the NPU must stay an explicit decision.</p>
+<p>The A8W8 QDQ pattern is claimed and proven (<code>ctest -R onebit_ep_qdq_proof</code>, exact int8 match); the
+<em>fused</em> form that skips the dequantise/quantise pairs is designed, not built.</p>
+<p>The two-engine order is implemented and exercised with a single library; a <em>second</em> EP library was
+not available to try it against (this ORT build ships no ROCM/HIP EP and there is no gfx1201 HIP EP
+plugin on the box), so treat a real NPU+GPU session as designed but unmeasured.</p>
+<p>The ops list is deliberately one entry long. A plugin EP that claims a node it cannot run makes a
+graph fail where it used to work, so ops are added only with a passing proof beside them.</p>
+<p>Not part of this, and never linked or shipped here: AMD's VitisAI execution provider wheel. This
+engine talks to the NPU through its own runtime (<a href="releases.html#private-components">Releases</a>),
+and an ORT graph served by <code>1bit</code> executes our EP's kernels, not VitisAI's.</p>
+<nav class="pager"><a class="prev" href="hybrid.html"><span>Previous</span>Hybrid</a><a class="next" href="onnx-pack.html"><span>Next</span>ONNX pack</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/onnx.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

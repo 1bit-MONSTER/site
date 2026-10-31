@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every local LLM node on the GPU with HRX · 1bit engine</title>
+<meta name="description" content="On AMD Strix Halo, all 43 local LLM configurations we test run fully on the GPU with HRX and our HIP kernels, and Qwen3.8-27B decodes at 36 tok/s.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Every local LLM node on the GPU with HRX · 1bit engine">
+<meta property="og:description" content="On AMD Strix Halo, all 43 local LLM configurations we test run fully on the GPU with HRX and our HIP kernels, and Qwen3.8-27B decodes at 36 tok/s.">
+<link rel="canonical" href="https://1bit.gg/blog-every-node-on-hrx.html">
+<meta property="og:url" content="https://1bit.gg/blog-every-node-on-hrx.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-every-node-on-hrx.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Every node on the GPU: local LLMs on Strix Halo in Lemonade">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Every local LLM node on the GPU with HRX · 1bit engine">
+<meta name="twitter:description" content="On AMD Strix Halo, all 43 local LLM configurations we test run fully on the GPU with HRX and our HIP kernels, and Qwen3.8-27B decodes at 36 tok/s.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-every-node-on-hrx.png">
+<meta name="twitter:image:alt" content="Every node on the GPU: local LLMs on Strix Halo in Lemonade">
+<meta property="article:tag" content="milestone">
+<meta property="article:tag" content="strix-halo">
+<meta property="article:tag" content="local-llm">
+<meta property="article:tag" content="hrx">
+<meta property="article:tag" content="lemonade">
+<meta property="article:tag" content="qwen">
+<meta property="article:tag" content="speculative-decoding">
+<meta property="article:tag" content="release">
+<meta property="article:published_time" content="2026-10-21">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "BlogPosting", "@id": "https://1bit.gg/blog-every-node-on-hrx.html#article", "headline": "Every node on the GPU: local LLMs on Strix Halo in Lemonade", "description": "On AMD Strix Halo, all 43 local LLM configurations we test run fully on the GPU with HRX and our HIP kernels, and Qwen3.8-27B decodes at 36 tok/s.", "url": "https://1bit.gg/blog-every-node-on-hrx.html", "mainEntityOfPage": "https://1bit.gg/blog-every-node-on-hrx.html", "image": "https://1bit.gg/assets/og-every-node-on-hrx.png", "datePublished": "2026-10-21", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "keywords": "milestone, strix-halo, local-llm, hrx, lemonade, qwen, speculative-decoding, release"}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="post">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html">Docs</a>
+      <a href="blog.html" aria-current="page">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<article class="art"><div class="container">
+<a class="back" href="blog.html">← all posts</a>
+<div class="art-meta"><time datetime="2026-10-21">2026-10-21</time><span class="tag">milestone</span><span class="tag">strix-halo</span><span class="tag">local-llm</span><span class="tag">hrx</span><span class="tag">lemonade</span><span class="tag">qwen</span><span class="tag">speculative-decoding</span><span class="tag">release</span></div>
+<h1>Every node on the GPU: local LLMs on Strix Halo in Lemonade</h1>
+<p class="lead">On a Ryzen AI Max+ 395 (Strix Halo), the 1bit engine now runs every graph node of every local LLM
+and mode we test on the integrated Radeon 8060S GPU, through AMD's HRX runtime and our own HIP
+kernels. Nothing falls back to the CPU. Here is what landed ahead of the first release, measured on
+that machine.</p>
+<div class="prose">
+<blockquote>
+<p><strong>Update (2026-10-30):</strong> the release candidate's checks are green: the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, and the hardware gate is green at the shipping pin; the tag and the packages are the owner's. The engine is pinned to Lemonade's weekly release. Current numbers: <a href="models.html">Models measured</a>; status: <a href="releases.html">Releases</a>.</p>
+</blockquote>
+<h2 id="43-of-43-configurations-all-on-the-gpu-with-hrx">43 of 43 configurations, all on the GPU with HRX<a class="anchor" href="#43-of-43-configurations-all-on-the-gpu-with-hrx" title="Permanent link">#</a></h2>
+<p>We keep a census of the models people run and the modes they run them in: a short chat, a long
+prompt, a q8 KV cache, four requests in parallel, speculative decoding with MTP, embeddings and
+reranking. The models are Qwen3 0.6B, 4B and 8B, Qwen3.8-27B, Qwen3-Coder-30B-A3B,
+GLM-4.7-Flash, ZAYA1-8B, LFM2, MiniCPM, and the nomic, bge and jina embedding and reranking models.</p>
+<p>On 20 October the census found 12 gaps, places where a node still ran on the CPU. All 12 are
+closed. The closing census: 43 of 43 runnable configurations with 0 nodes off the GPU, one graph
+split, and every request answered (<a href="hrx.html">how HRX runs</a>;
+<a href="https://github.com/1bit-MONSTER/engine/pull/476">#476</a>,
+<a href="https://github.com/1bit-MONSTER/engine/pull/480">#480</a>,
+<a href="https://github.com/1bit-MONSTER/engine/pull/481">#481</a>). Among them:</p>
+<ul>
+<li>a q8_0 KV cache, with K and V or K alone, now keeps flash attention on the GPU;</li>
+<li>four parallel requests work on LFM2, ZAYA1-8B and the Qwen3.5/3.8 family;</li>
+<li>Qwen3.8-27B with MTP answers an 8K-token prompt;</li>
+<li>jina-bert's attention, with its ALiBi bias, runs on the GPU.</li>
+</ul>
+<h2 id="qwen38-27b-speed-with-mtp-speculative-decoding">Qwen3.8-27B speed with MTP speculative decoding<a class="anchor" href="#qwen38-27b-speed-with-mtp-speculative-decoding" title="Permanent link">#</a></h2>
+<p>Qwen3.8-27B (UD-Q4_K_XL) with MTP speculative decoding, greedy 256-token chats:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>prompt</th>
+<th>before</th>
+<th>now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>code</td>
+<td>25.9 tok/s</td>
+<td><strong>36.0 tok/s</strong></td>
+</tr>
+<tr>
+<td>prose</td>
+<td>20.5 tok/s</td>
+<td><strong>26.8 tok/s</strong></td>
+</tr>
+<tr>
+<td>short</td>
+<td>21.9 tok/s</td>
+<td><strong>29.9 tok/s</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The verify step checks four tokens at once. New kernels for 2 to 8 tokens took it from 121 ms to
+88 ms (<a href="https://github.com/1bit-MONSTER/engine/pull/487">#487</a>). Decode without MTP is unchanged
+at 12.2 tok/s. The same model reads a 4,096-token prompt at 560 to 585 tok/s, depending on the batch size (llama-bench). How to run it:
+<a href="serve.html">1bit serve</a>.</p>
+<h2 id="strict-gpu-placement-by-default">Strict GPU placement by default<a class="anchor" href="#strict-gpu-placement-by-default" title="Permanent link">#</a></h2>
+<p>A node that quietly runs on the CPU is a slowdown nobody asked for. HRX placement is now strict by
+default: if any node of a model would run on the CPU, the load stops with one line that names the
+node, its op and its shape, and <code>--no-strict-device</code> turns the fallback back on
+(<a href="https://github.com/1bit-MONSTER/engine/pull/482">#482</a>).</p>
+<p>The hardware gate that every pin change passes now builds our kernels into the server, checks
+that every graph of every gate model is on the GPU, adds q8 KV cache rows, and checks every kernel
+registration against its compiled code at startup
+(<a href="https://github.com/1bit-MONSTER/engine/pull/478">#478</a>,
+<a href="https://github.com/1bit-MONSTER/engine/pull/484">#484</a>). That gate caught three bugs this week
+before they reached main (<a href="hw-gate.html">the hardware gate</a>).</p>
+<p>The runtime also got safer: one memory budget for every buffer, coherent host reads, and after a
+GPU fault the server refuses new work and exits cleanly, so Lemonade can restart the model
+(<a href="https://github.com/1bit-MONSTER/engine/pull/486">#486</a>).</p>
+<h2 id="inside-lemonade-on-ubuntu-2604-and-as-1bit-os">Inside Lemonade, on Ubuntu 26.04 and as 1bit OS<a class="anchor" href="#inside-lemonade-on-ubuntu-2604-and-as-1bit-os" title="Permanent link">#</a></h2>
+<p>Lemonade now starts the engine's llama-server directly: one HTTP hop instead of two, one process
+fewer, and a quarter of a second off each model load
+(<a href="https://github.com/1bit-MONSTER/engine/pull/475">#475</a>). On Ubuntu 26.04 the stock lemond from
+the Lemonade PPA can use the engine through a systemd drop-in, with no patch to Lemonade
+(<a href="https://github.com/1bit-MONSTER/engine/pull/483">#483</a>). The same build also ships as the 1bit OS
+image, a bootable Lemonade appliance (<a href="lemonade.html">the engine in Lemonade</a>).</p>
+<h2 id="the-npu-engine">The NPU engine<a class="anchor" href="#the-npu-engine" title="Permanent link">#</a></h2>
+<p>The XDNA 2 NPU engine is coming along: correctness first, speed next
+(<a href="npu.html">NPU status</a>). More in a later post.</p>
+<h2 id="when-it-ships">When it ships<a class="anchor" href="#when-it-ships" title="Permanent link">#</a></h2>
+<p>The first release goes out when every item on our release checklist is done. Three full release
+rehearsals this week (build, packages, the OS image booted in a VM, a clean build from the binary
+drop) passed end to end (<a href="releases.html">releases</a>).</p>
+</div>
+<nav class="pager"><a class="prev" href="blog-bitnet-b158-on-hrx.html"><span>Newer</span>BitNet b1.58 runs on HRX</a><a class="next" href="blog-hrx-and-npu-direction.html"><span>Older</span>Where the engine is going: HRX and the NPU</a></nav>
+</div></article>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

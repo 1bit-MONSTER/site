@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Porting map: private tree to public engine · 1bit engine</title>
+<meta name="description" content="How the working 1bit-MONSTER engine is ported into this public repository without its history: the steps, what is done, and what stays private.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Porting map: private tree to public engine · 1bit engine">
+<meta property="og:description" content="How the working 1bit-MONSTER engine is ported into this public repository without its history: the steps, what is done, and what stays private.">
+<link rel="canonical" href="https://1bit.gg/PORTING.html">
+<meta property="og:url" content="https://1bit.gg/PORTING.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Porting map: private tree to public engine · 1bit engine">
+<meta name="twitter:description" content="How the working 1bit-MONSTER engine is ported into this public repository without its history: the steps, what is done, and what stays private.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-22">
+<meta property="article:modified_time" content="2026-10-21">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/PORTING.html#article", "headline": "Porting map", "description": "How the working 1bit-MONSTER engine is ported into this public repository without its history: the steps, what is done, and what stays private.", "url": "https://1bit.gg/PORTING.html", "mainEntityOfPage": "https://1bit.gg/PORTING.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-22", "dateModified": "2026-10-21", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html" aria-current="page">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="porting-map">Porting map<a class="anchor" href="#porting-map" title="Permanent link">#</a></h1>
+<p>This repository is the working 1bit-MONSTER engine, ported without its history.
+Each step below is one PR (or a short series) that builds and runs on Strix Halo before the next one starts.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Component</th>
+<th>Source in 1bit-MONSTER</th>
+<th>Done when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>The engine runs inside Lemonade.</strong> Lemonade runs <code>1bit serve</code> as a backend: one model per process behind an OpenAI-compatible API</td>
+<td><code>tools/unified_server.cpp</code></td>
+<td><strong>landed</strong> (<a href="serve.html">1bit serve</a>): NPU and HRX pass <code>serve_e2e</code> on Strix Halo (Vulkan and ZINC did too, before RFC #213 stage 3 and the core strip removed them); <code>smoke_serve</code> runs in CI. The engine first embedded Lemonade (v11.9.0 plus local recipes); after a review<sup id="fnref:geramyl"><a class="footnote-ref" href="#fn:geramyl">1</a></sup> it is embedded <em>into</em> Lemonade instead: the vendored copy is removed, and the Lemonade recipe that runs <code>1bit serve</code> (<code>onebit</code>) lives in our fork <a href="https://github.com/1bit-MONSTER/lemonade">1bit-MONSTER/lemonade</a> (<a href="lemonade.html">Lemonade</a>)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>HRX.</strong> llama.cpp with <code>GGML_HRX=ON</code> on AMD's tested pair (it was built with <code>GGML_VULKAN=ON</code> too until RFC #213 stage 3, which removed the engine's Vulkan and ROCm builds)</td>
+<td><code>1bit-MONSTER/llama.cpp</code> <code>1bit/hrx-vulkan-patched</code> (AMD's <code>hrx-graph-develop-v2</code> plus our commits) + <code>1bit-MONSTER/hrx-system</code> <code>1bit/main</code> (<code>ROCm/hrx-system</code> at AMD's pin plus our commits), pinned from <code>ROCm/ggml-staging-automation</code></td>
+<td><strong>landed</strong> (<a href="hrx.html">HRX</a>): <code>1bit serve</code> runs GGUF checkpoints on <code>HRX0</code> (and the CPU from the same build); kept current by <code>bump-hrx.yml</code>. The decode-split flash-attention race (#123, #140) is fixed (llama.cpp <code>00adc2b</code>, #176) and the kernel is on by default again (#178). Since 2026-10-18 pinned to AMD's <code>e3e6a976</code> hrx-system line (<code>1bit/e3e6a976-pin-6</code>: our four fixes replayed plus our live-out fix for ROCm/hrx-system#1535) with llama.cpp <code>8d9ce2c1a</code> (#441; since 2026-10-19 hrx-system <code>82804197</code> and llama.cpp <code>00f2a68de</code>, #458, #461). Measured at the #441 move: test-backend-ops 1141/1141, long-prompt needles 20/20 + 5/5 + 5/5, KLD 0 and identical output on Qwen3-0.6B and ZAYA1-8B, pp512 +4.4% / +7.8%, tg128 +2.5% / +2.8%. The hold in <code>config/hrx-system-hold.config</code> now names that pin, so later AMD hrx-system moves stay manual</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>NPU engine.</strong> The NPU engine, with its kernels built from source</td>
+<td>1bit-MONSTER's NPU engine</td>
+<td><strong>in progress</strong> (<a href="npu.html">NPU engine</a>): the model reader, Q4NX, the tokenizer and serving landed (#8, #9), and Qwen3-0.6B was served on the NPU through <code>1bit serve</code>. The XDNA driver is pinned upstream (#12). GGUF on the NPU (#179, #181, #209): <code>1bit serve -m &lt;gguf&gt; --device npu</code> repacks a GGUF to Q4NX and runs six architectures, correct but not yet fast. The layer kernel and lm head built from source decode Qwen3-0.6B, 1.7B and 4B at cosine similarity 0.9999 or better against an fp64 reference at every tested position, and greedy decode matches the reference exactly; they are closed source and not merged yet</td>
+</tr>
+<tr>
+<td>3x</td>
+<td><strong>35B MoE on the NPU (experimental, closed source).</strong> Qwen3.6-35B-A3B on the NPU</td>
+<td>a closed-source add-on</td>
+<td><strong>landed as an add-on</strong> (<a href="npu.html#add-on-routes">NPU engine</a>): built into <code>1bit</code> with <code>-DONEBIT_NPU_PRIVATE</code>; parity against the fp64 reference passes (3 positions, argmax 846 / 198 / 3710), and <code>1bit serve --device npu</code> answers "The capital of France is Paris." Without the add-on, <code>serve</code> says the route is not part of the build</td>
+</tr>
+<tr>
+<td>+</td>
+<td><strong>Linux kernel.</strong> The kernel that provides <code>amdxdna</code> and <code>amdgpu</code>, pinned to upstream</td>
+<td><code>torvalds/linux</code> release tags; config from the Strix Halo kernel of 2026-09-23</td>
+<td><strong>moved</strong> to its own repository (2026-10-04): v7.3-rc4 built into Debian packages with <code>amdxdna</code> in-tree, and that repository keeps it current. Installing it on Strix Halo is a separate, deliberate step; 1bit OS (<code>os/</code>) takes a built kernel (<code>KVER=</code> / <code>VMLINUZ=</code>)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Laya router.</strong> A non-autoregressive scorer that picks where each request runs</td>
+<td><code>src/laya_scorer.cpp</code>, <code>include/laya_scorer.h</code> on <code>backup/laya-and-results-2026-09-22</code>; model at <code>~/models/laya</code></td>
+<td><strong>landed, opt-in</strong> (<a href="laya.html">Laya router</a>): source <code>NandhaKishorM/laya</code> + the three HF checkpoints pinned, hash-verified fetch, <code>bump-laya.yml</code> (#18; source <code>ca5045a3f1fa</code> and checkpoint revision <code>7b928d828b7b</code> since #439); the C++ scorer matches the Python reference on the root and <code>typed-decisions/</code> checkpoints (max logit diff 8.6e-6, same argmax) and <code>1bit serve --device auto --laya-model &lt;dir&gt;</code> routes each request (#90). Load 2.8 s once, then 0.38 s per decision (was 8.75 s, #91). Since RFC #186 (#187) it classifies each conversation (95.5% on 200 labelled requests) and <code>config/route-policy.json</code> picks the device; the scorer runs on HRX at 15-16 ms a decision (#206, #208). Next: <code>multilingual/</code> (mmBERT-base)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Every HF model, kept current.</strong> The architecture registry and the daily HF census that finds new architectures and ranks the unmapped ones by model count (1bit-MONSTER's registry mapped 2,030 HF arch strings to its own kernels; here the backends' pinned code decides)</td>
+<td><code>src/model_registry*.cpp</code>, <code>Testing/census_*.py</code> and <code>.json</code>, <code>.github/workflows/census-{watch,sweep,autopr}.yml</code></td>
+<td><strong>landed</strong> (<a href="registry.html">Model registry</a>): <code>registry/architectures.json</code> generated from the pinned HRX llama.cpp fork (265 HF architectures at first; ZINC's column left with the core strip); <code>census.yml</code> sweeps HF daily. First sweep: 415,414 text-generation models, mapped 94.88%, checked 64.33% of those with an architecture (reported separately); the 2026-10-17 sweep counts 425,483 text-generation models, 338,650 with an architecture (2,822 architectures), 94.62% mapped and 63.9% checked (#438). All seven checked GGUF architectures pass on HRX since the llama.cpp pin <code>96f6b89</code> (#95)</td>
+</tr>
+<tr>
+<td>5z</td>
+<td><strong>ZAYA1 (Zyphra) on the GPU.</strong> An architecture upstream llama.cpp lacks, in our llama.cpp; <code>1bit serve --device hrx</code> (and <code>auto</code>) runs it</td>
+<td><code>1bit-MONSTER/llama.cpp</code> <code>1bit/hrx2-archive</code> (<code>src/models/zaya.cpp</code>) and 1bit-MONSTER's <code>tools/convert_zaya_safetensors_to_gguf.py</code></td>
+<td><strong>landed</strong> (<a href="https://github.com/1bit-MONSTER/engine/blob/0baf286/docs/vulkan.md#zaya1-zyphra-from-our-llamacpp">vulkan.md at 0baf286</a>): ported to the pinned fork with a converter; matches transformers in FP32 at 95/96 teacher-forced positions; Q4_K_M decoded at 93 tok/s on the removed Vulkan build, 61.5 on the removed ROCm build and 25.5 on HRX at first; on HRX it now decodes at about 90 tok/s (94.0 tg128, llama.cpp #42, <a href="hrx.html#not-yet">HRX</a>) and passes <code>serve_e2e</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>ZINC (NVIDIA and more).</strong> Upstream <code>zolotukhin/zinc</code>, a Zig GGUF engine</td>
+<td>not in 1bit-MONSTER; was pinned from upstream <code>main</code></td>
+<td><strong>removed</strong> in the core strip (2026-10-04: the engine is HRX + HIP kernels + the NPU; Lemonade's own backends serve other GPUs). It had passed <code>serve_e2e</code> on Strix Halo (Vulkan) and answered on an RTX 5090 (CUDA); the record is <a href="https://github.com/1bit-MONSTER/engine/blob/7eaa6e6/docs/zinc.md">zinc.md at 7eaa6e6</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="how-the-pieces-fit">How the pieces fit<a class="anchor" href="#how-the-pieces-fit" title="Permanent link">#</a></h2>
+<pre><code>Lemonade (the host users talk to)
+  └─ runs, as its onebit backend ─&gt; 1bit serve -m &lt;model&gt; --port &lt;p&gt;   one OpenAI-compatible API
+                   ├─ NPU model directory ──&gt; the NPU engine, in process
+                   ├─ .gguf --device hrx|cpu ──&gt; this build's llama.cpp (ggml-hrx with HIP kernels + the CPU; no Vulkan, ROCm, Metal or CUDA)
+                   ├─ Laya ──&gt; picks the device per request (step 4, opt-in)
+                   └─ model registry ──&gt; every HF architecture, refreshed by the daily census (step 5)
+</code></pre>
+<h2 id="known-facts-carried-over">Known facts carried over<a class="anchor" href="#known-facts-carried-over" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Vulkan is not inside HRX.</strong> Until RFC #213 stage 3, one build compiled both ggml backends; it now compiles ggml-hrx only.<ul>
+<li>(Previous build, ggml-hrx2.) On zaya1-8b, <code>Vulkan0</code> decoded at 74.8 tok/s and <code>HRX20</code> at 18.4, because
+HRX2 fell back to the CPU for 2,088 ops.</li>
+<li>Q4NX loaded only on <code>HRX20</code>, the ggml-hrx2 backend AMD dropped in June. Since the
+move to AMD's live ggml-hrx (docs/hrx.md) it is not served; the Q4NX kernels are
+kept on <code>1bit-MONSTER/llama.cpp</code> <code>1bit/hrx2-archive</code> for a port.</li>
+</ul>
+</li>
+</ul>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:geramyl">
+<p>The review came from <a href="https://github.com/Geramy">geramyL</a>, a moderator on Lemonade's Discord. Thank you.&#160;<a class="footnote-backref" href="#fnref:geramyl" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+<nav class="pager"><a class="prev" href="npu-leaderboard.html"><span>Previous</span>NPU leaderboard</a><span></span></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/PORTING.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

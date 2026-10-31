@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lemonade Server backend: the onebit recipe · 1bit engine</title>
+<meta name="description" content="How the 1bit engine runs inside AMD&#x27;s Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Lemonade Server backend: the onebit recipe · 1bit engine">
+<meta property="og:description" content="How the 1bit engine runs inside AMD&#x27;s Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA.">
+<link rel="canonical" href="https://1bit.gg/lemonade.html">
+<meta property="og:url" content="https://1bit.gg/lemonade.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Lemonade Server backend: the onebit recipe · 1bit engine">
+<meta name="twitter:description" content="How the 1bit engine runs inside AMD&#x27;s Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-22">
+<meta property="article:modified_time" content="2026-10-23">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/lemonade.html#article", "headline": "Lemonade", "description": "How the 1bit engine runs inside AMD's Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA.", "url": "https://1bit.gg/lemonade.html", "mainEntityOfPage": "https://1bit.gg/lemonade.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-22", "dateModified": "2026-10-23", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html" aria-current="page">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="lemonade">Lemonade<a class="anchor" href="#lemonade" title="Permanent link">#</a></h1>
+<p><strong>The 1bit engine runs inside <a href="https://github.com/lemonade-sdk/lemonade">Lemonade</a></strong>, and its
+<code>onebit</code> recipe passes Lemonade's own LLM test suite on HRX: 29 of 29 tests run, all pass. Lemonade
+is the server users talk to, with its own catalog, downloads, router and UI. For the models it
+serves with 1bit, it runs the engine as a backend, the same way it runs <code>llama-server</code>. For a GGUF
+it starts the engine's HRX <code>llama-server</code> directly, one HTTP hop
+(<a href="https://github.com/1bit-MONSTER/engine/pull/475">#475</a>, <a href="#the-recipe-that-runs-it">below</a>); for
+the other routes it starts <code>1bit serve</code> (<a href="serve.html">1bit serve</a>), waits for <code>/health</code>, and forwards
+OpenAI requests to it. The engine exposes nothing but that OpenAI-compatible API.</p>
+<p>Recovery stays Lemonade's: when a backend hangs, <code>1bit serve</code> answers <code>/health</code> with 503 and, once
+a request has had no progress for <code>--watchdog</code> seconds, kills its backend and exits non-zero
+(<a href="serve.html#when-a-backend-hangs">serve.md, "When a backend hangs"</a>). Lemonade's BackendWatchdog
+then loads the model again.</p>
+<h2 id="how-it-got-here">How it got here<a class="anchor" href="#how-it-got-here" title="Permanent link">#</a></h2>
+<p>Step 1 first went the other way. <code>1bit lemonade</code> ran Lemonade v11.9.0's server
+core inside the <code>1bit</code> process, and this repository carried Lemonade local
+recipes for the engine (<code>onebit</code>, <code>mlx</code>, <code>zinc</code>, the <code>hrx_device</code> option).
+A review<sup id="fnref:geramyl"><a class="footnote-ref" href="#fn:geramyl">1</a></sup> pointed out that the engine should be embedded into Lemonade, not
+the reverse. So on 2026-09-23:</p>
+<ul>
+<li><code>third_party/lemonade</code> and every local delta were removed. The engine no
+  longer builds Lemonade's code or its fetched libraries.</li>
+<li><code>1bit serve</code> took over what the local recipes did, for every device: NPU,
+  Vulkan, HRX, ZINC and MLX.</li>
+</ul>
+<h2 id="the-recipe-that-runs-it">The recipe that runs it<a class="anchor" href="#the-recipe-that-runs-it" title="Permanent link">#</a></h2>
+<p>One recipe in Lemonade runs the engine, <code>onebit</code>, in the same shape as its
+<code>llama-server</code> recipe:</p>
+<pre><code>1bit serve -m &lt;model&gt; --port &lt;p&gt; [--device ...] [--ctx-size N] [--alias &lt;name&gt;]
+</code></pre>
+<p>Lemonade downloads and resolves GGUF checkpoints as for llamacpp, and its
+backend selector picks the device (<code>hrx</code> or <code>npu</code>; unset,
+the recipe sends <code>--device auto</code>). Replies already carry Lemonade's model name (<code>--alias</code>),
+so requests pass through unchanged.</p>
+<p><strong>One hop for GGUF models</strong> (fork branch <code>1bit/one-hop</code>). For a <code>.gguf</code>, the recipe first runs that
+command with <code>--print-backend</code>: serve makes its load-time checks (architecture, memory, recipes)
+and prints the llama-server it would start, and Lemonade starts that llama-server itself and
+talks to it directly, as it does for <code>llamacpp</code>. A request then crosses one HTTP hop instead of
+two. NPU model directories, DwarfStar, <code>--pm</code> and <code>--laya</code> still run through <code>1bit serve</code>
+(serve exits 5 for them), and <code>LEMONADE_ONEBIT_ONE_HOP=0</code> keeps serve in the path for every model
+(<a href="serve.html#one-hop-from-lemonade-print-backend">serve.md, "One hop from Lemonade"</a>).</p>
+<p>The recipe lives in our Lemonade fork,
+<a href="https://github.com/1bit-MONSTER/lemonade">1bit-MONSTER/lemonade</a>: upstream
+Lemonade plus the <code>onebit</code> backend (fork PR #1). Build <code>lemond</code> from the fork and
+put <code>1bit</code> on PATH (or set <code>$LEMONADE_ONEBIT_BIN</code>).</p>
+<p>The engine pins the Lemonade it is tested with: <code>third_party/lemonade</code> is the fork at a
+fixed commit. It is never linked into the engine. <code>scripts/build-lemonade.sh</code> builds
+<code>lemond</code> and the <code>lemonade</code> CLI from it:</p>
+<pre><code class="language-sh">scripts/build-lemonade.sh ~/.cache/lemonade-pin
+LEMONADE_ONEBIT_BIN=$PWD/build/1bit ~/.cache/lemonade-pin/bin/lemond
+</code></pre>
+<p><code>.github/workflows/bump-lemonade.yml</code> opens a PR here when the fork's <code>main</code> moves (after
+the upstream release sync below). Before merging, rebuild and rerun the LLM suite on Strix Halo.</p>
+<p>On Strix Halo the recipe passes Lemonade's own LLM test suite
+(<code>test/server_llm.py --wrapped-server onebit</code>) on HRX (the checklist below has the counts;
+Vulkan passed too before RFC #213 stage 3 removed it). It is not proposed upstream yet: the plan is to embed the engine fully
+in the fork first, then propose it upstream. The fork follows upstream's releases:
+<code>.github/workflows/sync-lemonade-fork.yml</code> checks daily and merges upstream's latest
+release tag (never a pre-release or <code>main</code>), so each engine release carries the Lemonade
+release current when it was built. It
+pushes only a clean merge that still registers <code>onebit</code>; otherwise it opens a PR
+in the fork that lists the conflicts. It also keeps the fork's own copies of
+upstream's workflows disabled. Lemonade asks for an RFC
+before a new backend.</p>
+<h2 id="embedding-checklist">Embedding checklist<a class="anchor" href="#embedding-checklist" title="Permanent link">#</a></h2>
+<p>What "fully embedded" still needs, measured on Strix Halo. The runs use the pinned fork
+(<code>third_party/lemonade</code>), the engine from <code>main</code>, and Lemonade's LLM suite
+(<code>test/server_llm.py --wrapped-server onebit --backend &lt;device&gt;</code>).</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>device</th>
+<th>2026-09-25, start</th>
+<th>now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HRX</td>
+<td>19 / 31</td>
+<td><strong>29 / 29 run, all pass</strong> (2 skipped; release pre-check 2026-10-02, from the packaged tarballs)</td>
+</tr>
+<tr>
+<td>NPU</td>
+<td>3 / 31</td>
+<td>in progress (<a href="npu.html">NPU engine</a>); the suite's small test models are GGUF</td>
+</tr>
+<tr>
+<td>Vulkan (removed in RFC #213 stage 3)</td>
+<td>19 / 31</td>
+<td>29 / 29 run, all pass, before its removal</td>
+</tr>
+</tbody>
+</table></div>
+<ol>
+<li>~~<strong>Declare what already works.</strong>~~ Done (fork #6). The recipe now declares tool calls,
+   <code>stop</code>, async, the Responses API, slots, tokenize, embeddings and reranking.</li>
+<li>~~<strong>Test on the device asked for.</strong>~~ Done (fork #6). The harness passes <code>--backend</code> to
+   <code>onebit</code>.</li>
+<li>~~<strong>Forward the rest of llama-server's API.</strong>~~ Done (#69). <code>1bit serve</code> forwards
+   <code>/v1/responses</code>, <code>/tokenize</code>, <code>/slots</code>, <code>/props</code> and <code>/metrics</code> on the llama-server devices.</li>
+<li>~~<strong>Embedding and reranking models.</strong>~~ Done (#70, fork #6). <code>1bit serve --embedding</code> /
+   <code>--reranking</code>, and the recipe serves those modes.</li>
+<li>~~<strong>Reranking on HRX.</strong>~~ Done. jina-reranker-v1-tiny reranks on HRX (the suite's three
+   rerank tests return the same top 3 as on Vulkan), and <code>1bit serve --rerank</code> runs on HRX (#281).</li>
+<li><strong>The NPU from Lemonade.</strong> The path works end to end: Lemonade downloads the Q4NX checkpoint
+   repo, the recipe hands <code>1bit serve</code> the directory, and the engine runs it on the NPU (the
+   experimental Qwen3.6-35B-A3B route builds with a closed add-on only,
+   <a href="npu.html#add-on-routes">NPU engine</a>). Still open:<ul>
+<li>the NPU engine's kernels built from source, verified but not merged (<a href="npu.html">NPU engine</a>);</li>
+<li>~~<code>reasoning_content</code>~~: done (#73), the NPU route splits the thinking out as llama-server does;</li>
+<li>~~models in our own Hugging Face repos~~: the 35B is <code>1bit-MONSTER/Qwen3.6-35B-A3B-NPU</code> (fork #8). (engine + fork)</li>
+</ul>
+</li>
+<li><strong>Beyond the LLM suite:</strong><ul>
+<li>the Laya router.</li>
+</ul>
+</li>
+</ol>
+<p><code>echo</code> and generation parameters are skipped, because Lemonade's own llamacpp recipe
+declares neither.</p>
+<h2 id="ubuntu-2604-the-ppas-lemond">Ubuntu 26.04: the PPA's lemond<a class="anchor" href="#ubuntu-2604-the-ppas-lemond" title="Permanent link">#</a></h2>
+<p>On Ubuntu 26.04 Lemonade installs from its PPA, and that <code>lemond</code> (2026.42.1~26.04) is upstream's,
+with no <code>onebit</code> recipe. The fork's Debian 13 <code>.deb</code> does not install there either: it depends
+on <code>libcpp-httplib0.41</code>, which 26.04 does not have. So on 26.04 the engine plugs into the stock
+<code>lemond</code> through the HRX recipe it already has, <code>llamacpp-hrx</code>, with no patch to Lemonade:</p>
+<ul>
+<li><code>lemond</code> looks for that recipe's <code>llama-server</code> in <code>LEMONADE_HRX_HRX_BIN</code>, then in <code>hrx.hrx_bin</code>
+  in its <code>config.json</code>. A path there skips its download of its own HRX build.</li>
+<li>The engine package's systemd drop-in, <code>lemonade/1bit-hrx.conf</code>
+  (<a href="https://github.com/1bit-MONSTER/engine/blob/main/config/lemonade/1bit-hrx.conf">config/lemonade/1bit-hrx.conf</a>), sets
+  <code>LEMONADE_HRX_HRX_BIN</code> to <code>lemonade-hrx</code> in the package.</li>
+<li><code>lemonade-hrx</code> (<a href="https://github.com/1bit-MONSTER/engine/blob/main/scripts/lemonade-hrx">scripts/lemonade-hrx</a>) runs the package's HRX
+  <code>llama-server</code>, with our HIP kernels, on Lemonade's arguments. First it runs
+  <code>1bit serve --print-backend-env</code>, which makes serve's load-time checks (architecture, memory)
+  and prints the environment serve gives an HRX backend: strict placement (<code>GGML_HRX_STRICT=1</code>),
+  TheRock's HSA runtime, CWSR placement (engine#315) and the ternary decode. It also fills in
+  what Lemonade's arguments leave to llama-server's defaults with serve's values: <code>-ngl 99</code>,
+  <code>--cache-reuse 256</code>, and <code>-kvu</code> above <code>--parallel 1</code>. A variable already set in <code>lemond</code>'s
+  environment wins, as it does under serve.</li>
+</ul>
+<p>To install:</p>
+<pre><code class="language-sh">sudo add-apt-repository ppa:lemonade-team/stable
+sudo apt install lemonade-server
+tar -I zstd -xf 1bit-&lt;version&gt;-linux-x86_64.tar.zst
+sudo 1bit-&lt;version&gt;-linux-x86_64/install-lemonade-ppa.sh      # to /opt/1bit; restarts lemond
+</code></pre>
+<p><code>install-lemonade-ppa.sh</code> (<a href="https://github.com/1bit-MONSTER/engine/blob/main/scripts/install-lemonade-ppa.sh">scripts/install-lemonade-ppa.sh</a>)
+copies the package to <code>/opt/1bit</code> (or the directory it is given, outside <code>/home</code>, since the
+service runs with <code>ProtectHome=yes</code>). It writes the drop-in to
+<code>/etc/systemd/system/lemond.service.d/1bit-hrx.conf</code> and reloads systemd. If the PPA's postinst
+did not already add the <code>lemonade</code> user to <code>render</code>, the script does. HRX also needs TheRock in
+<code>/opt/rocm-therock</code> (<a href="hrx.html">HRX</a>).</p>
+<p>To run <code>lemond</code> as yourself instead of as the service, set the same variable for it
+(<code>LEMONADE_HRX_HRX_BIN=/opt/1bit/lemonade-hrx lemond</code>) or put the path in <code>hrx.hrx_bin</code> in its
+<code>config.json</code>.</p>
+<p>Lemonade's HRX catalog (the <code>*-HRX</code> models) then runs on the engine, and so does a GGUF you
+register with <code>recipe: "llamacpp-hrx"</code>. Per-model arguments go in Lemonade's <code>hrx_args</code>, except
+the ones Lemonade sets itself (<code>-m</code>, <code>--ctx-size</code>, <code>--device</code>, <code>--port</code>, <code>--jinja</code>,
+<code>--metrics</code>). NPU model directories, DwarfStar, <code>--pm</code> and <code>--laya</code> are not
+llama-server, so they stay with <code>/opt/1bit/1bit serve</code> (<a href="serve.html">1bit serve</a>), outside the stock
+<code>lemond</code>.</p>
+<p><a href="https://github.com/1bit-MONSTER/engine/blob/main/scripts/check-ubuntu-2604-lemond.sh">scripts/check-ubuntu-2604-lemond.sh</a> runs this whole path
+in a clean <code>ubuntu:26.04</code> container: PPA, package, a model registered with <code>llamacpp-hrx</code>, a load
+and a chat completion. It passes when <code>lemond</code> started <code>lemonade-hrx</code> rather than installing its
+own HRX build, and when the <code>llama-server</code> it ran has <code>GGML_HRX_STRICT=1</code>. Without <code>--gpu</code> it
+needs no GPU: a stand-in records the <code>llama-server</code> command and environment, then runs Ubuntu's
+CPU llama.cpp. On Strix Halo, <code>--gpu</code> runs the real one on HRX0:</p>
+<pre><code class="language-sh">scripts/check-ubuntu-2604-lemond.sh out/1bit-&lt;version&gt;-linux-x86_64.tar.zst ~/models/Qwen3-0.6B-Q4_K_M.gguf --gpu
+</code></pre>
+<h2 id="vulkan-rocm-metal-and-cuda-are-lemonades">Vulkan, ROCm, Metal and CUDA are Lemonade's<a class="anchor" href="#vulkan-rocm-metal-and-cuda-are-lemonades" title="Permanent link">#</a></h2>
+<p>On the GPU the engine is pure HRX with HIP kernels; no Vulkan, ROCm backend, Metal, ZINC or CUDA (RFC #213 stage 3, 2026-10-01: HRX + NPU only; the
+core strip, 2026-10-04: no ZINC, so no CUDA; 2026-10-12: no MLX/Metal route and no Windows
+package). Lemonade ships its own backends for Vulkan, ROCm, CUDA, the CPU, MLX on Apple Silicon and
+Windows, so a model, feature or platform the engine does not run on HRX or the NPU is Lemonade's to
+serve:</p>
+<ul>
+<li><code>1bit serve --device vulkan</code>, <code>--device rocm</code>, <code>--device zinc</code> and <code>--device mlx</code> exit at once
+  with that reason, as do <code>--lean</code>, <code>--adaptive</code>, <code>--long-model</code>, <code>--prefill-device</code>, <code>--zinc</code> and
+  <code>--mlx-server</code>
+  (<a href="serve.html#removed-devices-and-flags">1bit serve</a>).</li>
+<li>An architecture only the removed Vulkan build ran (Zyphra Zamba, Zamba2 and BlackMamba, and a
+  few upstream-only ones) is refused with a pointer to Lemonade's <code>llamacpp</code> recipe.
+  Qwen3.8-Flash-Next (<code>qwen4exp</code>) runs on HRX since llama.cpp pin <code>e57beb97</code>.</li>
+</ul>
+<p>In the pinned fork (<a href="https://github.com/1bit-MONSTER/lemonade">1bit-MONSTER/lemonade</a>,
+<code>third_party/lemonade</code> at <code>80064ba72a98</code>, fork #15 on <code>main</code>), the <code>onebit</code> backend has two entries, <code>hrx</code> and <code>npu</code>
+(<code>backend_versions.json</code>); its <code>vulkan</code> and <code>cuda</code> entries are gone. Lemonade offers <code>onebit</code>
+models only on machines with <code>hrx</code> or <code>npu</code>. Lemonade's other recipes (its <code>llamacpp</code> Vulkan, ROCm
+and CUDA backends, MLX and the rest) are Lemonade's own and unchanged.</p>
+<h2 id="on-its-own">On its own<a class="anchor" href="#on-its-own" title="Permanent link">#</a></h2>
+<p><code>1bit serve</code> also works without Lemonade, for any OpenAI client:</p>
+<pre><code class="language-sh">1bit serve -m ~/models/Qwen3-0.6B-Q4_K_M.gguf --port 8000      # --device auto: HRX0, else the CPU
+curl http://127.0.0.1:8000/v1/chat/completions -H 'Content-Type: application/json' \
+     -d '{&quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;}]}'
+</code></pre>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:geramyl">
+<p>The review came from <a href="https://github.com/Geramy">geramyL</a>, a moderator on Lemonade's Discord. Thank you.&#160;<a class="footnote-backref" href="#fnref:geramyl" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+<nav class="pager"><a class="prev" href="models.html"><span>Previous</span>Models measured</a><a class="next" href="releases.html"><span>Next</span>Releases</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/lemonade.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

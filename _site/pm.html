@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Manager: ZAYA1-8B delegates · 1bit engine</title>
+<meta name="description" content="1bit serve --pm makes the served model the engine&#x27;s Project Manager: ZAYA1-8B routes every request and delegates to expert models over the same OpenAI API.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Project Manager: ZAYA1-8B delegates · 1bit engine">
+<meta property="og:description" content="1bit serve --pm makes the served model the engine&#x27;s Project Manager: ZAYA1-8B routes every request and delegates to expert models over the same OpenAI API.">
+<link rel="canonical" href="https://1bit.gg/pm.html">
+<meta property="og:url" content="https://1bit.gg/pm.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Project Manager: ZAYA1-8B delegates · 1bit engine">
+<meta name="twitter:description" content="1bit serve --pm makes the served model the engine&#x27;s Project Manager: ZAYA1-8B routes every request and delegates to expert models over the same OpenAI API.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-10-06">
+<meta property="article:modified_time" content="2026-10-20">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/pm.html#article", "headline": "The Project Manager (1bit serve --pm)", "description": "1bit serve --pm makes the served model the engine's Project Manager: ZAYA1-8B routes every request and delegates to expert models over the same OpenAI API.", "url": "https://1bit.gg/pm.html", "mainEntityOfPage": "https://1bit.gg/pm.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-10-06", "dateModified": "2026-10-20", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html" aria-current="page">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="the-project-manager-1bit-serve-pm">The Project Manager (<code>1bit serve --pm</code>)<a class="anchor" href="#the-project-manager-1bit-serve-pm" title="Permanent link">#</a></h1>
+<p>ZAYA1-8B is made for reasoning and calls tools reliably. <code>1bit serve --pm</code> makes the served
+model the Project Manager of the engine: it keeps every conversation, answers what it can
+itself, and hands a task that fits an expert's domain to that expert model, then relays the
+expert's answer to the user. The experts are ordinary Lemonade models: the PM asks Lemonade to
+run one, Lemonade loads it (it keeps two LLMs at once, so one expert runs beside the PM), and
+the expert's answer comes back as a tool result.</p>
+<p>This is different from Laya (<a href="laya.html">Laya router</a>), which sorts requests among <em>devices</em> for one
+model. The PM routes among <em>models</em>, and the model itself decides.</p>
+<pre><code>client ──POST /v1/chat/completions──▶ 1bit serve --pm ──▶ ZAYA (llama-server, resident)
+                                          │   ◀── delegate(expert=&quot;code&quot;, task=...)
+                                          └──POST ${lemonade-url}/api/v1/chat/completions, model = expert id──▶ Lemonade ──▶ expert
+                                              ◀── the expert's answer (tool result) ──▶ ZAYA composes the final answer ──▶ client
+</code></pre>
+<h2 id="running-it">Running it<a class="anchor" href="#running-it" title="Permanent link">#</a></h2>
+<p><strong>From Lemonade</strong> (the normal way; the engine is embedded in Lemonade, which owns model loading,
+bind address, port and auth):</p>
+<ul>
+<li>Pick the catalog entry <code>ZAYA1-8B-PM-1bit</code> in Lemonade's model browser (our fork's
+  <code>server_models.json</code>). Its <code>recipe_options</code> carry <code>"onebit_pm": true</code>, and the <code>onebit</code> recipe
+  then starts <code>1bit serve --pm --lemonade-url http://&lt;its own host&gt;:&lt;port&gt;</code>. Nothing else to set.</li>
+<li>Or add ZAYA as a custom recipe: Lemonade's <code>POST /v1/pull</code> registers user models (the <code>user.*</code>
+  namespace), and the <code>onebit</code> recipe reads <code>recipe_options.onebit_pm</code> from a user registration
+  exactly as from the built-in catalog:</li>
+</ul>
+<p><code>sh
+  curl -X POST http://127.0.0.1:13305/api/v1/pull -H 'Content-Type: application/json' -d '{
+    "model_name": "user.ZAYA1-8B-PM-1bit",
+    "recipe": "onebit",
+    "checkpoint": "1bit-MONSTER/ZAYA1-8B-GGUF:zaya1-8b-Q4_K_M.gguf",
+    "recipe_options": {"onebit_pm": true},
+    "labels": ["chat", "tool-calling"]
+  }'</code></p>
+<p><code>recipe_options.onebit_pm_experts</code> may name an experts file (below); without it the engine's
+  built-in experts apply. Remove the registration with <code>POST /v1/delete</code> (<code>{"model_name":
+  "user.ZAYA1-8B-PM-1bit"}</code>).</p>
+<p>The experts' catalog ids (<code>Qwen2.5-Coder-7B-Instruct-1bit</code>, <code>Qwen3-Coder-30B-A3B-Instruct-1bit</code>,
+<code>Qwen3.8-27B-1bit</code>, <code>gpt-oss-20b-mxfp4-1bit</code>) are ordinary <code>-1bit</code> entries in the same catalog:
+each can be pulled and chatted with on its own. Lemonade downloads an expert's GGUF the first time
+the PM asks for it, so pull the experts you want ahead of time.</p>
+<p><strong>Standalone</strong>, against a running Lemonade:</p>
+<pre><code class="language-sh">1bit serve -m zaya1-8b-Q4_K_M.gguf --alias ZAYA1-8B-PM --pm --lemonade-url http://127.0.0.1:13305
+# optional: --pm-experts my-experts.json, --pm-spawn-url http://127.0.0.1:8791 (agent workers, below)
+# optional: --pm-router laya   (the engine asks the Laya router which expert first; below)
+</code></pre>
+<p>The other <code>1bit serve</code> options apply unchanged (device, <code>--ctx-size</code>, recipes). <code>--pm</code> does not
+combine with <code>--laya</code> or with <code>--embedding</code>/<code>--reranking</code>.</p>
+<h2 id="what-a-request-does">What a request does<a class="anchor" href="#what-a-request-does" title="Permanent link">#</a></h2>
+<ol>
+<li>The PM's system prompt (who it is, when to answer and when to delegate, the experts with their
+   <code>use_when</code> text) goes first; a system message of the client's follows it.</li>
+<li>The PM gets two tools: <code>experts()</code> lists the experts; <code>delegate(expert, task, context)</code> hands
+   a self-contained brief to one of them. With <code>--pm-spawn-url</code> it gets a third, <code>spawn_worker</code>
+   (below). The round runs greedy (temperature 0 unless the request
+   sets one) with <code>chat_template_kwargs.enable_thinking</code> false (<code>pm.thinking</code> or the request's own
+   value changes that), and stops at the end of a tool call.</li>
+<li>A <code>delegate</code> call becomes one non-streaming chat request to
+   <code>${lemonade-url}/api/v1/chat/completions</code> with <code>model</code> = the expert's catalog id (and the
+   expert's <code>max_tokens</code>). Lemonade loads the model if it is not loaded. The expert's full answer
+   is the tool result, cut at <code>pm.max_result_bytes</code> (UTF-8 safe, with a note when cut). One line
+   is logged per delegation: expert, task length, milliseconds, ok or why not.</li>
+<li>The loop runs at most <code>pm.max_rounds</code> rounds (default 4); the last round offers no tools, so
+   the PM must answer. A round without a tool call is the final answer.</li>
+<li>Tool calls are read from llama-server's parsed <code>tool_calls</code>, or from the text of the answer in
+   ZAYA's own form (<code>&lt;zyphra_tool_call&gt;&lt;function=delegate&gt;&lt;parameter=expert&gt;code&lt;/parameter&gt;…</code>)
+   or Qwen's <code>&lt;tool_call&gt;{"name": …, "arguments": {…}}&lt;/tool_call&gt;</code>.</li>
+<li>The reply is a normal chat completion under the served model's name, plus a <code>pm</code> object
+   (<code>rounds</code>, <code>delegations</code> with <code>expert</code>, <code>id</code>, <code>ms</code>, <code>ok</code>, and <code>spawns</code> with <code>worker</code>, <code>box</code>,
+   <code>class</code>, <code>model</code>, <code>ms</code>, <code>ok</code>, <code>reason</code>) and an <code>X-1bit-PM</code> header. With
+   <code>"stream": true</code> the final answer arrives as SSE chunks (a role chunk, <code>reasoning_content</code> and
+   <code>content</code> pieces, a finish chunk, <code>[DONE]</code>).</li>
+</ol>
+<p>When Lemonade is not reachable, answers an error, or the expert returns nothing, the tool result
+says so ("delegation to … failed: …") and the PM answers alone, saying the expert was not
+available. It never fails silently, and never pretends an expert answered.</p>
+<h2 id="the-experts-file">The experts file<a class="anchor" href="#the-experts-file" title="Permanent link">#</a></h2>
+<p><code>config/pm-experts.json</code> is built into the binary; <code>--pm-experts FILE</code> (or Lemonade's
+<code>onebit_pm_experts</code>) replaces it.</p>
+<pre><code class="language-json">{
+  &quot;pm&quot;: {&quot;max_rounds&quot;: 4, &quot;max_result_bytes&quot;: 32768, &quot;delegate_timeout_s&quot;: 1800, &quot;thinking&quot;: false},
+  &quot;experts&quot;: [
+    {&quot;expert&quot;: &quot;code&quot;, &quot;id&quot;: &quot;Qwen2.5-Coder-7B-Instruct-1bit&quot;, &quot;domain&quot;: &quot;programming&quot;,
+     &quot;use_when&quot;: &quot;Writing, fixing, explaining or reviewing code…&quot;, &quot;max_tokens&quot;: 4096}
+  ]
+}
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>expert</code></td>
+<td>the name the PM uses in <code>delegate(expert=…)</code></td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>the model's Lemonade catalog id: what the PM asks Lemonade to run</td>
+</tr>
+<tr>
+<td><code>domain</code>, <code>use_when</code></td>
+<td>shown to the PM; this text is the routing</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>the expert's answer budget (0: Lemonade's default)</td>
+</tr>
+<tr>
+<td><code>pm.max_rounds</code></td>
+<td>PM rounds per request, tool rounds included (default 4)</td>
+</tr>
+<tr>
+<td><code>pm.max_result_bytes</code></td>
+<td>an expert's answer is cut here before the PM sees it (default 32768)</td>
+</tr>
+<tr>
+<td><code>pm.delegate_timeout_s</code></td>
+<td>read timeout for one expert answer (default 1800)</td>
+</tr>
+<tr>
+<td><code>pm.thinking</code></td>
+<td><code>enable_thinking</code> for the PM's rounds (default false)</td>
+</tr>
+<tr>
+<td><code>pm.system_prompt</code></td>
+<td>replaces the built-in prompt (the experts list is still appended)</td>
+</tr>
+<tr>
+<td><code>pm.chat_path</code></td>
+<td>Lemonade's chat path (default <code>/api/v1/chat/completions</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The defaults: <code>code</code> → Qwen2.5-Coder-7B-Instruct (Q4_K_M, 4.7 GB, Apache-2.0: light and quick
+to load, the default for code), <code>code-heavy</code> → Qwen3-Coder-30B-A3B-Instruct (large refactors and
+long repositories; an 18 GB load), <code>reasoning</code> → Qwen3.8-27B (long reasoning, mathematics,
+analysis), <code>agentic</code> → gpt-oss-20b (tool-heavy agentic tasks). General conversation is the PM's
+own; there is no expert for it.</p>
+<h2 id="routing-with-laya-pm-router-laya">Routing with Laya (<code>--pm-router laya</code>)<a class="anchor" href="#routing-with-laya-pm-router-laya" title="Permanent link">#</a></h2>
+<p><code>--pm</code> alone leaves the choice of expert to the model: it reads the experts' <code>domain</code> and
+<code>use_when</code> text and decides for each request. <code>--pm-router laya</code> moves that decision into the
+engine first. Before the PM's first round, the engine asks its Laya router (the same scorer and
+the same <code>classify_request</code> as <code>--laya</code>, <a href="laya.html">Laya router</a>) which class the request is — Laya
+answers <code>code</code>, <code>prose</code>, <code>short</code> or <code>long_doc</code>, with a calibrated confidence — and looks the
+class up in the <code>pm.routes</code> table of the experts file:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>class</th>
+<th>expert by default</th>
+<th>the class means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td><code>code</code></td>
+<td>source code, a script, a fix to a program, or an explanation of code</td>
+</tr>
+<tr>
+<td><code>prose</code></td>
+<td><code>reasoning</code></td>
+<td>an explanation, plan or advice that needs a longer written answer</td>
+</tr>
+<tr>
+<td><code>long_doc</code></td>
+<td><code>code-heavy</code></td>
+<td>work over a long pasted document, log, table, transcript or file</td>
+</tr>
+<tr>
+<td><code>short</code></td>
+<td><em>(none)</em></td>
+<td>a greeting, a quick fact, a calculation, a one-line answer</td>
+</tr>
+</tbody>
+</table></div>
+<p>A class with no expert (an empty name in the table), an expert the file does not list, or a class
+the router is less sure of than <code>pm.routes_min_confidence</code> (default 0.16, the route policy's
+floor) leaves the request to the PM, which answers it itself exactly as with the default router.
+Otherwise the engine makes the <code>delegate</code> call itself, as one normal tool round, and the PM
+composes the final answer from the expert's answer, as it does for its own delegation. The reply's
+<code>pm.routing</code> object carries what the router said: <code>class</code>, <code>score</code>, <code>ms</code>, and <code>expert</code> when one
+was chosen.</p>
+<p>Laya has no class for a <em>heavy</em> code task, so <code>code-heavy</code> is reached through <code>long_doc</code>: a long
+pasted document goes to the larger coder. A decision costs about 0.4-0.6 s with the C++ scorer on
+the CPU and about 25 ms with ggmlc's <code>laya</code> on HRX (<code>-DONEBIT_LAYA_GGML=ON</code>, <a href="laya.html">Laya router</a>).
+The checkpoint is the one <code>--laya</code> uses: <code>--laya-model DIR</code>, else <code>$ONEBIT_LAYA_MODEL</code>, else
+<code>~/.local/share/1bit/laya</code> (<code>scripts/fetch-laya.sh</code>); without one, serve refuses to start rather
+than route by guess.</p>
+<pre><code class="language-sh">1bit serve -m zaya1-8b-Q4_K_M.gguf --alias ZAYA1-8B-PM --pm --pm-router laya \
+  --laya-model ~/.local/share/1bit/laya --lemonade-url http://127.0.0.1:13305
+</code></pre>
+<h2 id="starting-an-agent-worker-pm-spawn-url">Starting an agent worker (<code>--pm-spawn-url</code>)<a class="anchor" href="#starting-an-agent-worker-pm-spawn-url" title="Permanent link">#</a></h2>
+<p>Some work is not one expert answer: it edits files, builds, measures, or runs for hours. For that
+the PM gets a third tool, <code>spawn_worker(worker, box, class, task)</code>, but only when <code>--pm-spawn-url
+URL</code> names an executor. The option is off by default; without it the tool is not offered at all.</p>
+<p>ZAYA only <em>proposes</em>. The engine POSTs a versioned proposal to the executor's <code>/propose</code> path:</p>
+<pre><code class="language-json">{&quot;schema_version&quot;: 1, &quot;worker&quot;: &quot;build-1&quot;, &quot;box&quot;: &quot;ryzen&quot;, &quot;class&quot;: &quot;code&quot;, &quot;task&quot;: &quot;...&quot;}
+</code></pre>
+<p>The executor either accepts it or refuses it with a reason, and either answer comes back as the
+tool result: on a refusal the PM says the worker was not started and answers the request anyway.
+The engine starts nothing itself — no shell, no tmux, no model choice of its own.</p>
+<p>The executor owns the guards, so they cannot drift with the model: the worker name must match
+<code>[a-z0-9-]{1,24}</code>, the class picks a model from a local table (a remote or public provider is
+refused), the endpoint is health-checked before launch, a name that already exists or a box at its
+worker cap is refused, <code>class: hardware</code> is pinned to the machine that has the hardware, and the
+project's local safety rules are appended to every brief before the worker starts. The task text is
+written to a brief file, never interpolated into a command line.</p>
+<p><code>--pm-spawn-url</code> is plain <code>http://</code> (the engine's client has no TLS). The executor binds loopback on
+its own machine, so a PM on another machine reaches it over an ssh tunnel and no port is exposed.
+<code>pm.spawn_timeout_s</code> in the experts file (default 180) is the read timeout for one proposal.</p>
+<h2 id="limits">Limits<a class="anchor" href="#limits" title="Permanent link">#</a></h2>
+<ul>
+<li>One expert at a time: Lemonade keeps two LLMs loaded (the PM and one expert), so a second
+  expert in the same request means Lemonade swaps models, which costs a load each time. The
+  prompt tells the PM to delegate once with a complete brief.</li>
+<li>Round cap: <code>pm.max_rounds</code> (default 4); the last round has no tools.</li>
+<li>No persistence: the PM has nothing but the conversation the client sends; delegations are not
+  remembered across requests. The log (one line per delegation) is the only record.</li>
+<li>The final answer is streamed once the PM has composed it: the SSE chunks arrive together at the
+  end, not token by token.</li>
+<li><code>--lemonade-url</code> is plain <code>http://</code> (the engine's HTTP client has no TLS). When Lemonade requires
+  an API key (<code>LEMONADE_API_KEY</code>), delegation requests carry none and fail with HTTP 401: the
+  engine has no API key of its own (Lemonade leads on auth), so run the PM against a Lemonade
+  without one, or on its loopback address where none is required.</li>
+<li>The routing is the model's decision; an expert's <code>use_when</code> text is the lever.</li>
+</ul>
+<h2 id="tests">Tests<a class="anchor" href="#tests" title="Permanent link">#</a></h2>
+<p><code>ctest -R pm_route</code> (<a href="https://github.com/1bit-MONSTER/engine/blob/main/tests/pm_route.sh">tests/pm_route.sh</a>, no GPU): a mock llama-server plays
+the PM (a <code>delegate(code)</code> call on the first round, the final answer on the second, in both the
+parsed and ZAYA's text form) and a mock Lemonade records the expert id it is asked for. It checks
+the delegation hits the default code expert's id with its <code>max_tokens</code>, the expert's answer
+reaches the client under the served name, a general question is answered without a delegation,
+streaming, a Lemonade that is down (the PM still answers, HTTP 200, the reply says so), an expert
+that errors, the round cap, <code>/v1/completions</code> untouched, and the refusals. With a mock executor
+(tests/fake_spawn_exec.py) it checks that <code>spawn_worker</code> posts the proposal and records it in
+<code>pm.spawns</code>, that a refusal and an unreachable executor are relayed with the PM still answering, and
+that the tool is not offered without <code>--pm-spawn-url</code>.</p>
+<nav class="pager"><a class="prev" href="laya.html"><span>Previous</span>Laya router</a><a class="next" href="registry.html"><span>Next</span>Model registry</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/pm.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

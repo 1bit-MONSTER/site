@@ -16,7 +16,7 @@ limitations under the License.
 -->
 tags: npu, xdna2, ternary, bonsai, ryzen-ai, work-in-progress, amd-npu-linux
 title: Ternary Bonsai-2-27B on the Ryzen AI NPU
-summary: PrismML's Ternary-Bonsai-2-27B answers correctly on the XDNA 2 NPU (device cosine 0.9908, argmax identical to the engine); decode went 13.3 to 8.87 to 4.1 s/token in one day, and the measurement says exactly where the rest is.and a fused per-layer design is the next step.
+summary: PrismML's Ternary-Bonsai-2-27B answers correctly on the XDNA 2 NPU (cosine 0.9908, argmax identical); decode 13.3 to 4.1 s/token in a day, ceiling measured.
 
 # Ternary Bonsai-2-27B on the Ryzen AI NPU
 

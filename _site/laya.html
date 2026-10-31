@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laya router: where each request runs · 1bit engine</title>
+<meta name="description" content="Laya, opt-in with 1bit serve --laya, sorts each conversation into code, prose, short answer or long document (95.5% right) and picks the backend and settings.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Laya router: where each request runs · 1bit engine">
+<meta property="og:description" content="Laya, opt-in with 1bit serve --laya, sorts each conversation into code, prose, short answer or long document (95.5% right) and picks the backend and settings.">
+<link rel="canonical" href="https://1bit.gg/laya.html">
+<meta property="og:url" content="https://1bit.gg/laya.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Laya router: where each request runs · 1bit engine">
+<meta name="twitter:description" content="Laya, opt-in with 1bit serve --laya, sorts each conversation into code, prose, short answer or long document (95.5% right) and picks the backend and settings.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-23">
+<meta property="article:modified_time" content="2026-10-28">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/laya.html#article", "headline": "Laya", "description": "Laya, opt-in with 1bit serve --laya, sorts each conversation into code, prose, short answer or long document (95.5% right) and picks the backend and settings.", "url": "https://1bit.gg/laya.html", "mainEntityOfPage": "https://1bit.gg/laya.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-23", "dateModified": "2026-10-28", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html" aria-current="page">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="laya">Laya<a class="anchor" href="#laya" title="Permanent link">#</a></h1>
+<p>Laya picks where each request runs: it sorts each conversation into code, prose, short answer
+or long document (95.5% right), and a measured policy picks the device. The test set is 200
+labelled requests. This is step 4 of the port (docs/PORTING.md).
+<a href="https://github.com/NandhaKishorM/laya">Laya</a> (Apache-2.0) is a
+non-autoregressive decision model: a ModernBERT-style encoder plus an RLCD
+decision head. It answers typed questions (<code>choice</code>, <code>score</code>, <code>noul</code>) about a
+request in one forward pass, with calibrated confidence. It has three
+checkpoints and a router that picks between them.</p>
+<h2 id="the-pin">The pin<a class="anchor" href="#the-pin" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th>Pin</th>
+<th>Kept current by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source</td>
+<td><code>third_party/laya</code> = <code>NandhaKishorM/laya</code> main <strong><code>fe9a6c35</code></strong></td>
+<td><code>bump-laya.yml</code></td>
+</tr>
+<tr>
+<td>Checkpoints</td>
+<td><code>config/laya.json</code> = Hugging Face <code>convaiinnovations/laya</code> at revision <strong><code>7b928d82</code></strong>: root (842 MB), <code>multilingual/</code> (644 MB, 34 MB tokenizer), <code>typed-decisions/</code> (842 MB)</td>
+<td><code>bump-laya.yml</code> (moves the source and the revision together)</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-sh">scripts/fetch-laya.sh            # into ~/.local/share/1bit/laya, where serve --laya looks
+scripts/fetch-laya.sh ~/models/laya-pinned
+</code></pre>
+<p><code>fetch-laya.sh</code> downloads exactly the pinned revision and checks every file
+against the Hub's list: sha256 for the LFS weights, the git blob id for the rest.
+Files already present and correct are not fetched again. Images and eval plots
+are skipped.</p>
+<p>Verified 2026-09-23 on Strix Halo: 20 files, 2.3 GB, all hashes match.</p>
+<h2 id="the-c-scorer">The C++ scorer<a class="anchor" href="#the-c-scorer" title="Permanent link">#</a></h2>
+<p>Ported from 1bit-MONSTER <code>src/laya_scorer.cpp</code> on
+<code>backup/laya-and-results-2026-09-22</code>, without its history. Zero Python at
+runtime: weights from <code>model.safetensors</code> (<code>laya/safetensors.{h,cpp}</code>, F16/F32
+-&gt; f32), tokens from the Hugging Face <code>tokenizer.json</code> through the engine's
+<code>npu::Tokenizer</code> (<code>laya/scorer.{h,cpp}</code>). One forward pass answers typed
+questions with the same calibrated confidence as the Python reference.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scorer</td>
+<td><code>laya/scorer.{h,cpp}</code></td>
+</tr>
+<tr>
+<td>Safetensors reader</td>
+<td><code>laya/safetensors.{h,cpp}</code></td>
+</tr>
+<tr>
+<td>Router</td>
+<td><code>laya/route.{h,cpp}</code></td>
+</tr>
+<tr>
+<td>Gate harness</td>
+<td><code>tests/laya_gate.cpp</code></td>
+</tr>
+<tr>
+<td>Routing e2e</td>
+<td><code>tests/laya_route_e2e.sh</code> + <code>tests/fake_backend_route.py</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>npu::Tokenizer</code> gained <code>token_id()</code> and the Rust-tokenizers ByteLevel regex
+(the <code>use_regex</code> pattern for <code>{"type":"ByteLevel"}</code> with no explicit Split, as
+ModernBERT serializes it); digits stay together so multi-digit tokens merge.</p>
+<h2 id="gate-against-the-python-reference">Gate against the Python reference<a class="anchor" href="#gate-against-the-python-reference" title="Permanent link">#</a></h2>
+<p>The scorer is gated against the Python <code>laya</code> package on the two
+ModernBERT-large checkpoints (root and <code>typed-decisions/</code>; <code>multilingual/</code> is
+mmBERT-base and stays a separate follow-up). <code>tests/laya_gate.cpp</code> runs the
+questions + state recorded in a <code>golden.json</code> and compares raw logits and
+act logits, the argmax decision, and temperature-1 softmax probabilities.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Checkpoint</th>
+<th>max |logit| diff</th>
+<th>act_logit rel</th>
+<th>argmax</th>
+<th>max |prob| diff</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>root (<code>laya</code>)</td>
+<td>8.6e-6</td>
+<td>1.1e-6</td>
+<td>0</td>
+<td>1.1e-6</td>
+</tr>
+<tr>
+<td><code>typed-decisions/</code></td>
+<td>4.8e-6</td>
+<td>6.1e-7</td>
+<td>0</td>
+<td>5.7e-7</td>
+</tr>
+</tbody>
+</table></div>
+<p>Tolerances: logits &lt;= 1e-3, act logits &lt;= 1e-3 relative, identical argmax,
+probabilities &lt;= 1e-4. Verified 2026-09-25 on Strix Halo.</p>
+<h2 id="routing">Routing<a class="anchor" href="#routing" title="Permanent link">#</a></h2>
+<p>Asked directly which device should run a request, Laya picks the same one whatever the
+request: ZINC for 8 of 8 varied requests among <code>vulkan,hrx,zinc</code> (measured 2026-09-28, pinned
+root checkpoint). It knows nothing about this hardware. So since RFC
+<a href="https://github.com/orgs/1bit-MONSTER/discussions/186">#186</a> it answers a question about the
+request instead, and a measured policy picks the device.</p>
+<ol>
+<li><strong>Classify</strong> (<code>laya/route.h</code>, <code>classify_request</code>). A request of 1,024 characters or more is
+   <code>long_doc</code> (a pasted document, log, table or file) without a model call. Anything shorter
+   gets one Laya choice among <code>code</code>, <code>prose</code> and <code>short</code>, with Laya's calibrated confidence.</li>
+<li><strong>Policy</strong> (<code>config/route-policy.json</code>, compiled in; <code>--route-policy FILE</code> replaces it). Each
+   class names a device and why. A class whose confidence is below <code>min_confidence</code> (0.16) takes
+   the policy's <code>default</code>. A device the model cannot run on falls back to <code>default</code>.</li>
+<li><strong>Once per conversation.</strong> <code>serve</code> caches the class by the conversation's opening (the messages
+   up to the first user message), so later turns skip the decision.</li>
+</ol>
+<pre><code class="language-sh">scripts/fetch-laya.sh
+1bit serve -m model.gguf --device auto --laya            # or --laya-model DIR
+1bit route --laya-model DIR --classify --state &quot;Write a Rust function that sums a slice.&quot;
+# code 0.44 hrx
+</code></pre>
+<p>Every routed reply carries <code>X-1bit-Route: &lt;class&gt; &lt;confidence&gt; &lt;device&gt;</code>, and <code>serve</code> logs each
+new decision, so real traffic shows how requests split. A directory holding the pinned repo's
+<code>typed-decisions/</code> checkpoint uses that one: it classifies best.</p>
+<p><strong>Classifier accuracy</strong> (<code>tests/laya_classify_eval</code> on <code>tests/laya_route_cases.json</code>, 200
+hand-labelled requests, 50 per class; ctest <code>laya_classify</code> fails below 90%):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Checkpoint, question</th>
+<th>Accuracy</th>
+<th>code</th>
+<th>prose</th>
+<th>short</th>
+<th>long_doc</th>
+<th>ms per decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>typed-decisions/</code>, size gate + three-way question</strong></td>
+<td><strong>95.5%</strong></td>
+<td>100%</td>
+<td>82%</td>
+<td>100%</td>
+<td>100%</td>
+<td>588</td>
+</tr>
+<tr>
+<td>root, size gate + three-way question</td>
+<td>92.0%</td>
+<td>94%</td>
+<td>74%</td>
+<td>100%</td>
+<td>100%</td>
+<td>401</td>
+</tr>
+<tr>
+<td><code>typed-decisions/</code>, four-way question, no size gate</td>
+<td>80.5%</td>
+<td>100%</td>
+<td>62%</td>
+<td>90%</td>
+<td>70%</td>
+<td>1,739</td>
+</tr>
+<tr>
+<td>root, four-way question, no size gate</td>
+<td>64.0%</td>
+<td>98%</td>
+<td>30%</td>
+<td>96%</td>
+<td>32%</td>
+<td>1,379</td>
+</tr>
+</tbody>
+</table></div>
+<p>Prose is the class Laya misses most, reading it as short. Confidence tracks accuracy: the least
+confident quarter is right 84% of the time, the rest 98-100%.</p>
+<p><strong>Why every class goes to one device.</strong> The policy may only change a row for a measured net
+gain, and on Strix Halo none exists yet. When this was written (2026-09-28) the one device was
+Vulkan; it is HRX now (below). The only per-class difference measured is the drafter:
+on Qwen3.8-27B, short replies decode faster with MTP (28.2 tok/s) than with DFlash2 (17.8), code
+the other way round (45.7 against 31.7). But llama-server fixes the drafter per server:
+<code>speculative.type</code>, <code>speculative.n_max</code> and <code>speculative.p_min</code> in a request are ignored
+(<code>draft_n</code> unchanged, 2026-09-28, on the engine's pin and upstream master), so the short-reply
+gain would need a second server holding a second copy of the model (about 16 GB for 27B) to save
+about 0.3 s on a 16-token reply.</p>
+<p><strong>Cost</strong> (<code>1bit serve --device auto --laya</code>, Qwen3.8-27B Q4_0 + DFlash2, 2026-09-28):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th>1-token reply, first turn</th>
+<th>later turn</th>
+<th>decode code / prose / short, tok/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>without <code>--laya</code></td>
+<td>498-518 ms</td>
+<td>713-849 ms</td>
+<td>50.5-50.7 / 26.7-26.9 / 19.0-19.2</td>
+</tr>
+<tr>
+<td><code>--laya</code></td>
+<td>1,008-1,048 ms</td>
+<td>703-767 ms</td>
+<td>50.6 / 26.7 / 18.9-19.1</td>
+</tr>
+</tbody>
+</table></div>
+<p>The first turn of a conversation pays about 0.5 s; later turns and decode are unchanged. That is
+why routing stays opt-in: <code>--device auto</code> without <code>--laya</code> means one device, HRX.</p>
+<p><strong>The policy since the engine went HRX only (2026-10-01).</strong> Every class goes to HRX. Long
+documents went to the lean ROCm build while HRX prefilled Qwen3.8-27B UD-Q4_K_XL at 97-99 tok/s.
+Since the HRX prompt-matmul routing (llama.cpp fork #55) it prefills 335 tok/s at 512 tokens and
+310 at 2,048 (llama-bench), and a 14,435-token prompt through <code>1bit serve --device hrx</code> runs at
+265 tok/s. The table above was measured on the earlier, all-Vulkan policy.</p>
+<p><code>tests/laya_route_e2e.sh</code> proves each class reaches the device the policy names
+(<code>tests/route-policy-e2e.json</code> sends code, prose and short to three fake devices), the header,
+the reuse on a later turn, and the error when no checkpoint is installed. A Q4NX model directory
+runs on the NPU only. <code>multilingual/</code> (mmBERT-base) and Apple/MLX routing are out of scope.</p>
+<h2 id="cost-per-decision">Cost per decision<a class="anchor" href="#cost-per-decision" title="Permanent link">#</a></h2>
+<p><code>1bit route</code> prints the scorer's load and decision times on stderr. On Strix Halo
+(<code>laya-pinned</code> root checkpoint, candidates <code>vulkan,hrx,zinc</code>), loading takes 2.7 s
+once, and each decision takes <strong>0.38 s</strong> (it was 8.75 s). Only the encoder's layout
+changed. Its projections and GeGLU go through the threaded <code>linear()</code>, the attention runs
+one thread per (sequence, head), and <code>linear()</code> reads each weight row once per four input
+rows. Every sum keeps its order, so the gate output is byte-identical to the
+single-threaded scorer. Those figures are for the old device question on a short request.
+The request-class decision takes 0.4-0.6 s (the table above), and <code>serve</code> pays it once per
+conversation.</p>
+<h2 id="the-gguf-scorer-ggmlc-on-hrx">The GGUF scorer: ggmlc on HRX<a class="anchor" href="#the-gguf-scorer-ggmlc-on-hrx" title="Permanent link">#</a></h2>
+<p><a href="https://github.com/monatis/ggmlc">ggmlc</a> compiles Laya's checkpoints to GGUFs that its own
+<code>laya</code> runtime runs on GGML (they are not llama.cpp GGUFs): English
+(<a href="https://huggingface.co/mys/laya-GGUF">mys/laya-GGUF</a>, ModernBERT-large, 421M parameters,
+512-token context), multilingual (<a href="https://huggingface.co/mys/laya-multilingual-GGUF">mys/laya-multilingual-GGUF</a>,
+100+ languages) and typed-decisions
+(<a href="https://huggingface.co/mys/laya-typed-decisions-GGUF">mys/laya-typed-decisions-GGUF</a>, for
+<code>choice</code> / <code>score</code> / <code>noul</code>). The engine pins our fork of ggmlc as <code>third_party/ggmlc</code>
+(<code>1bit/main</code>: upstream plus an HRX build) and the typed-decisions Q8_0 in <code>config/laya.json</code>;
+<code>scripts/fetch-laya.sh</code> fetches it into <code>&lt;laya dir&gt;/gguf/</code> and checks its sha256.</p>
+<p>The scorer runs on HRX0, AMD's backend: ggmlc's <code>laya</code> is built against <code>third_party/llama.cpp</code>'s
+ggml, whose ggml-hrx carries the LOOM kernels a ModernBERT encoder needs and llama models did not
+(LayerNorm, strided and broadcast arithmetic, clamp, F32 to F16 copies, attention over
+one-block-per-head layouts, small and odd-K matmuls; 1bit-MONSTER/llama.cpp#31).</p>
+<pre><code class="language-sh">cmake -B build -DONEBIT_LAYA_GGML=ON ...   # builds ggmlc's laya on HRX with TheRock's amdclang
+scripts/fetch-laya.sh
+1bit serve -m MODEL.gguf --laya            # uses the GGUF scorer when both are there
+</code></pre>
+<p>With the binary and the GGUF present, <code>serve --laya</code> starts <code>laya daemon &lt;gguf&gt; --family
+typed-decisions --device hrx</code> (with the HSA runtime HRX needs, as for <code>--device hrx</code>) and asks it
+serve's question over its stdin and stdout (not its <code>serve</code>, which listens on every interface
+with no key). Without them it uses the C++ scorer on the safetensors. <code>--laya-model FILE.gguf</code>
+picks another GGUF, <code>ONEBIT_LAYA_GGML</code> another binary, <code>ONEBIT_LAYA_DEVICE</code> another device (<code>cpu</code>).</p>
+<p><strong>Measured</strong> (Strix Halo, the 200 labelled requests of <code>tests/laya_route_cases.json</code>, 150 of
+them asked of the model, the rest long_doc by size):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Scorer</th>
+<th>Class accuracy</th>
+<th>Decision, p50</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C++ scorer, typed-decisions safetensors, CPU (through <code>serve</code>)</td>
+<td>95.5%</td>
+<td>538 ms</td>
+</tr>
+<tr>
+<td><strong>ggmlc <code>laya</code> on HRX0, typed-decisions Q8_0 GGUF</strong></td>
+<td><strong>95.5%</strong></td>
+<td><strong>25 ms</strong> (15 ms at a steady 64 tokens, 25 at 128)</td>
+</tr>
+<tr>
+<td>ggmlc <code>laya</code> on Vulkan, same GGUF (upstream ggmlc, for comparison; not built by the engine)</td>
+<td>95.5%</td>
+<td>22 ms (12 ms at a steady length)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The p50 includes the first request of each length bucket, which compiles and records that
+shape once (about 150 ms). At a steady length HRX is within 3 ms of Vulkan at 64 tokens and level
+with it at 128. Three things got it there from 44 ms: ggmlc gives its graphs a uid, so HRX's
+graph-program cache and graph replay hit instead of re-importing and re-recording every call
+(25 -&gt; 15 ms); a fused kernel for the rotate-half RoPE that ggmlc lowers to eight nodes, and one
+for GEGLU (1,170 launches a decision down to about 780); and attention that computes each score
+once. Next is the NPU.
+Answers match Vulkan's probabilities within about 1e-3. Asked directly on Vulkan: typed-decisions
+F16 95.5% at 36 ms; the English GGUF 93.0% (Q8_0) and 91.5% (F16), so the typed-decisions
+checkpoint stays the router's. <code>tests/laya_gguf_route.sh</code> covers the daemon wiring without a GPU.</p>
+<p><strong>Other languages.</strong> The 150 model-decided cases machine-translated into Spanish, German,
+Japanese, Chinese, Hindi and Russian (Qwen3-Coder-30B-A3B, greedy; 682 kept after dropping replies
+that answered instead of translating), on HRX0:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Scorer</th>
+<th>es</th>
+<th>de</th>
+<th>ja</th>
+<th>zh</th>
+<th>hi</th>
+<th>ru</th>
+<th>All</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>typed-decisions for every language</strong></td>
+<td><strong>92.5%</strong></td>
+<td><strong>90.7%</strong></td>
+<td><strong>89.0%</strong></td>
+<td><strong>86.4%</strong></td>
+<td>60.0%</td>
+<td><strong>83.7%</strong></td>
+<td><strong>83.7%</strong></td>
+</tr>
+<tr>
+<td>typed-decisions for English, multilingual GGUF otherwise (ggmlc's language routing)</td>
+<td>73.3%</td>
+<td>71.3%</td>
+<td>65.3%</td>
+<td>83.1%</td>
+<td>60.0%</td>
+<td>68.1%</td>
+<td>69.1%</td>
+</tr>
+</tbody>
+</table></div>
+<p>The multilingual checkpoint answers this question worse in every language, so the router keeps
+typed-decisions for all of them; Hindi is the weak spot either way.</p>
+<p>ggmlc declares the MIT licence (<code>pyproject.toml</code>, README) but its repository carries no LICENSE
+file yet; the GGUFs are Apache-2.0 like the checkpoints.</p>
+<h2 id="the-encoder-on-the-npu-add-on">The encoder on the NPU (add-on)<a class="anchor" href="#the-encoder-on-the-npu-add-on" title="Permanent link">#</a></h2>
+<p><code>laya/encoder.h</code> lets an add-on run the C++ scorer's 28 encoder layers somewhere else: it
+registers an encoder by name, and <code>Scorer::set_encoder</code> hands it each sequence's embedded rows
+(the tokenizer, embeddings and classifier head stay on the CPU). The engine registers none. A
+closed-source NPU add-on (<a href="npu.html#add-on-routes">NPU engine</a>) registers <code>npu</code>, and</p>
+<pre><code class="language-sh">cmake -B build -DONEBIT_NPU=ON -DONEBIT_NPU_PRIVATE=&lt;add-on checkout&gt; ...
+ONEBIT_LAYA_DEVICE=npu 1bit serve -m MODEL.gguf --laya
+</code></pre>
+<p>runs the encoder on the NPU instead of the GGUF daemon. It shares the NPU with other users
+through the engine's device lock: while another process holds it (an NPU <code>1bit serve</code>), the
+encoder declines and that decision's layers run on the CPU. Without the add-on,
+<code>ONEBIT_LAYA_DEVICE=npu</code> exits saying how to build it (checked by <code>tests/laya_gguf_route.sh</code>).</p>
+<p><strong>Measured</strong> (Strix Halo, <code>tests/laya_route_cases.json</code>): 194/200 = 97.0% class accuracy (the
+CPU scorer: 95.5%). It keeps the GPU free for the model being served; the GGUF scorer on HRX
+(above) is the faster default.</p>
+<h2 id="proof-on-the-hrx-engine-2026-10-02">Proof on the HRX engine (2026-10-02)<a class="anchor" href="#proof-on-the-hrx-engine-2026-10-02" title="Permanent link">#</a></h2>
+<p>The question: does Laya work in the engine as it ships now, with HRX as its only GPU route? The
+answer is yes, with the measurements below. Setup: engine <code>main</code> at <code>6f324e4</code> (llama.cpp fork pin <code>d60cc4f</code>), built
+with <code>-DONEBIT_HRX=ON -DONEBIT_LAYA_GGML=ON</code>, on Strix Halo in balanced power mode (85 W).
+The checkpoints are the pinned ones from <code>scripts/fetch-laya.sh</code>. The CPU runs went through
+<code>~/lb/thermal-run.sh</code> (4 cores, nice 19, paused at 78 C), so the CPU decision times are slower
+than on an idle box.</p>
+<p><strong>Gates</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>laya_gate</code>, root checkpoint, against the Python reference</td>
+<td>PASS: logits 2.6e-6, act logits 2.1e-7 rel, argmax 0, probabilities 3.0e-7</td>
+</tr>
+<tr>
+<td><code>laya_gate</code>, <code>typed-decisions/</code></td>
+<td>PASS: logits 3.1e-6, act logits 2.6e-7 rel, argmax 0, probabilities 6.2e-7</td>
+</tr>
+<tr>
+<td><code>laya_encoder_test</code></td>
+<td>PASS (7/7)</td>
+</tr>
+<tr>
+<td><code>laya_classify_eval</code>, C++ scorer, CPU</td>
+<td><strong>95.5%</strong> (191/200), 687 ms a decision</td>
+</tr>
+<tr>
+<td>The same 200 cases through the GGUF scorer on HRX0 (serve's daemon and question)</td>
+<td><strong>95.5%</strong> (191/200), p50 23.7 ms, 17.6 ms warm; daemon ready in 627 ms</td>
+</tr>
+<tr>
+<td><code>tests/laya_route_e2e.sh</code></td>
+<td>PASS (11/11) after this change; before it, 2 checks failed (below)</td>
+</tr>
+<tr>
+<td><code>tests/laya_gguf_route.sh</code></td>
+<td>PASS (9/9, 1 skipped) after this change; before it, 1 check failed (below)</td>
+</tr>
+<tr>
+<td>Determinism: 12 requests, each asked 5 times</td>
+<td>identical class and confidence 12/12 on the CPU scorer, 12/12 on HRX</td>
+</tr>
+</tbody>
+</table></div>
+<p>Both scorers give the same confusion matrix:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>want \ got</th>
+<th>code</th>
+<th>prose</th>
+<th>short</th>
+<th>long_doc</th>
+<th>right</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>code</td>
+<td>50</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>prose</td>
+<td>0</td>
+<td>41</td>
+<td>9</td>
+<td>0</td>
+<td>82%</td>
+</tr>
+<tr>
+<td>short</td>
+<td>0</td>
+<td>0</td>
+<td>50</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>long_doc</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>50</td>
+<td>100%</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two test expectations were older than the HRX-only build, and neither was a routing bug.
+<code>laya_route_e2e.sh</code> worked out the expected device with <code>--devices vulkan,hrx,zinc</code>, so it
+expected <code>short -&gt; vulkan</code>. In a build with HRX, serve offered Laya <code>hrx</code> and <code>zinc</code> (plus <code>rocm</code>
+with the then lean ROCm build), and it fell back correctly to <code>hrx</code> (<code>short 0.24 hrx</code>). The test now
+reads the candidates from the build's <code>CMakeCache.txt</code>, as <code>gguf_devices()</code> picks them.
+<code>laya_gguf_route.sh</code> checked the error for a GGUF without ggmlc's <code>laya</code>. A
+<code>-DONEBIT_LAYA_GGML=ON</code> build always finds its own <code>laya</code>, so it now prints that the check was
+skipped.</p>
+<p><strong>End to end</strong> (<code>1bit serve -m Qwen3-4B-Q4_K_M.gguf --device auto --laya</code> beside the same server
+without <code>--laya</code>, both on HRX). 48 hand-written requests, 12 per class, each a new conversation,
+<code>temperature 0</code>, 64 tokens, streamed. Requests alternate between the two servers, and every
+request was sent in three rounds, each with fresh servers. Time to first token is the median;
+"added" is the median of the per-request difference. Rounds 2 and 3 are pooled (n = 24 a class).
+In round 1, time to first token on both servers flipped between about 80 ms and about 300 ms;
+its median added time over all 48 was +32 ms.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>right</th>
+<th>confidence, median (range)</th>
+<th>device</th>
+<th>TTFT <code>--laya</code></th>
+<th>TTFT without</th>
+<th>added</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>code</td>
+<td>12/12</td>
+<td>0.42 (0.14-0.53)</td>
+<td>hrx</td>
+<td>137 ms</td>
+<td>99 ms</td>
+<td>+38 ms</td>
+</tr>
+<tr>
+<td>prose</td>
+<td>12/12</td>
+<td>0.17 (0.11-0.35)</td>
+<td>hrx</td>
+<td>114 ms</td>
+<td>80 ms</td>
+<td>+33 ms</td>
+</tr>
+<tr>
+<td>short</td>
+<td>12/12</td>
+<td>0.23 (0.11-0.33)</td>
+<td>hrx</td>
+<td>116 ms</td>
+<td>85 ms</td>
+<td>+33 ms</td>
+</tr>
+<tr>
+<td>long_doc</td>
+<td>12/12</td>
+<td>1.00 (size gate)</td>
+<td>hrx</td>
+<td>526 ms</td>
+<td>522 ms</td>
+<td>0 ms</td>
+</tr>
+<tr>
+<td>all</td>
+<td><strong>48/48</strong></td>
+<td>0.33</td>
+<td>hrx</td>
+<td>132 ms</td>
+<td>98 ms</td>
+<td><strong>+31 ms</strong></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Every reply carried <code>X-1bit-Route</code>, and every request went to <code>hrx</code>. 8 of the 48 were below
+  <code>min_confidence</code> (0.16), and the policy's default is <code>hrx</code> too.</li>
+<li>Each round gave the same 48 headers. The answers were sensible, and 47-48 of 48 matched the
+  server without <code>--laya</code> word for word.</li>
+<li>Route cache: one conversation per class, three later turns each, gave the same header on all
+  16 turns. Serve logged 49 decisions a round (48 plus the warm-up) and none for the later turns.</li>
+<li>The 2026-09-28 cost table above (about 0.5 s on a first turn) was the CPU scorer. With the
+  GGUF scorer on HRX, the first turn of a conversation costs about 33 ms, and a long document
+  costs nothing.</li>
+</ul>
+<p><strong>Candidates.</strong> Since RFC #213 stage 3 and the core strip (2026-10-04, which removed ZINC),
+serve's Laya candidates for a <code>.gguf</code> are <code>hrx</code> and <code>cpu</code> in a build with HRX, and <code>cpu</code> alone in
+one without. Every row of <code>config/route-policy.json</code>, and its default, is <code>hrx</code>, and a candidate's
+backend starts only when the policy picks it. <code>1bit route</code>'s default <code>--devices</code> is
+<code>npu,hrx,cpu</code>. (The measurements above that name <code>vulkan</code> or <code>zinc</code> candidates predate both.)</p>
+<p><strong>Agent dispatch, out of domain.</strong> We also tried <code>1bit route --classify</code> as a dispatcher for
+agent sessions: code to engine work, prose to docs, long_doc to review, short to quick answers,
+and anything under 0.16 confidence to a human. The test set was 40 hand-labelled orchestration
+tasks, 10 per class. Laya's test set is chat requests, not agent tasks, and it shows:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>want \ got</th>
+<th>code</th>
+<th>prose</th>
+<th>short</th>
+<th>long_doc</th>
+<th>right</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>code</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10/10</td>
+</tr>
+<tr>
+<td>prose</td>
+<td>4</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>6/10</td>
+</tr>
+<tr>
+<td>short</td>
+<td>7</td>
+<td>0</td>
+<td>3</td>
+<td>0</td>
+<td>3/10</td>
+</tr>
+<tr>
+<td>long_doc</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>5/10</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>60% (24/40).</strong> 23 tasks cleared 0.16 and 17 of those were right. The other 17 went to a human.</li>
+<li>Engine jargon reads as code. "Is box.lock free?" came out as code 0.13, and "Write the
+  acknowledgements section" as code 0.07.</li>
+<li>A long-document task described in one line ("review a 30-file PR diff") is under the size gate,
+  so it can only come out code, prose or short. With the diff, log or document attached, all 5
+  were <code>long_doc</code>.</li>
+<li>The other two question wordings in <code>laya/route.cpp</code> did worse: 47.5% and 40.0%.</li>
+<li>Laya is good at telling code tasks apart from the rest, but agent dispatch would need its own
+  labelled set, or keyword rules ahead of the model.</li>
+</ul>
+<nav class="pager"><a class="prev" href="dwarfstar.html"><span>Previous</span>DwarfStar</a><a class="next" href="pm.html"><span>Next</span>Project Manager</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/laya.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

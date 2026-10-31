@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model registry and Hugging Face census · 1bit engine</title>
+<meta name="description" content="Which Hugging Face model architectures the 1bit engine runs: a registry built from the pinned backends&#x27; own code, and a daily census of the models people use.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Model registry and Hugging Face census · 1bit engine">
+<meta property="og:description" content="Which Hugging Face model architectures the 1bit engine runs: a registry built from the pinned backends&#x27; own code, and a daily census of the models people use.">
+<link rel="canonical" href="https://1bit.gg/registry.html">
+<meta property="og:url" content="https://1bit.gg/registry.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Model registry and Hugging Face census · 1bit engine">
+<meta name="twitter:description" content="Which Hugging Face model architectures the 1bit engine runs: a registry built from the pinned backends&#x27; own code, and a daily census of the models people use.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-25">
+<meta property="article:modified_time" content="2026-10-27">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/registry.html#article", "headline": "Model registry and HF census", "description": "Which Hugging Face model architectures the 1bit engine runs: a registry built from the pinned backends' own code, and a daily census of the models people use.", "url": "https://1bit.gg/registry.html", "mainEntityOfPage": "https://1bit.gg/registry.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-25", "dateModified": "2026-10-27", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html" aria-current="page">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="model-registry-and-hf-census">Model registry and HF census<a class="anchor" href="#model-registry-and-hf-census" title="Permanent link">#</a></h1>
+<p>Step 5 of the port (<a href="PORTING.html">Porting map</a>): which Hugging Face models this engine can
+run, kept current every day. Two numbers are reported, and they are never added together:</p>
+<ul>
+<li><strong>Mapped:</strong> a backend's own code accepts the model's architecture.</li>
+<li><strong>Checked:</strong> a model of that architecture loaded, answered and streamed through
+  <code>1bit serve</code> on Strix Halo (<code>tests/serve_e2e.sh</code>).</li>
+</ul>
+<h2 id="the-registry">The registry<a class="anchor" href="#the-registry" title="Permanent link">#</a></h2>
+<p><code>registry/architectures.json</code> maps each HF architecture (a config's <code>architectures[0]</code>,
+such as <code>Qwen3ForCausalLM</code>) to its GGUF architecture and the backends that accept it.
+<code>tools/registry_build.py</code> generates it from the pinned sources. None of it is typed in by
+hand:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Accepts the architecture when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HF -&gt; GGUF</td>
+<td>a <code>@ModelBase.register(...)</code> class in our HRX fork's llama.cpp converter names it</td>
+</tr>
+<tr>
+<td><code>hrx</code></td>
+<td>the GGUF architecture is in our HRX fork's <code>src/llama-arch.cpp</code>; the same llama-server runs it on the CPU (<code>--device cpu</code>), so <code>hrx</code> also means the CPU route</td>
+</tr>
+<tr>
+<td><code>npu</code></td>
+<td>the NPU engine's model type: <code>qwen3</code> (its kernels are built for Qwen3-0.6B's shapes)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The <code>vulkan</code> column (the upstream llama.cpp release the engine built for Vulkan) left with that
+build in RFC #213 stage 3. With it went the HF class names only the upstream
+converter registers: 33 classes, 23 of them for architectures the HRX fork does not run (among
+them <code>zamba</code>, <code>zamba2</code>, <code>blackmamba</code>; <code>qwen4exp</code> is back since pin <code>e57beb97</code>) and 10 aliases of architectures it does run
+(DFlash drafters, <code>exaone-moe</code>, <code>nemotron_h_moe</code>), which a GGUF converted elsewhere still runs on.
+The <code>zinc</code> column (ZINC's <code>parseArchitecture</code>; 63 HF architectures on 2026-10-03) left with ZINC in
+the core strip (2026-10-04).</p>
+<p>On 2026-10-04 (core strip): 290 HF architectures mapped, hrx 290, npu 7. The file
+also lists <code>gguf_architectures.hrx</code>, every GGUF architecture the pinned fork's runtime builds (141
+then): CMakeLists.txt compiles that list into <code>1bit serve</code>, which refuses any other architecture on
+hrx and cpu with a pointer to Lemonade's llamacpp backend. Mapped means a backend's code accepts the architecture; the census below reports how many were checked. <code>registry/architectures.json</code> always holds the current counts and the pins they come from: every pin bump regenerates it (<code>scripts/registry-regen.sh</code>, run by the bump workflows), and CI's <code>registry_pins</code> test fails a pin that moved without it.</p>
+<p><strong>Reviewed gaps.</strong> Some unmapped architectures only look like a supported family. <a href="arch-gaps.html">Architecture gaps</a> records why each of them is not an alias. <code>registry/significant.json</code> lists those classes, and <code>tools/registry_build.py --check-gaps</code> (ctest <code>registry_gaps</code>) fails if one becomes mapped without a recorded reason.</p>
+<h2 id="checked-models">Checked models<a class="anchor" href="#checked-models" title="Permanent link">#</a></h2>
+<p><code>tools/registry_check.py &lt;1bit&gt; --models &lt;dir&gt;</code> runs <code>tests/serve_e2e.sh</code> for every row of
+<code>registry/check_models.tsv</code> and records the result in <code>registry/checked.json</code>, failures
+included. The architecture recorded is the one the backend loads: the GGUF
+<code>general.architecture</code>, or the NPU directory's <code>model_type</code>. Checked on Strix Halo
+2026-09-25, engine <code>8c2805d</code> (hrx rows at the llama.cpp pin <code>96f6b89</code>):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>GGUF architecture</th>
+<th>Model</th>
+<th>hrx</th>
+<th>npu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>qwen3</code></td>
+<td>Qwen3-0.6B</td>
+<td>pass</td>
+<td>pass</td>
+</tr>
+<tr>
+<td><code>qwen2</code></td>
+<td>Qwen2.5-7B-Instruct</td>
+<td>pass</td>
+<td></td>
+</tr>
+<tr>
+<td><code>qwen3moe</code></td>
+<td>Qwen3-Coder-30B-A3B</td>
+<td>pass</td>
+<td></td>
+</tr>
+<tr>
+<td><code>qwen35moe</code></td>
+<td>Qwen3.6-35B-A3B Q8_0</td>
+<td>pass</td>
+<td></td>
+</tr>
+<tr>
+<td><code>deepseek2</code></td>
+<td>GLM-4.7-Flash</td>
+<td>pass</td>
+<td></td>
+</tr>
+<tr>
+<td><code>minicpm</code></td>
+<td>MiniCPM4-8B</td>
+<td>pass</td>
+<td></td>
+</tr>
+<tr>
+<td><code>llama</code></td>
+<td>MiniCPM5-1B</td>
+<td>pass</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>(The vulkan rows, which passed on the same date, were dropped from <code>registry/check_models.tsv</code> and
+<code>registry/checked.json</code> with the Vulkan build, as were the Zyphra Zamba rows, which ran on Vulkan
+only. The zinc rows went with ZINC in the core strip.)</p>
+<p>GLM-4.7-Flash and Qwen3-Coder-30B-A3B failed on HRX until the llama.cpp pin <code>96f6b89</code> (#95).
+The pin fixes four things:
+- HRX0 now claims flash attention for MLA heads (576) and at full context (262144).
+- The path without flash attention now compiles.
+- HRX0 no longer claims a sigmoid MoE router.
+- HRX0's expert matmul (MUL_MAT_ID) now reads each token's expert ids at their real row
+  stride. It used to read them packed, so every token of a batched prompt after the first
+  went to the wrong experts. Qwen MoE models were immune, because their router dispatch
+  supplies the stride.</p>
+<h2 id="the-census">The census<a class="anchor" href="#the-census" title="Permanent link">#</a></h2>
+<p><code>tools/census.py</code> walks every page of the HF API's text-generation listing (with each
+model's config inline) and counts models by architecture. <code>registry/census.json</code> keeps the
+counts and the coverage read against the registry and the checked results. The
+<code>census.yml</code> workflow runs daily at 05:17 UTC. It rebuilds the registry from the pins,
+sweeps HF, and opens a PR when anything changed.</p>
+<p>The census of 2026-10-17 (the first full sweep ran 2026-09-25), with <code>registry/census.json</code> holding the latest:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th>models</th>
+<th>share of those with an architecture</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text-generation models on HF</td>
+<td>425,483</td>
+<td></td>
+</tr>
+<tr>
+<td>With an architecture in their config</td>
+<td>338,650 (2,822 architectures)</td>
+<td></td>
+</tr>
+<tr>
+<td>Mapped</td>
+<td>320,418</td>
+<td>94.62%</td>
+</tr>
+<tr>
+<td>Checked</td>
+<td>216,406</td>
+<td>63.9%</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Mapped</th>
+<th>Checked</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hrx</td>
+<td>94.62%</td>
+<td>63.9%</td>
+</tr>
+<tr>
+<td>npu</td>
+<td>53.77%</td>
+<td>9.37%</td>
+</tr>
+</tbody>
+</table></div>
+<p>"Checked" counts every model whose architecture has a passing model. It does not mean each
+of those models was run. The unmapped architectures with the most models are
+<code>Step1MoEForCausalLM</code> (2,882), <code>ParlerTTSForConditionalGeneration</code> (1,585),
+<code>ChessForCausalLM</code> (970) and <code>LlavaLlamaForCausalLM</code> (453); <code>OPTForCausalLM</code> and
+<code>GPTNeoForCausalLM</code>, which led this list in September, are mapped now.
+<code>tools/census.py --pr-body</code> lists the top ten.</p>
+<h2 id="the-watch">The watch<a class="anchor" href="#the-watch" title="Permanent link">#</a></h2>
+<p>The sweep is a snapshot, so a class that appears <em>tomorrow</em> moves the mapped share
+quietly. <code>tools/census_watch.py</code> polls the newest text-generation models (createdAt
+descending), reads each one's architecture class from the config inline in the listing,
+and compares it against <code>registry/architectures.json</code> — the same read <code>census.py</code>'s
+coverage() makes, so "uncovered" here means "not in the number the census reports". No
+per-model fetch and no compiled probe: the registry is generated data, keyed by the HF
+architecture class the census counts.</p>
+<p>Exit 0 means every newest model is mapped; <strong>exit 1 is the alert</strong> — a class arrived that
+no backend accepts. One kind of unmapped class is reported without the alert: a class whose
+models all load through custom modeling code (<code>auto_map</code> in the config, or a runtime that is
+not Transformers, so Transformers has no implementation of it either) and that fewer than 3
+uploaders publish. Research one-offs like that arrive every day (<code>Ihatetomatoes/nanoBeard-sloop-14M</code>
+is a raw <code>pytorch</code> nanoGPT checkpoint whose config says <code>architectures: ["GPT"]</code> and
+<code>model_type: nanobeard-gpt</code>, engine#296). It alerts once 3 uploaders use it, and a reviewed
+class (<code>registry/significant.json</code>) always alerts, unless its entry says <code>"watch": "report"</code>:
+a research architecture reviewed as not an alias that nothing upstream implements
+(<code>GrugMoeForCausalLM</code>, engine#381). The watcher lists those as <code>. REVIEWED</code> without the alert.</p>
+<p>The watch runs daily at 04:30 UTC (ahead of the 05:17 sweep) in two places:
+- GitHub Actions (<code>.github/workflows/census-watch.yml</code>, <a href="https://github.com/1bit-MONSTER/engine/discussions/246">RFC #246</a>), which files one deduped
+  <code>census-watch</code> issue. Only its alert job holds <code>issues: write</code>, and that job runs no
+  repository code.
+- the systemd timer on the development box (<code>scripts/1bit-census-watch.{service,timer}</code>, from
+  the <code>~/census-main</code> worktree that tracks <code>origin/main</code>), which marks its unit failed and
+  logs every run to <code>~/.1bit/logs/census-watch-*.log</code>.</p>
+<p>A class the watcher flags is one of two things, and the run says which:</p>
+<ul>
+<li><strong>new class</strong> — map it in <code>registry/architectures.json</code>, but only when a pinned
+  backend's code really accepts the architecture (rule 3 in CONTRIBUTING.md: recognized
+  is not verified).</li>
+<li><strong>reviewed, not an alias</strong> — already in <code>registry/significant.json</code>
+  (<a href="arch-gaps.html">Architecture gaps</a>); it needs real engine support, and if a backend starts
+  accepting it, the reason is recorded as <code>mapped_ok</code>.</li>
+</ul>
+<p>Gated repos (no config without a token) are reported as unverifiable and never fail the
+run; derivatives (a quantized GGUF, a LoRA adapter) have no config by design and are
+skipped, because the release they derive from carries the config and is what gets checked.</p>
+<p>The same run also watches FastFlowLM (engine#588), because that is where a family arrives
+that the engine may have to serve itself: their HF org
+(<code>api/models?author=FastFlowLM&amp;sort=lastModified</code>, one listing request whose <code>expand[]</code>
+brings <code>lastModified</code>, the tags and the config back inline — no per-model fetch) and their
+runtime releases (<code>FastFlowLM/FastFlowLM</code>). A repo prints one line with its <code>*.q4nx</code> files
+and sizes (<code>?blobs=true</code>, fetched only for a repo that is new or changed), its license and
+base model, its architecture, whether <code>architectures.json</code> maps that architecture, and
+whether the npu route already serves the family. A family the registry does not map prints
+<code>!! NEW FLM</code> and is the alert, exactly like an uncovered class: exit 1 either way, so
+neither watch can turn the other's alert green. A repo with no config is one of the org's
+quantized <code>.gguf</code> drops — a derivative, reported but not an alert. A release whose notes or
+asset names mention <code>q4nx</code>, <code>chunk</code> or <code>layout</code> is marked <code>kernel-format</code> for a human to
+read before the pinned Q4NX decoder moves; that line alone does not alert ("chunk" also
+matches streamed-SSE prose, so the flag means "read the notes").</p>
+<p>The repo ids and their <code>lastModified</code>, plus the release tags, are kept in the same state
+file, so a daily run prints only what is new or changed; <code>--full</code> lists every repo and
+release on demand. A FastFlowLM fetch that fails is a runtime failure (exit 2) — never a
+quiet day — but an alert from the other watch still wins the exit code.</p>
+<h2 id="commands">Commands<a class="anchor" href="#commands" title="Permanent link">#</a></h2>
+<pre><code>tools/registry_build.py            # rebuild registry/architectures.json from the pins
+tools/registry_build.py --check    # exit 1 if it is stale
+tools/registry_check.py build/1bit --models ~/models   # run the checks on Strix Halo
+tools/census.py                    # full HF sweep (about 420 pages)
+tools/census.py --report           # recompute coverage from the saved counts
+tools/census_watch.py              # newest models vs the registry, plus FastFlowLM's org and
+                                   # releases (--full to list all); exit 1 on an uncovered class
+                                   # or an unmapped FastFlowLM family
+scripts/census-watch.sh            # the same, with the log file and the origin/main refresh
+</code></pre>
+<nav class="pager"><a class="prev" href="pm.html"><span>Previous</span>Project Manager</a><a class="next" href="arch-gaps.html"><span>Next</span>Architecture gaps</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/registry.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

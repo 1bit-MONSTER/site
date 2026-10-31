@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linux kernel for the Strix Halo box · 1bit engine</title>
+<meta name="description" content="The kernel the Strix Halo box runs: Linux v7.3-rc4 with the IOMMU PerfOpt backports, built from our config, MOK-signed for Secure Boot, and the next-tag steps.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Linux kernel for the Strix Halo box · 1bit engine">
+<meta property="og:description" content="The kernel the Strix Halo box runs: Linux v7.3-rc4 with the IOMMU PerfOpt backports, built from our config, MOK-signed for Secure Boot, and the next-tag steps.">
+<link rel="canonical" href="https://1bit.gg/kernel.html">
+<meta property="og:url" content="https://1bit.gg/kernel.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Linux kernel for the Strix Halo box · 1bit engine">
+<meta name="twitter:description" content="The kernel the Strix Halo box runs: Linux v7.3-rc4 with the IOMMU PerfOpt backports, built from our config, MOK-signed for Secure Boot, and the next-tag steps.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-23">
+<meta property="article:modified_time" content="2026-10-23">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/kernel.html#article", "headline": "Kernel readiness: moving the box to a new kernel", "description": "The kernel the Strix Halo box runs: Linux v7.3-rc4 with the IOMMU PerfOpt backports, built from our config, MOK-signed for Secure Boot, and the next-tag steps.", "url": "https://1bit.gg/kernel.html", "mainEntityOfPage": "https://1bit.gg/kernel.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-23", "dateModified": "2026-10-23", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html" aria-current="page">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="kernel-readiness-moving-the-box-to-a-new-kernel">Kernel readiness: moving the box to a new kernel<a class="anchor" href="#kernel-readiness-moving-the-box-to-a-new-kernel" title="Permanent link">#</a></h1>
+<p>The Strix Halo box runs a kernel we build, not the distribution's: everything the engine and the NPU
+need is pinned by hand, so the next kernel is a step list, not an investigation. This page is that
+list, with the facts that go stale marked as facts and the commands that do not.</p>
+<ul>
+<li><strong>Runs today:</strong> <code>7.3.0-rc4-1bit-perfopt</code> — Linux <code>v7.3-rc4</code> plus two backports of the IOMMU
+  PerfOpt series, built with clang (<code>LLVM=1</code>), debug info off.</li>
+<li><strong>Why the backports:</strong> with the GPU in its identity domain, PerfOpt is worth real prefill on HRX and
+  costs nothing at decode. Qwen3.8-27B UD-Q4_K_XL on HRX0, same build pin, five repeats:</li>
+</ul>
+<div class="table"><table>
+<thead>
+<tr>
+<th>arm</th>
+<th>pp512</th>
+<th>pp2048</th>
+<th>tg128</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>7.3.0-rc4-1bit</code> (distribution-shaped base)</td>
+<td>364.0</td>
+<td>353.1</td>
+<td>12.00</td>
+</tr>
+<tr>
+<td><code>7.3.0-rc4-1bit-perfopt</code>, on (<code>PerfOpt armed on IOMMU0</code>)</td>
+<td><strong>446.4</strong></td>
+<td><strong>426.1</strong></td>
+<td>12.04</td>
+</tr>
+<tr>
+<td><code>7.3.0-rc4-1bit-perfopt</code>, <code>amdgpu.iommu_perfopt=0</code></td>
+<td>358.4</td>
+<td>347.0</td>
+<td>12.06</td>
+</tr>
+</tbody>
+</table></div>
+<p>So the gain is PerfOpt itself, not the compiler (the off arm matches the base), it is prefill only,
+  and greedy output is byte-identical across the three arms.
+- <strong>Out-of-tree modules that must follow every kernel:</strong> <code>amdxdna</code> (the NPU driver, <a href="npu.html">NPU engine</a>,
+  "The XDNA driver") and <code>ec_su_axb35</code> (the box's fan EC). Both live in
+  <code>/lib/modules/&lt;version&gt;/updates/</code> and both must be rebuilt against the new kernel and signed.</p>
+<h2 id="what-ready-means">What "ready" means<a class="anchor" href="#what-ready-means" title="Permanent link">#</a></h2>
+<ol>
+<li>an upstream tag to move to, and whether the PerfOpt series is <strong>native</strong> in it (then the
+   backports are dropped, not re-applied);</li>
+<li>a kernel built from our config on another machine, packaged as <code>.deb</code>;</li>
+<li>kernel and modules signed with the box's own MOKs;</li>
+<li>the box boots it, the two out-of-tree modules load, <code>mokutil</code> agrees;</li>
+<li>the <a href="hw-gate.html">hardware gate</a> passes on it;</li>
+<li>the weekly package and the 1bit OS image pick it up.</li>
+</ol>
+<h2 id="0-facts-first">0. Facts first<a class="anchor" href="#0-facts-first" title="Permanent link">#</a></h2>
+<pre><code class="language-sh">git ls-remote --tags https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git | grep 'v7\.4'
+# is our series already upstream in that tag?
+grep -ril perfopt drivers/iommu/amd/      # a hit = drop the backports
+</code></pre>
+<p>The 2026-10-23 check: <strong>no <code>v7.4</code> tag</strong> (<code>v7.3</code> final was tagged 2026-10-18, the 7.4 merge window was
+still open, so rc1 lands about two weeks later), no <code>v7.3.y</code> stable either, and <code>perfopt</code> was <strong>not</strong>
+in <code>v7.3</code>'s <code>drivers/iommu/amd/</code> — the series is queued for 7.4, so the backports stay until then.
+Both backport commits (the <code>iommu/amd</code> one and the <code>drm/amdgpu</code> one that enables PerfOpt on iGPUs in
+the identity domain) applied to <code>v7.3</code> <strong>cleanly</strong>, needing no rebase.</p>
+<h2 id="1-build-never-on-the-box">1. Build — never on the box<a class="anchor" href="#1-build-never-on-the-box" title="Permanent link">#</a></h2>
+<p>The box is for running; a build there heats the die that a model is loading on. Build on a quieter
+machine with the box's config.</p>
+<pre><code class="language-sh">git clone --depth 1 --branch &lt;tag&gt; https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git ~/wt/k74/&lt;tag&gt;
+cd ~/wt/k74/&lt;tag&gt;
+cp &lt;box&gt;:/boot/config-$(uname -r of the box) .config      # or the config of record, see below
+scripts/config --file .config --set-str LOCALVERSION &quot;-1bit-perfopt&quot;
+# only while the tag lacks the series:
+git am --3way iommu-amd-perfopt.patch
+make LLVM=1 olddefconfig
+export LLVM=1                    # dpkg-buildpackage re-enters make: export it, do not just pass it
+nice -n 19 make LLVM=1 -j12 bindeb-pkg
+</code></pre>
+<ul>
+<li>The <strong>config of record</strong> is the one the box's running kernel was built from
+  (<code>/boot/config-$(uname -r)</code>): <code>CONFIG_AMD_IOMMU=y</code>, <code>CONFIG_DRM_AMDGPU=m</code>,
+  <code>CONFIG_MODULE_SIG{,_ALL,_SHA256}=y</code>, <code>CONFIG_CC_IS_CLANG=y</code>, <code>CONFIG_DEBUG_INFO_NONE=y</code>. Between
+  the base <code>7.3.0-rc4-1bit</code> config and <code>-perfopt</code> the only differences are the clang version and
+  debug info (28 lines, nothing workload-specific).</li>
+<li><code>bindeb-pkg</code> needs <code>debhelper</code>, <code>libelf-dev</code> and the LLVM tools (<code>llvm-21</code>, <code>lld-21</code>); the kernel
+  is clang-built, so a gcc-only host silently builds the wrong compiler unless <code>LLVM=1</code> is exported.</li>
+<li>Artefacts land in the <strong>parent</strong> directory: <code>linux-image-&lt;version&gt;_&lt;arch&gt;.deb</code> and
+  <code>linux-headers-&lt;version&gt;_&lt;arch&gt;.deb</code>.</li>
+<li><code>make install</code> on the box also works (that is how the current kernel was installed before the
+  debhelper path existed), but the <code>.deb</code> route is what the weekly package expects and it puts the
+  modules where <code>depmod</code> and the module-signing hook see them.</li>
+</ul>
+<h2 id="2-sign-two-keys-on-the-box">2. Sign — two keys, on the box<a class="anchor" href="#2-sign-two-keys-on-the-box" title="Permanent link">#</a></h2>
+<p>The box has two machine-owned MOKs enrolled, and they are not interchangeable. Whether Secure Boot
+itself is on is the owner's setting in firmware (on 2026-10-23 the box booted with it <strong>off</strong>, after a
+firmware reset); signing does not depend on it, and skipping it means the next boot with Secure Boot
+on refuses the kernel.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>key</th>
+<th>path</th>
+<th>signs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>strixhalo Secure Boot Kernel</code> (EKU codeSigning)</td>
+<td><code>/var/lib/shim-signed/mok/MOK-Kernel.{priv,pem,der}</code></td>
+<td>the kernel image</td>
+</tr>
+<tr>
+<td><code>strixhalo Secure Boot MOK</code> (module-signing OID)</td>
+<td><code>/var/lib/shim-signed/mok/MOK.{priv,pem,der}</code></td>
+<td>every <code>.ko</code> we build</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-sh"># kernel: automatic on install (this is what the hook does), or by hand
+sudo sbsign --key /var/lib/shim-signed/mok/MOK-Kernel.priv \
+            --cert /var/lib/shim-signed/mok/MOK-Kernel.pem \
+            --output /boot/vmlinuz-&lt;version&gt; /boot/vmlinuz-&lt;version&gt;
+# modules we built ourselves (in-tree modules carry the build-time key already)
+sudo kmodsign sha512 /var/lib/shim-signed/mok/MOK.priv \
+                       /var/lib/shim-signed/mok/MOK.der updates/amdxdna.ko
+</code></pre>
+<ul>
+<li><code>/etc/kernel/postinst.d/z0-mok-sign</code> signs any kernel image the installer did not sign, and does
+  nothing when <code>sbverify --list</code> already shows a signature.</li>
+<li><strong>Trap:</strong> a MOK whose EKU is module-signing only (Ubuntu's default style) is <strong>rejected by shim for
+  kernel images</strong>. That is why there are two keys; signing a <code>vmlinuz</code> with <code>MOK.priv</code> produces a
+  kernel that will not boot under Secure Boot.</li>
+<li><strong>Trap:</strong> an unsigned copy left in <code>/boot</code> as <code>vmlinuz-*.unsigned</code> becomes a GRUB menu entry.
+  Keep originals outside <code>/boot</code> (<code>/var/backups/kernels/</code>).</li>
+<li>A BIOS/firmware reset can drop the enrolled MOKs. The fix needs the owner at the console
+  (MokManager), and can be primed over ssh beforehand:
+  <code>mokutil --import /var/lib/shim-signed/mok/MOK-Kernel.der</code>, then the same for <code>MOK.der</code>, then the
+  owner confirms both in MokManager on the next boot.</li>
+</ul>
+<h2 id="3-install-on-the-box">3. Install — on the box<a class="anchor" href="#3-install-on-the-box" title="Permanent link">#</a></h2>
+<pre><code class="language-sh">sudo dpkg -i linux-image-&lt;version&gt;_&lt;arch&gt;.deb linux-headers-&lt;version&gt;_&lt;arch&gt;.deb
+sudo depmod -a &lt;version&gt;
+ls /lib/modules/&lt;version&gt;/updates/            # the out-of-tree modules for THIS version go here
+</code></pre>
+<p>Removing a kernel is deleting <code>/boot/*&lt;version&gt;*</code> and <code>/lib/modules/&lt;version&gt;</code> (the <code>.deb</code> route also
+offers <code>dpkg -r linux-image-&lt;version&gt;</code>). Keep the Canonical fallback kernel installed: it is the
+recovery path when a new kernel does not reach a console.</p>
+<h2 id="4-boot-entry-without-changing-the-default">4. Boot entry — without changing the default<a class="anchor" href="#4-boot-entry-without-changing-the-default" title="Permanent link">#</a></h2>
+<p><code>update-grub</code> (the installer runs it) adds the new kernel under "Advanced options for Ubuntu". Leave
+<code>GRUB_DEFAULT</code> pointing at the kernel that is running: the owner chooses when the box moves, and the
+previous kernel stays as the fallback entry.</p>
+<h2 id="5-reboot-the-owner-with-a-console">5. Reboot — the owner, with a console<a class="anchor" href="#5-reboot-the-owner-with-a-console" title="Permanent link">#</a></h2>
+<p>The build and install steps are remote; the reboot is not. Have console access before it (MokManager
+is a firmware screen), and expect one extra reboot if a MOK has to be enrolled.</p>
+<h2 id="6-verify-in-this-order">6. Verify, in this order<a class="anchor" href="#6-verify-in-this-order" title="Permanent link">#</a></h2>
+<pre><code class="language-sh">uname -r                                              # the new version
+sudo mokutil --sb-state                               # SecureBoot enabled/disabled (owner's setting)
+sudo mokutil --list-enrolled | grep -i 1bit           # both machine MOKs still enrolled
+sudo sbverify --list /boot/vmlinuz-$(uname -r)        # &quot;signature 1&quot; + our issuer
+for f in /lib/modules/$(uname -r)/updates/*.ko; do modinfo -F signer &quot;$f&quot;; done
+sudo dmesg | grep -iE 'amdgpu|iommu|amdxdna' | grep -iE 'fail|error|timeout|fault'   # must be empty
+</code></pre>
+<p>Then the two box-specific gates: the IOMMU PerfOpt line (<code>PerfOpt armed on IOMMU0</code>, or
+<code>amdgpu.iommu_perfopt=0</code> when it should be off) and the NPU driver — <code>amdxdna</code> loaded at the pinned
+version and the NPU visible to <code>xrt-smi</code> (<a href="npu.html">NPU engine</a>).</p>
+<h2 id="7-the-hardware-gate">7. The hardware gate<a class="anchor" href="#7-the-hardware-gate" title="Permanent link">#</a></h2>
+<p>A boot is not a proof. <code>scripts/hw-gate.sh</code> (and the <code>hw-gate</code> label / <code>hw-gate.yml</code>) runs the six
+checks that have caught the real regressions — ops, fa-decode-q8, kat, kld, needle, placement — and
+it runs them on the box's new kernel, so a kernel that changes numerics, times out on a long prompt
+or moves a node off HRX fails there rather than in a customer's run. Details:
+<a href="hw-gate.html">Hardware gate</a>.</p>
+<h2 id="8-packages-and-the-1bit-os-image">8. Packages and the 1bit OS image<a class="anchor" href="#8-packages-and-the-1bit-os-image" title="Permanent link">#</a></h2>
+<ul>
+<li>The weekly release preflight needs a <strong>readable</strong> kernel image: <code>/boot/vmlinuz-$(uname -r)</code> is
+  root-only on Ubuntu, so pass <code>VMLINUZ=&lt;copy&gt;</code> (<a href="releases.html">Releases</a>, "The release run").</li>
+<li><code>os/mini/mkimage.sh</code> builds the unified kernel image from that <code>vmlinuz</code>, and with <code>MOK_KEY</code> +
+  <code>MOK_CERT</code> it signs the UKI with the same kernel key, so a 1bit OS stick boots with Secure Boot
+  left on instead of asking for it to be switched off.</li>
+<li>Record the kernel version in the release notes: a box that moves kernel is a release-visible
+  change, and the gate result belongs next to it.</li>
+</ul>
+<h2 id="checklist">Checklist<a class="anchor" href="#checklist" title="Permanent link">#</a></h2>
+<ul>
+<li>[ ] tag chosen; is the PerfOpt series native (drop the backports) or not (re-apply, and note any rebase)?</li>
+<li>[ ] config of record copied from the box, <code>olddefconfig</code> clean, no prompts</li>
+<li>[ ] <code>bindeb-pkg</code> produced image + headers <code>.deb</code> with the intended <code>LOCALVERSION</code></li>
+<li>[ ] <code>amdxdna</code> and <code>ec_su_axb35</code> rebuilt against the new <code>/lib/modules/&lt;version&gt;/build</code></li>
+<li>[ ] kernel signed by <code>MOK-Kernel</code>, modules by <code>MOK</code>, both verified with <code>sbverify</code>/<code>modinfo -F signer</code></li>
+<li>[ ] fallback kernel and <code>GRUB_DEFAULT</code> untouched</li>
+<li>[ ] owner reboots with console access; MOKs still enrolled</li>
+<li>[ ] hardware gate passes on the new kernel</li>
+<li>[ ] weekly package and OS image built from the new kernel</li>
+</ul>
+<h2 id="rehearsal-2026-10-23">Rehearsal, 2026-10-23<a class="anchor" href="#rehearsal-2026-10-23" title="Permanent link">#</a></h2>
+<p>No <code>v7.4-rc</code> existed yet, so this was rehearsed twice: against <strong><code>v7.3</code></strong> (the newest tag) with the
+backports re-applied, and against <strong>linux-next <code>next-20261022</code></strong>, which is the 7.4 merge window's
+content (<code>Makefile</code> says 7.3.0 + next patches) and is therefore the honest preview of <code>7.4-rc1</code>.
+Both were built on a separate 16-core machine with the config of record, <code>LLVM=1</code> (clang 21.1.8),
+<code>nice -n 19 make -j12 bindeb-pkg</code>.</p>
+<h3 id="facts">Facts<a class="anchor" href="#facts" title="Permanent link">#</a></h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>question</th>
+<th>answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v7.4*</code> tags upstream</td>
+<td>none (<code>v7.3</code> final is the newest tag, 2026-10-18)</td>
+</tr>
+<tr>
+<td><code>v7.3.y</code> stable</td>
+<td>none yet</td>
+</tr>
+<tr>
+<td>where is 7.4?</td>
+<td>merge window open: torvalds master head is <code>Merge tag 'net-next-7.4'</code> (2026-10-23)</td>
+</tr>
+<tr>
+<td>PerfOpt in <code>v7.3</code>?</td>
+<td><strong>no</strong> — 0 hits in <code>drivers/iommu/amd/</code>; the two backports apply cleanly (343 insertions over 8 files)</td>
+</tr>
+<tr>
+<td>PerfOpt in <code>next-20261022</code>?</td>
+<td><strong>yes</strong> — present in <code>drivers/iommu/amd/</code> and as <code>iommu_perfopt</code> in <code>amdgpu_drv.c</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>So the rule the checklist asks for resolves itself: <strong>on the 7.4 path the backports are dropped</strong>, on
+a 7.3-based kernel they are re-applied (and needed no rebase).</p>
+<h3 id="builds">Builds<a class="anchor" href="#builds" title="Permanent link">#</a></h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>tree</th>
+<th>backports</th>
+<th><code>bindeb-pkg</code></th>
+<th>artefacts</th>
+<th>kernel release</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v7.3</code></td>
+<td>applied (2 commits on top of the tag)</td>
+<td>pass, ~15 min</td>
+<td><code>linux-image</code> 84.6 MB + <code>linux-headers</code> 10.4 MB + <code>linux-libc-dev</code></td>
+<td><code>7.3.0-1bit-perfopt+</code></td>
+</tr>
+<tr>
+<td><code>next-20261022</code></td>
+<td>not needed (native)</td>
+<td>pass, ~15 min</td>
+<td><code>linux-image</code> 85.0 MB + <code>linux-headers</code> 10.5 MB + <code>linux-libc-dev</code></td>
+<td><code>7.3.0-next-20261022-1bit-perfopt</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>olddefconfig</code> was clean on both. Its config delta is the part to read before adopting a tag: <strong>28
+lines</strong> on <code>v7.3</code> (clang version and debug info only), <strong>110 lines</strong> on <code>next-20261022</code> — new
+clang-21/7.4 symbols (<code>CC_HAS_COUNTED_BY</code>, <code>CC_OPT_*</code>, <code>BPF_CRYPTO</code>, …) plus options our config had
+that the newer tree no longer offers (<code>ANDROID_BINDER*</code>, <code>ARCH_HAS_DEBUG_WX</code>,
+<code>ARCH_SUPPORTS_PER_VMA_LOCK</code>). None of them is needed by the engine or the NPU, but the diff is where
+a silently dropped feature shows up.</p>
+<h3 id="the-out-of-tree-module">The out-of-tree module<a class="anchor" href="#the-out-of-tree-module" title="Permanent link">#</a></h3>
+<p><code>amdxdna</code> (amd/xdna-driver at the engine's submodule pin) builds against <strong>both</strong> trees,
+<code>MAKE_RC=0</code>, producing <code>amdxdna.ko</code> — <strong>no 7.4 API break</strong> in the 7.4 merge-window content. That is
+the single most likely break in this whole path, and it is not there yet; it is worth re-running the
+moment <code>v7.4-rc1</code> is tagged, because next is a moving target.</p>
+<p>One trap the driver's own <code>Makefile</code> sets: it exports an <strong>empty <code>ARCH</code></strong> into the kernel's
+<code>configure_kernel.sh</code> probe, and the kernel then stops with
+<code>scripts/Makefile.clang: add '--target=' option</code>. Pass <code>ARCH=x86_64</code> on the make line:</p>
+<pre><code class="language-sh">make -f drivers/accel/amdxdna/Makefile KERNEL_SRC=&lt;kernel tree&gt; ARCH=x86_64 \
+     BUILD_ROOT_DIR=&lt;out&gt; LLVM=1 all
+</code></pre>
+<h3 id="traps-that-cost-time-in-the-order-they-bite">Traps that cost time, in the order they bite<a class="anchor" href="#traps-that-cost-time-in-the-order-they-bite" title="Permanent link">#</a></h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>trap</th>
+<th>symptom</th>
+<th>fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>missing packaging deps</td>
+<td><code>dpkg-checkbuilddeps: unmet build dependencies: libdw-dev</code></td>
+<td><code>debhelper libelf-dev libdw-dev</code> (<code>libdw-dev</code> is the one nobody expects)</td>
+</tr>
+<tr>
+<td><code>LLVM=1</code> only on the command line</td>
+<td>the packaging stage rebuilds with the wrong compiler</td>
+<td><code>export LLVM=1</code> — <code>dpkg-buildpackage</code> re-enters make</td>
+</tr>
+<tr>
+<td>empty <code>ARCH</code> (above)</td>
+<td><code>add '--target=' option to scripts/Makefile.clang</code></td>
+<td>pass <code>ARCH=x86_64</code></td>
+</tr>
+<tr>
+<td>tree past its tag</td>
+<td>kernel release and module vermagic end in <code>+</code> (<code>7.3.0-1bit-perfopt+</code>)</td>
+<td>expected: <code>scripts/setlocalversion</code> appends <code>+</code> for commits past the tag. The <code>.deb</code> version is clean because <code>KDEB_PKGVERSION</code> is set; for a clean <code>uname -r</code> build from a tree with no <code>.git</code> (or override <code>KERNELRELEASE=</code>, which fixes the release string but was not exercised end to end)</td>
+</tr>
+<tr>
+<td>an unsigned copy in <code>/boot</code></td>
+<td>a <code>vmlinuz-*.unsigned</code> menu entry</td>
+<td>keep originals in <code>/var/backups/kernels/</code></td>
+</tr>
+<tr>
+<td>module-signing-only MOK</td>
+<td>kernel image rejected by shim</td>
+<td>sign images with <code>MOK-Kernel</code>, modules with <code>MOK</code></td>
+</tr>
+<tr>
+<td>firmware reset</td>
+<td>Secure Boot back on with no MOKs</td>
+<td>re-import both MOKs and confirm in MokManager at the console</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="not-rehearsed-here">Not rehearsed here<a class="anchor" href="#not-rehearsed-here" title="Permanent link">#</a></h3>
+<p>Installing, signing, booting and gating on the box (that is the owner's reboot), the fan-EC module
+(its source lives only on the box), and any throughput re-measurement on the new kernel. Those are
+steps 2 to 8 above, and the hardware gate is what makes the result more than "it booted".</p>
+<nav class="pager"><a class="prev" href="architecture.html"><span>Previous</span>How the engine is built</a><a class="next" href="npu-leaderboard.html"><span>Next</span>NPU leaderboard</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/kernel.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

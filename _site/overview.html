@@ -24,7 +24,7 @@
 <meta property="article:published_time" content="2026-09-22">
 <meta property="article:modified_time" content="2026-10-30">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "@id": "https://1bit.gg/overview.html#article", "headline": "1bit engine: local LLMs on the AMD Ryzen AI MAX+ 395", "description": "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.", "url": "https://1bit.gg/overview.html", "mainEntityOfPage": "https://1bit.gg/overview.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-22", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "about": {"@id": "https://1bit.gg/#software"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/overview.html#article", "headline": "1bit engine: local LLMs on the AMD Ryzen AI MAX+ 395", "description": "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.", "url": "https://1bit.gg/overview.html", "mainEntityOfPage": "https://1bit.gg/overview.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-22", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "about": {"@id": "https://1bit.gg/#software"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -40,11 +40,11 @@
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
       <span>1bit engine</span>
     </a>
-    <nav>
+    <nav aria-label="Site">
       <a href="overview.html" aria-current="page">Engine</a>
       <a href="docs.html">Docs</a>
       <a href="blog.html">Blog</a>
-      <a href="https://github.com/1bit-MONSTER/engine/wiki">Benchmarks</a>
+      <a href="models.html">Benchmarks</a>
     </nav>
     <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
       <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
@@ -55,6 +55,7 @@
   </div>
 </header>
 
+<a class="skip" href="#content">Skip to content</a>
 <main id="content">
 <div class="container docs">
 <details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
@@ -74,7 +75,9 @@
 <p class="group">Devices</p><ul>
 <li><a href="hrx.html">HRX</a></li>
 <li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
 <li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
@@ -87,13 +90,9 @@
 </ul>
 <p class="group">Project</p><ul>
 <li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
-</ul>
-<p class="group">More</p><ul>
-<li><a href="hybrid.html">Hybrid: NPU prefill, HRX decode (--device hybrid)</a></li>
-<li><a href="kernel.html">Kernel readiness: moving the box to a new kernel</a></li>
-<li><a href="npu-leaderboard.html">NPU engine leaderboard</a></li>
-<li><a href="onnx-pack.html">The ONNX pack: weights to Q4NX, matmuls to our kernels, no VitisAI</a></li>
 </ul>
 </nav></details>
 <article class="docs-page prose">
@@ -146,7 +145,7 @@
 </tr>
 <tr>
 <td>2026-10-30</td>
-<td>The HRX pin carries the DeepSeek-V4.1 port; ONNX Runtime runs in-process with our own execution provider on the NPU; the NPU and the GPU are measured running at the same time (<a href="https://github.com/1bit-MONSTER/engine/pull/672">#672</a>, <a href="https://github.com/1bit-MONSTER/engine/pull/647">#647</a>, <a href="hybrid.html">Hybrid: NPU prefill, HRX decode (--device hybrid)</a>)</td>
+<td>The HRX pin carries the DeepSeek-V4.1 port; ONNX Runtime runs in-process with our own execution provider on the NPU; the NPU and the GPU are measured running at the same time (<a href="https://github.com/1bit-MONSTER/engine/pull/672">#672</a>, <a href="https://github.com/1bit-MONSTER/engine/pull/647">#647</a>, <a href="hybrid.html">Hybrid</a>)</td>
 </tr>
 </tbody>
 </table></div>
