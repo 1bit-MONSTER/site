@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What the 1bit engine is and what runs where · 1bit engine</title>
+<meta name="description" content="The engine&#x27;s README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="What the 1bit engine is and what runs where · 1bit engine">
+<meta property="og:description" content="The engine&#x27;s README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.">
+<link rel="canonical" href="https://1bit.gg/overview.html">
+<meta property="og:url" content="https://1bit.gg/overview.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What the 1bit engine is and what runs where · 1bit engine">
+<meta name="twitter:description" content="The engine&#x27;s README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-09-22">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "@id": "https://1bit.gg/overview.html#article", "headline": "1bit engine: local LLMs on the AMD Ryzen AI MAX+ 395", "description": "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.", "url": "https://1bit.gg/overview.html", "mainEntityOfPage": "https://1bit.gg/overview.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-22", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "about": {"@id": "https://1bit.gg/#software"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav>
+      <a href="overview.html" aria-current="page">Engine</a>
+      <a href="docs.html">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="https://github.com/1bit-MONSTER/engine/wiki">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html" aria-current="page">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="dwarfstar.html">DwarfStar</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="hybrid.html">Hybrid: NPU prefill, HRX decode (--device hybrid)</a></li>
+<li><a href="kernel.html">Kernel readiness: moving the box to a new kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU engine leaderboard</a></li>
+<li><a href="onnx-pack.html">The ONNX pack: weights to Q4NX, matmuls to our kernels, no VitisAI</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="1bit-engine-local-llms-on-the-amd-ryzen-ai-max-395">1bit engine: local LLMs on the AMD Ryzen AI MAX+ 395<a class="anchor" href="#1bit-engine-local-llms-on-the-amd-ryzen-ai-max-395" title="Permanent link">#</a></h1>
+<p><a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue" /></a>
+<a href="https://github.com/1bit-MONSTER/engine/tree/main/third_party/lemonade"><img alt="Lemonade pin: last bump" src="https://img.shields.io/github/last-commit/1bit-MONSTER/engine?path=third_party%2Flemonade&amp;label=Lemonade%20pin&amp;color=f5c518" /></a>
+<a href="https://github.com/1bit-MONSTER/engine/releases"><img alt="Releases" src="https://img.shields.io/badge/releases-GitHub-24292f" /></a>
+<a href="https://1bit.gg/"><img alt="Documentation: 1bit.gg" src="https://img.shields.io/badge/docs-1bit.gg-1779e1" /></a>
+<a href="https://discord.gg/fa5m4Vawpa"><img alt="Discord" src="https://img.shields.io/badge/chat-Discord-5865F2" /></a></p>
+<p>Boot a USB stick, and your Strix Halo machine serves local LLMs on its GPU and NPU through AMD's
+<a href="https://github.com/lemonade-sdk/lemonade">Lemonade Server</a>. That is the whole setup.</p>
+<h2 id="get-started">Get started<a class="anchor" href="#get-started" title="Permanent link">#</a></h2>
+<ol>
+<li>Download <code>1bit-os-&lt;version&gt;.img.zst</code> from the <a href="https://github.com/1bit-MONSTER/engine/releases">releases page</a>.</li>
+<li>Write it to a USB stick (8 GB or more).</li>
+<li>Boot the machine from the stick. Secure Boot can stay on; the image is signed.</li>
+<li>Lemonade comes up with its catalog and web UI. Try it from the live session; to keep it, run <code>1bit-install &lt;disk&gt; --yes</code> there and the 1bit appliance is on the disk (<a href="https://github.com/1bit-MONSTER/engine/blob/main/os/v2/README.md#the-live-medium-and-what-an-install-writes">os/v2/README.md</a>).</li>
+</ol>
+<p>Already running Lemonade on Ubuntu? The <code>lemonade-onebit</code> package from the same releases page adds the engine as a Lemonade backend; nothing else changes (<a href="lemonade.html">Lemonade</a>).</p>
+<h2 id="what-it-is">What it is<a class="anchor" href="#what-it-is" title="Permanent link">#</a></h2>
+<p>The 1bit engine is Lemonade's <code>onebit</code> backend for the AMD Ryzen AI MAX+ 395 (Strix Halo). It runs the Radeon 8060S iGPU through HRX with our own HIP kernels, and the XDNA 2 NPU through our own NPU runtime, behind the OpenAI-compatible API Lemonade already gives you. Every model is checked on the hardware before it ships; the models and their measured numbers are one page: <a href="models.html">Models measured</a>.</p>
+<h2 id="milestones">Milestones<a class="anchor" href="#milestones" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>when</th>
+<th>what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-10-04</td>
+<td>The engine becomes HRX + our HIP kernels + the NPU engine, embedded in Lemonade; Vulkan, ROCm and CUDA builds removed (<a href="https://github.com/1bit-MONSTER/engine/discussions/213">RFC #213</a>, <a href="https://github.com/1bit-MONSTER/engine/pull/306">#306</a>)</td>
+</tr>
+<tr>
+<td>2026-10-20</td>
+<td>One HTTP hop from Lemonade to the engine's server; the stock Ubuntu <code>lemond</code> runs the engine with no patch (<a href="https://github.com/1bit-MONSTER/engine/pull/475">#475</a>, <a href="https://github.com/1bit-MONSTER/engine/pull/483">#483</a>)</td>
+</tr>
+<tr>
+<td>2026-10-21</td>
+<td>Every HRX pin change passes a hardware gate on Strix Halo before merge; Qwen3.8-27B decodes at 36 tok/s with MTP on our kernels (<a href="https://github.com/1bit-MONSTER/engine/pull/478">#478</a>, <a href="hw-gate.html">Hardware gate</a>)</td>
+</tr>
+<tr>
+<td>2026-10-23</td>
+<td>First release candidate built, booted from USB on the hardware with Secure Boot on (<a href="releases.html">Releases</a>)</td>
+</tr>
+<tr>
+<td>2026-10-25</td>
+<td>Microsoft BitNet b1.58 (TQ1_0 / TQ2_0) runs fully on HRX (<a href="models.html">Models measured</a>)</td>
+</tr>
+<tr>
+<td>2026-10-30</td>
+<td>The HRX pin carries the DeepSeek-V4.1 port; ONNX Runtime runs in-process with our own execution provider on the NPU; the NPU and the GPU are measured running at the same time (<a href="https://github.com/1bit-MONSTER/engine/pull/672">#672</a>, <a href="https://github.com/1bit-MONSTER/engine/pull/647">#647</a>, <a href="hybrid.html">Hybrid: NPU prefill, HRX decode (--device hybrid)</a>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The release goes out when every item on the release checklist is done (<a href="releases.html">Releases</a>); the weekly Lemonade pin moves with Lemonade's releases.</p>
+<h2 id="documentation">Documentation<a class="anchor" href="#documentation" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="https://1bit.gg/">1bit.gg</a>: the docs site, built from this repository's <code>docs/</code>.</li>
+<li><a href="architecture.html">How the engine is built</a>: how the engine is built, what runs where, the hardware gate, the kernel, the direction.</li>
+<li><a href="serve.html">1bit serve</a>: <code>1bit serve</code> and its options.</li>
+<li><a href="https://github.com/1bit-MONSTER/engine/wiki">Measured results</a>: every number with how it was taken.</li>
+<li><a href="https://github.com/1bit-MONSTER/site">Site repository</a>: builds 1bit.gg from this repository.</li>
+</ul>
+<h2 id="license">License<a class="anchor" href="#license" title="Permanent link">#</a></h2>
+<p>The source code in this repository is Apache-2.0. See <a href="https://github.com/1bit-MONSTER/engine/blob/main/LICENSE">LICENSE</a>.</p>
+<p>The release binaries (the Linux package and 1bit OS) also contain two proprietary components,
+compiled in: the 1bit NPU runtime and the 1bit HIP kernels for HRX. They are not in this
+repository, their source is not published, and they are not under Apache-2.0: they ship under the
+<a href="https://github.com/1bit-MONSTER/engine/blob/main/LICENSE-BINARY">1bit Binary License</a> (free to use for any purpose and to pass on unmodified;
+third-party parts in <a href="https://github.com/1bit-MONSTER/engine/blob/main/NOTICE-BINARY">NOTICE-BINARY</a>). A build from this
+repository without them has no NPU engine and runs HRX on the public kernels only
+(<a href="https://github.com/1bit-MONSTER/engine/blob/main/NOTICE">NOTICE</a>, <a href="releases.html#private-components">Releases</a>).</p>
+<h2 id="how-to-credit">How to credit<a class="anchor" href="#how-to-credit" title="Permanent link">#</a></h2>
+<p>Credit is welcome and, for the code, required: the Apache-2.0 license keeps the copyright
+notices and the <a href="https://github.com/1bit-MONSTER/engine/blob/main/NOTICE">NOTICE</a> file with every copy. Three lines are enough:</p>
+<pre><code>1bit engine - https://github.com/1bit-MONSTER/engine - Copyright 2026 bong-water-water-bong - Apache-2.0
+</code></pre>
+<p><a href="https://github.com/1bit-MONSTER/engine/blob/main/CITATION.cff">CITATION.cff</a> carries the same in citation form (GitHub shows it under
+"Cite this repository"). If you build on a specific piece, name the file or the pull request it
+came from; the history is public.</p>
+<h2 id="thank-you">Thank you<a class="anchor" href="#thank-you" title="Permanent link">#</a></h2>
+<p><strong><a href="https://github.com/Osmantic/ODS">Osmantic / ODS</a> comes first.</strong> ODS introduced me to
+vibecoding, and that is where all of this started. Without it, this engine would not exist.</p>
+<p><strong>The Lemonade team and AMD's developers.</strong> <a href="https://github.com/lemonade-sdk/lemonade">Lemonade</a>
+is where this engine runs. AMD's developers left breadcrumbs all over the place: the XDNA driver
+and XRT, IRON and Peano, HRX, their tested llama.cpp integration, their issues, their examples.
+This engine is what following those breadcrumbs built.</p>
+<p>The repositories this engine is built on, in order of importance:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Repository</th>
+<th>What it gives this engine</th>
+<th>License</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="https://github.com/amd/xdna-driver">amd/xdna-driver</a></td>
+<td>The XDNA 2 NPU kernel driver (<code>amdxdna</code>) the NPU engine runs on</td>
+<td>GPL-2.0 (driver)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="https://github.com/Xilinx/XRT">Xilinx/XRT</a></td>
+<td>AMD's NPU runtime and its API, where the engine's NPU work started</td>
+<td>Apache-2.0 (userspace)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="https://github.com/Xilinx/mlir-aie">Xilinx/mlir-aie</a></td>
+<td>IRON and aiecc: how our own NPU kernels are written and compiled</td>
+<td>Apache-2.0 WITH LLVM-exception</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="https://github.com/Xilinx/llvm-aie">Xilinx/llvm-aie</a></td>
+<td>Peano, the C++ compiler for the NPU's AI Engine cores</td>
+<td>Apache-2.0 WITH LLVM-exception</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="https://github.com/ggml-org/llama.cpp">ggml-org/llama.cpp</a></td>
+<td>GGUF inference on the Radeon iGPU through HRX (AMD's tested pair), and on the CPU</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="https://github.com/ROCm/hrx-system">ROCm/hrx-system</a> (our fork <a href="https://github.com/1bit-MONSTER/hrx-system">1bit-MONSTER/hrx-system</a> carries two commits)</td>
+<td>HRX, AMD's HIP Runtime Extended, behind the HRX0 device</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="https://github.com/torvalds/linux">torvalds/linux</a></td>
+<td>The kernel, with <code>amdxdna</code> and <code>amdgpu</code> in-tree</td>
+<td>GPL-2.0 WITH Linux-syscall-note</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a href="https://github.com/huggingface/tokenizers">huggingface/tokenizers</a></td>
+<td>Every model's <code>tokenizer.json</code>, byte-exact, behind our C ABI</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>9</td>
+<td><a href="https://github.com/NandhaKishorM/laya">NandhaKishorM/laya</a></td>
+<td>The router that decides where each request runs</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="https://github.com/ROCm/FastFlowLM">ROCm/FastFlowLM</a></td>
+<td>The Q4NX NPU model format and its models on Hugging Face (<code>FastFlowLM/*-NPU2</code>), which the engine's NPU route runs on its own kernels</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="https://github.com/antirez/ds4">antirez/ds4</a> (DwarfStar)</td>
+<td>DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next on its own kernels (ROCm on Strix Halo, CUDA, Metal)</td>
+<td>MIT</td>
+</tr>
+</tbody>
+</table></div>
+<p>Also built on <a href="https://github.com/nlohmann/json">nlohmann/json</a> (MIT)
+and <a href="https://github.com/yhirose/cpp-httplib">yhirose/cpp-httplib</a> (MIT).</p>
+<p>Every third-party copyright and license is listed in <a href="https://github.com/1bit-MONSTER/engine/blob/main/NOTICE">NOTICE</a>. Each project keeps its
+own license; nothing here relicenses anyone's work.</p>
+
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/README.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

@@ -14,10 +14,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-draft: true
-tags: npu, xdna2, ternary, bonsai, ryzen-ai, work-in-progress
+tags: npu, xdna2, ternary, bonsai, ryzen-ai, work-in-progress, amd-npu-linux
 title: Ternary Bonsai-2-27B on the Ryzen AI NPU
-summary: PrismML's Ternary-Bonsai-2-27B now answers correctly on the XDNA 2 NPU (device cosine 0.9908, argmax identical to the engine) and decodes at 8.87 s/token, from 11.5; the per-role kernel design is at its measured ceiling, and a fused per-layer design is the next step.
+summary: PrismML's Ternary-Bonsai-2-27B answers correctly on the XDNA 2 NPU (device cosine 0.9908, argmax identical to the engine); decode went 13.3 to 8.87 to 4.1 s/token in one day, and the measurement says exactly where the rest is.and a fused per-layer design is the next step.
 
 # Ternary Bonsai-2-27B on the Ryzen AI NPU
 
@@ -45,15 +44,24 @@ Two changes, in [engine #661](https://github.com/1bit-MONSTER/engine/pull/661):
 
 Together: 8.87 s/token, from 11.5 on the same file and the same device.
 
-## Where the ceiling is
+## Decode again: 8.87 to 4.1 s/token, by weight layout alone
 
-Measured end to end, the per-role kernel design (one kernel per role: projection, attention,
-gate, and so on, each a separate dispatch over the whole array) moves 2.85 to 3.1 GB/s of
-weights. A 27B ternary file at that rate is seconds per token, which is what the number above
-is. The design has reached what it can do; the next step is a fused per-layer kernel, one
-dispatch per layer that keeps the activations on the array between roles. The reference figure
-for that design is 24 GB/s. It is not built yet, and until it is, the Bonsai row for the NPU
-stays a correctness result, not a speed.
+The same evening, one more change with no kernel edit: the weights are written to the container
+in the order the kernel's tiles consume them, so every tile is one contiguous read instead of 64
+short runs ([engine #667](https://github.com/1bit-MONSTER/engine/pull/667)). Bit-identical
+output, and the decode step went from 8.87 to 4.10 to 4.29 s/token on the same device.
+
+## Where the ceiling is, measured
+
+A pass-through probe, the kernel's data path with the arithmetic removed, says the layout above is
+at the limit of that data path: the device is bound by the number of tiles it moves per column, not
+by the bytes in them. Two consequences, both measured the same day. First, the file is already
+4-bit on disk, and streaming those bytes instead of dequantised 8-bit ones halves the work per
+token; that kernel path is built and byte-exact in the private kernel tree and ships when all five
+phases of the layer are through their gates. Second, the remaining distance to the stream rate our
+small-model route already reaches on this silicon is in the data path itself, which is the next
+piece of work. Until the five phases are in, the Bonsai row for the NPU stays a correctness result
+with a dated speed, not a claim.
 
 The NPU route and its current state are on [NPU engine](../docs/npu.md); the model's HRX numbers
 (43.3 tok/s with MTP in PQ2_0) are in [Models measured](../docs/models.md).
