@@ -90,15 +90,15 @@ RELEASES = REPO + "/releases"
 LEMONADE = "https://github.com/lemonade-sdk/lemonade"
 DISCORD = "https://discord.gg/fa5m4Vawpa"
 
-TAGLINE = ("Local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo), inside AMD's Lemonade Server: "
-           "HRX with our own HIP kernels on the Radeon 8060S iGPU, and our own NPU runtime on the XDNA 2 NPU, "
-           "behind an OpenAI-compatible API.")
+TAGLINE = ("One binary to rule them all: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 "
+           "(Strix Halo), any model on the Radeon 8060S iGPU and the XDNA 2 NPU, inside AMD's Lemonade Server. "
+           "Boot a stick and it serves.")
 # The home page's search title (without the " · 1bit engine" suffix) and description. Keep the
 # description <= DESCRIPTION_MAX characters and update it with each milestone (README.md, docs/hrx.md).
 HOME_TITLE = "Local LLM inference on AMD Ryzen AI MAX+ 395"
-HOME_DESCRIPTION = ("1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, "
-                    "on the Radeon 8060S iGPU through HRX and on the XDNA 2 NPU.")
-HOME_KEYWORDS = ("LLM inference, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, HIP kernels, XDNA 2 NPU, "
+HOME_DESCRIPTION = ("1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside "
+                    "Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.")
+HOME_KEYWORDS = ("model-agnostic LLM inference, local LLM, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, HIP kernels, XDNA 2 NPU, live USB, 1bit OS, "
                  "Lemonade Server, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, BitNet b1.58, ternary, "
                  "Ternary-Bonsai, gpt-oss-20b, MXFP4, NVFP4, MTP, speculative decoding, 1bit OS, local AI")
 

@@ -14,10 +14,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-draft: true
-tags: weekly, release, lemonade, hrx, npu, 1bit-os, strix-halo
+tags: weekly, release, lemonade, hrx, npu, 1bit-os, strix-halo, ryzen-ai-max-395
 title: This week in the engine
-summary: This week's Lemonade release is the pin, the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, the hardware gate is green at the shipping pin, and two measurements say where Flash-Next prefill and the two-engine NPU stand.
+summary: This week's Lemonade release is the pin, the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, the HRX pin carries the DeepSeek-V4.1 port, ONNX Runtime runs in-process with our own execution provider, and the README is simple again.d the two-engine NPU stand.
 
 # This week in the engine
 
@@ -54,6 +53,35 @@ each waits for the other. Two engines need kernel sets partitioned to disjoint h
 array, one column partition per engine, which is
 [#656](https://github.com/1bit-MONSTER/engine/issues/656). Until then the second engine is opt-in
 and costs more than it gives.
+
+## Later the same day
+
+- **The HRX pin moved again**, to a fork head that carries six commits: the host-gap profiler,
+  the KV cache zero-padding repair, the DeepSeek-V4.1-Flash port, and the `GET_ROWS` fix that
+  lets Flash-Next's 320-million-row token table gather on the GPU instead of the CPU
+  ([#672](https://github.com/1bit-MONSTER/engine/pull/672), fork
+  [#156](https://github.com/1bit-MONSTER/llama.cpp/pull/156),
+  [#159](https://github.com/1bit-MONSTER/llama.cpp/pull/159)). Every pin move passes the hardware
+  gate on the board first; the recipe for a hand-raised bump is now written down
+  ([#675](https://github.com/1bit-MONSTER/engine/pull/675)).
+- **ONNX Runtime runs inside the engine**, behind a build flag, with our own execution provider.
+  Its first proof is a MatMul on the NPU through an ORT session, repeatable, within 0.5 % of the
+  CPU provider's result; a Quark-quantised A8W8 graph runs on it unchanged. The first whole model
+  through it is not right yet, and the write-up says so
+  ([#647](https://github.com/1bit-MONSTER/engine/pull/647), [ONNX Runtime](../docs/onnx.md)).
+- **The NPU and the GPU run at the same time.** A reported hazard said they could not; forty
+  measured reps say they can, at a cost of about 13 % of the NPU's weight stream while the GPU is
+  busy. The numbers are in [Hybrid](../docs/hybrid.md).
+- **The README is simple again**: boot a stick, try it, install it; the technical map moved to
+  [How the engine is built](../docs/architecture.md)
+  ([#676](https://github.com/1bit-MONSTER/engine/pull/676)).
+- The engine became a workload for AMD's Hyperloom tuner
+  ([#660](https://github.com/1bit-MONSTER/engine/pull/660)), the daily census and bump workflows
+  now report their failures instead of failing silently
+  ([#664](https://github.com/1bit-MONSTER/engine/pull/664),
+  [#665](https://github.com/1bit-MONSTER/engine/pull/665)), and the kernel arena that scores NPU
+  kernels against a byte-exact oracle has its public half in the tree
+  ([#668](https://github.com/1bit-MONSTER/engine/pull/668)).
 
 ## Merged on 30 October
 

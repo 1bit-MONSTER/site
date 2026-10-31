@@ -14,8 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-draft: true
-tags: bitnet, ternary, hrx, strix-halo, local-llm, quantization
+tags: bitnet, ternary, hrx, strix-halo, local-llm, quantization, amd-gpu, radeon-8060s
 title: BitNet b1.58 runs on HRX
 summary: Microsoft's BitNet b1.58 2B-4T in its TQ2_0 ternary GGUF (1.11 GiB) runs end to end on the Radeon 8060S through HRX, perplexity 102.42 against 102.56 on the CPU, and decodes at 123.4 tok/s.
 
