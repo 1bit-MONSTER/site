@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 tags: release, v2026.44, lemonade, hrx, npu, 1bit-os, strix-halo, ryzen-ai-max-395
-title: v2026.44, the first release: one binary, boot a stick
+title: v2026.44: one binary, boot a stick
 summary: The first published release of the 1bit engine. A signed live USB that brings up the GPU, the NPU and Lemonade Server on a Ryzen AI MAX+ 395, or one tarball for an Ubuntu that already runs ROCm. What ships, how it was tested on the hardware, and what is not in it.
 
 # v2026.44, the first release
@@ -61,8 +61,11 @@ last candidate has booted from the stick on a real Max+ 395:
 - image checks (sealed sets, licences, release identity) and the VM release tests
 - QEMU: live boot, run, install to a disk, boot from the installed disk
 - the release stick: written and read back byte for byte
-- **live USB boot on the board with Secure Boot on, then a full install to a disk and a boot from
-  it**, with the release check run on both
+- **live USB boot on the board with Secure Boot on**, and `1bit-release-check` run on the live
+  stick: `RESULT: PASS (19 checks, no failures)`, read off the stick's own `/data/release-check.log`
+- an **installed system** -- live boot, install to a disk, boot from the installed disk -- run in
+  **QEMU**, not on the board: `RESULT: PASS (19 checks, no failures)` and `VMTEST-RELEASE PASS (10
+  PASS, 9 SKIP, 0 FAIL)`. The install on the hardware is the next release's gate, not this one's
 
 One candidate was pulled back from publication last week because the stick test had not been run
 on that exact build. The rule stands: the whole gate, on the hardware, on the bytes that ship.
