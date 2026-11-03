@@ -126,6 +126,10 @@ PAGE_META = {
      '1bit OS is a Puppy Linux appliance: ResolutePup64 with Lemonade and the engine inside, our MOK-signed kernel, headless by default, apt, persistent 1BIT-DATA.'),
     'os-v3-live-puppy-eval': ('Puppy as the base of 1bit OS: the evaluation',
      'The measurements behind the Puppy appliance: size, memory, the glibc ceiling, the kernel config gap, the package inventory and the gates that decided it.'),
+    'install': ('Install 1bit OS: stick, internal disk, USB',
+     'How to install 1bit OS: run it from the stick with no install, 1bit-install to an internal disk or another USB drive, Secure Boot, and what each erases.'),
+    'clients': ('Connect a client to Lemonade on 1bit OS',
+     'How clients reach Lemonade on 1bit OS: the address and API key, curl, the web app, Lemonade Mobile on iPhone and Android, OpenAI SDKs and the CLI.'),
     'bench': ('How the numbers are measured',
      "How the engine's serve numbers are taken: tools/bench.py A/B-measures 1bit serve configurations in the same run, and a recipe earns its place by that measure."),
     'recipes': ('Recipes: tuned backend settings',
@@ -176,7 +180,9 @@ NAV = [
     ("Devices", [("hrx", "HRX"), ("npu", "NPU engine"), ("hybrid", "Hybrid"), ("onnx", "ONNX Runtime"), ("onnx-pack", "ONNX pack"), ("dwarfstar", "DwarfStar")]),
     ("Components", [("laya", "Laya router"), ("pm", "Project Manager"), ("registry", "Model registry"),
                     ("arch-gaps", "Architecture gaps"), ("moe-streaming", "MoE streaming"), ("tokenizers", "Tokenizers")]),
-    ("Project", [("architecture", "How the engine is built"), ("os-v3", "1bit OS"), ("kernel", "Linux kernel"), ("npu-leaderboard", "NPU leaderboard"), ("PORTING", "Porting map")]),
+    ("Project", [("architecture", "How the engine is built"), ("os-v3", "1bit OS"), ("install", "Install 1bit OS"),
+                 ("clients", "Connect a client"), ("kernel", "Linux kernel"), ("npu-leaderboard", "NPU leaderboard"),
+                 ("PORTING", "Porting map")]),
 ]
 
 
