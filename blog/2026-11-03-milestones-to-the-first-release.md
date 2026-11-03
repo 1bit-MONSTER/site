@@ -16,16 +16,18 @@ limitations under the License.
 -->
 draft: true
 tags: milestones, release, v2026.44, strix-halo, ryzen-ai-max-395, local-llm, lemonade, hrx, npu, xdna2, bitnet, ternary, 1bit-os, puppy-linux, amd-npu-linux
-title: Strix Halo LLM engine: milestones to v2026.44
-summary: Ten weeks of the 1bit engine, local LLMs on the Ryzen AI MAX+ 395 GPU and NPU inside Lemonade, from the first commit to the first release, v2026.44.
+title: Strix Halo LLM engine: April to v2026.44
+summary: Seven months of the 1bit engine, from a 1-bit HIP kernel in April to v2026.44: local LLMs on the Ryzen AI MAX+ 395 GPU and NPU, inside Lemonade.
 
-# From the first commit to the first release: the 1bit engine on Strix Halo
+# From April to the first release: the 1bit engine on Strix Halo
 
 The 1bit engine runs local LLMs on the AMD Ryzen AI MAX+ 395 (Strix Halo): on the Radeon 8060S
 iGPU through AMD's HRX runtime with our own HIP kernels, and on the XDNA 2 NPU through our own
-runtime, all inside AMD's Lemonade Server. This post is the whole road from the clean repository
-on 22 September 2026 to the first release, v2026.44, with every measured number linked to the
-post or document it came from, and with a plain list of what was and was not tested.
+runtime, all inside AMD's Lemonade Server. This post is the whole road: from the first 1-bit HIP
+kernel on 16 April 2026, through the NPU unlock four days after the project repository opened, to
+the clean repository on 22 September and the first published release, v2026.44. Every measured
+number links to the post, document or commit it came from, and there is a plain list of what was
+and was not tested.
 
 The engine is Apache-2.0 and lives at
 [github.com/1bit-MONSTER/engine](https://github.com/1bit-MONSTER/engine). It is model agnostic:
@@ -57,6 +59,61 @@ The source in the repository is Apache-2.0. The release binaries also contain tw
 components, compiled in: the 1bit NPU runtime and the 1bit HIP kernels for HRX. They are closed
 source and ship under the 1bit Binary License, free to use
 ([README](https://github.com/1bit-MONSTER/engine#license), [releases](../docs/releases.md#private-components)).
+
+## April to September 2026: how it started
+
+The project began as one person with one Strix Halo box and a question: how much of a modern
+model can run on the Ryzen AI MAX+ 395 alone. The early history lives in the archived
+[1bit-MONSTER monorepo](https://github.com/1bit-MONSTER/1bit-MONSTER) and the
+[old blog](https://1bit-monster.github.io/1bit-MONSTER/1bit-blog.html).
+
+**16 April: the first kernel.** The first commits put a native GEMM and a fused Wave32 ternary
+kernel on `gfx1151`, then a Q1_0 HIP kernel that made prompt processing on Bonsai 1-bit models
+24-33x faster, and a burn of seven 1-bit models at 4,172 tok/s prompt on Bonsai-1.7B (monorepo
+commits of 16 April). Overnight the standalone prefill kernel went from 47 % of AMD's Composable
+Kernel to 101.7 %, and the measured WMMA ceiling of the 8060S was written down at 55.36 TFLOPS,
+so the kernel's 56 % of peak was a known number rather than a guess.
+
+**19 April: the project repository opens.** The monorepo was created on 19 April, with a Rust
+workspace for the server and agents around the kernels.
+
+**23 April: the NPU unlock, four days later.** The XDNA 2 NPU on Strix Halo went from "no Linux
+path" to a working one: 160 of 160 IRON tests passed on the device, and the open toolchain ran end
+to end, from MLIR-AIE through Peano to a loaded binary, in 26.8 seconds. The same day BitNet-2.4B
+served at 79-90 tok/s on the 8060S (perplexity 9.18), next to text-to-speech, speech-to-text and
+image lanes, and the first AMD Lemonade Developer Challenge submission was written up. Version
+v0.1.0 was cut on 24 April.
+
+**May and June: quieter months.** Most of the work went into installing and packaging Lemonade
+and its backends cleanly; the ROCm C++ kernel library reached v0.2.0 with a full benchmark update
+on 24 June.
+
+**July: the NPU decodes.** On 1 July 1-bit models were verified at 281 tok/s on the Strix Halo
+GPU, and the monorepo tagged v1.0.0. The NPU work moved from kernels to whole models:
+[M=32 batch decode at 97 tok/s](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-npu-v12.html) on 2 July,
+[three bugs that had broken it](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-three-bugs.html),
+[token-level routing across backends](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-tokenrouter.html),
+[Unsloth for AMD](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-unsloth.html),
+[one binary for all formats](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-binary-formats.html),
+[the Zyphra family](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-zyphra.html), and on 30 July
+[Qwen3.6-35B-A3B streaming fully on the NPU](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-qwen36.html).
+
+**August: one engine, every model.** On 1 August the single `1bit` binary embedded Lemonade's core
+with coherent GPU inference. Then [one engine for every model](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-1775-models.html),
+[what 1-bit quantization actually does to a model](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-1bit-explained.html),
+[ROCm next to CUDA from the 1-bit side](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-rocm-vs-cuda.html),
+[local RAG with our own embeddings](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-local-rag.html), and on 29 August
+[AMD's HRX runtime inside the engine](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-hrx-engine.html), the runtime the release
+is built on.
+
+**Early September: the NPU on real models.** [ZAYA1-8B on the NPU](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-zaya-q4nx-hrx.html)
+on 1 September and [the 35B MoE's NPU layout](https://1bit-monster.github.io/1bit-MONSTER/1bit-post-35b-moe-layout.html) on 2 September.
+Three weeks later everything that had proven itself moved into a clean, Apache-2.0 repository,
+and that is where the rest of this post picks up.
+
+The monorepo shipped its own releases, v0.1.0 in April and v1.0.0 in July, and they stay in that
+archive with the rest of the history from before the project became the 1bit engine. v2026.44 is
+the first release of the 1bit engine itself.
 
 ## September 2026: the clean repository and the first week of Ryzen AI MAX+ 395 local LLM work
 
