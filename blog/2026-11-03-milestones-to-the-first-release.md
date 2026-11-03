@@ -63,9 +63,8 @@ source and ship under the 1bit Binary License, free to use
 ## April to September 2026: how it started
 
 The project began as one person with one Strix Halo box and a question: how much of a modern
-model can run on the Ryzen AI MAX+ 395 alone. The early history lives in the archived
-[1bit-MONSTER monorepo](https://github.com/1bit-MONSTER/1bit-MONSTER) and the
-[old blog](https://1bit-monster.github.io/1bit-MONSTER/1bit-blog.html).
+model can run on the Ryzen AI MAX+ 395 alone. The early history is in an archived monorepo and on
+the [old blog](https://1bit-monster.github.io/1bit-MONSTER/1bit-blog.html).
 
 **16 April: the first kernel.** The first commits put a native GEMM and a fused Wave32 ternary
 kernel on `gfx1151`, then a Q1_0 HIP kernel that made prompt processing on Bonsai 1-bit models
@@ -324,7 +323,7 @@ then: the whole gate, on the hardware, on the bytes that ship.
 
 **2 November: the census.** The daily census counted 432,540 text-generation models on Hugging
 Face, 342,299 with an architecture (2,974 architectures): 94.46% mapped to a backend, 63.68%
-checked ([#815](https://github.com/1bit-MONSTER/engine/pull/815), [registry](../docs/registry.md)).
+checked ([#815](https://github.com/1bit-MONSTER/engine/pull/815), the census of 2 November).
 
 **2 November: candidate 20 on the board.** The engine build that becomes v2026.44 (engine commit
 `a5271d92b287`) booted from a live USB stick on a Ryzen AI MAX+ 395 with Secure Boot on, and
@@ -452,8 +451,8 @@ including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ formats
 | nomic, bge, jina (embeddings, reranking) | HRX | in the 43-of-43 census ([post](2026-10-21-every-node-on-hrx.md)) |
 
 The registry maps 94.46% of the Hugging Face text-generation models that name an architecture to a
-backend, and the daily census reports separately how many have been checked
-([registry](../docs/registry.md)). "Mapped" means a backend's code accepts the architecture; it is
+backend in the census of 2 November, and the daily census reports separately how many have been
+checked ([how the registry works](../docs/registry.md)). "Mapped" means a backend's code accepts the architecture; it is
 not a claim that every one of them has been run.
 
 ## How to test it and break it
