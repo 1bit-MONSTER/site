@@ -283,7 +283,8 @@ v2026.44 is the first published release of the 1bit engine. Releases are tagged
 `v<ISO year>.<ISO week>`, like Lemonade's own versions ([releases](../docs/releases.md)). It comes
 two ways:
 
-- **`1bit-os-v2026.44.img.zst`: 1bit OS, a Puppy Linux AI appliance** (next section).
+- **1bit OS, a Puppy Linux AI appliance** (next section): `1bit-os-puppy.img.xz` on
+  [Hugging Face](https://huggingface.co/1bit-MONSTER/1bit-OS).
 - **`lemonade-onebit-v2026.44-linux-x86_64.tar.zst`**: Lemonade Server from our fork with the
   `onebit` backend and the engine in `1bit/`, for an Ubuntu that already runs ROCm. Unpack it
   anywhere and start Lemonade through `lemond-onebit`, which points Lemonade's `onebit` backend at
@@ -312,13 +313,15 @@ wants it, and is started only from its own boot entry. The same system goes onto
 
 ### How to boot the stick
 
-1. Download `1bit-os-v2026.44.img.zst` from the
-   [releases page](https://github.com/1bit-MONSTER/engine/releases) and check it against the
-   release's `SHA256SUMS`.
+1. Download `1bit-os-puppy.img.xz` and `SHA256SUMS` from
+   [huggingface.co/1bit-MONSTER/1bit-OS](https://huggingface.co/1bit-MONSTER/1bit-OS) and check
+   the file with `sha256sum -c SHA256SUMS --ignore-missing`.
 2. Write it to a USB stick of 16 GB or more (the image is about 9 GB), for example with
-   `zstd -dc 1bit-os-v2026.44.img.zst | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`,
+   `xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`,
    where `/dev/sdX` is the stick and nothing else.
-3. Boot the Ryzen AI MAX+ 395 machine from the stick, with Secure Boot left on.
+3. Boot the Ryzen AI MAX+ 395 machine from the stick. Secure Boot can stay on: the kernel is
+   signed with the 1bit key, and a machine that does not trust that key yet asks you to enroll
+   it once in MokManager. You can also turn Secure Boot off.
 4. The console menu shows the machine's address and the Lemonade URL. Lemonade is up with the
    engine behind it: the GPU through HRX and our HIP kernels, the NPU through our own runtime.
 
