@@ -26,8 +26,13 @@ the XDNA 2 NPU.
   `site/style.css` and `site/theme.js`.
 - `.github/workflows/pages.yml` builds the site on every pull request, deploys `main` to GitHub
   Pages, and rebuilds every three hours so engine doc changes reach the site.
-- Every page carries its canonical address, Open Graph and Twitter card tags and JSON-LD; the
-  build writes `sitemap.xml` (lastmod from git), `robots.txt` and the Atom feed `feed.xml`.
+- `site/pages/*.md` are the site's own landing pages (the Strix Halo guide, the FAQ): short hubs
+  for the searches mapped in `SEO-KEYWORDS.md`, with facts only from the engine docs and the posts.
+- Every page carries its canonical address, Open Graph and Twitter card tags and JSON-LD
+  (breadcrumbs, and FAQPage where a page has an FAQ); the build writes `sitemap.xml` (lastmod from
+  git), `robots.txt`, `llms.txt` and the Atom feed `feed.xml`.
+- `SHARE-KIT.md` holds drafts for sharing the project (Reddit, Hacker News) for the maintainer to
+  post; nothing is posted from this repository.
 
 Build locally:
 
