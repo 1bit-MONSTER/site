@@ -28,8 +28,12 @@ same binary is the whole operating system when you want it to be.
 
 - **Boot a stick.** 1bit OS is a **Puppy Linux appliance**: `ResolutePup64`, built with woof-CE on
   the Ubuntu 26.04 "resolute" base, with Lemonade Server and the engine embedded in it and our own
-  MOK-signed `7.3.0-rc4-1bit-perfopt` kernel underneath. Write `1bit-os-v2026.44.img.zst` to a stick
-  of 16 GB or more (the image is about 9 GB), boot a Ryzen AI MAX+ 395 from it with Secure Boot on, and Lemonade comes up: the
+  MOK-signed `7.3.0-rc4-1bit-perfopt` kernel underneath. Download `1bit-os-puppy.img.xz` (2.2 GB
+  compressed, 9.1 GB written) and its `SHA256SUMS` from
+  [Hugging Face](https://huggingface.co/1bit-MONSTER/1bit-OS) - the image is too big for a GitHub
+  release asset, which is capped at 2 GiB - check the checksum, and write it to a stick
+  of 16 GB or more (`xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`,
+  or balenaEtcher/Rufus in DD mode, which take the `.xz` directly). Boot a Ryzen AI MAX+ 395 from it with Secure Boot on, and Lemonade comes up: the
   GPU through HRX and our HIP kernels, the NPU through our own runtime. It boots **headless** - a
   console login, no X - and the boot menu's `1bit OS (desktop)` entry brings up Puppy's desktop for
   anyone who wants one. `bash`, `sudo` and `apt` work; models, Lemonade's config and your SSH keys
