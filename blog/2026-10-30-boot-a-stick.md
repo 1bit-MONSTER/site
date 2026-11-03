@@ -24,6 +24,13 @@ The feedback we hear most is "keep it simple". So here is the whole setup for lo
 Ryzen AI MAX+ 395 (Strix Halo) machine:
 
 1. Download the 1bit OS image from the [releases page](https://github.com/1bit-MONSTER/engine/releases).
+   > **Update (2026-11-02):** the image itself now comes from **Hugging Face**, not the GitHub release:
+   > [`1bit-os-puppy.img.xz`](https://huggingface.co/1bit-MONSTER/1bit-OS), 2.2 GB compressed / 9.1 GB
+   > written, with its `SHA256SUMS` - a GitHub release asset is capped at 2 GiB. Fetch both, run
+   > `sha256sum -c SHA256SUMS --ignore-missing`, then
+   > `xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress` (balenaEtcher
+   > and Rufus in DD mode take the `.xz` directly, on a stick of 16 GB or more). The releases page keeps
+   > the `lemonade-onebit` package and the release notes.
 2. Write it to a USB stick of 8 GB or more.
 3. Boot the machine from the stick. Secure Boot stays on; the image is signed.
 4. Lemonade comes up with its catalog and its web UI. Pick a model and talk to it.

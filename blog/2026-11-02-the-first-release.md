@@ -25,8 +25,12 @@ same binary is the whole operating system when you want it to be.
 
 ## Two ways to run it
 
-- **Boot a stick.** `1bit-os-v2026.44.img.zst` is a live USB image, Secure Boot signed. Write it
-  to a stick of 8 GB or more, boot a Ryzen AI MAX+ 395 machine from it, and Lemonade Server is up
+- **Boot a stick.** `1bit-os-puppy.img.xz` (2.2 GB compressed, 9.1 GB written) and its
+  `SHA256SUMS` come from [Hugging Face](https://huggingface.co/1bit-MONSTER/1bit-OS) - the image is too
+  big for a GitHub release asset, which is capped at 2 GiB - and it is Secure Boot signed. Check the
+  checksum, write it to a stick of 16 GB or more (`xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX
+  bs=4M conv=fsync status=progress`, or balenaEtcher/Rufus in DD mode, which take the `.xz` directly),
+  boot a Ryzen AI MAX+ 395 machine from it, and Lemonade Server is up
   with the engine behind it: the GPU through HRX and our HIP kernels, the NPU through our own
   runtime. `1bit-install <disk> --yes` puts the same system on a disk.
 - **Add it to an Ubuntu that already runs ROCm.** `lemonade-onebit-v2026.44-linux-x86_64.tar.zst`
