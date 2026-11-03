@@ -26,7 +26,8 @@ same binary is the whole operating system when you want it to be.
 ## Two ways to run it
 
 - **Boot a stick.** `1bit-os-puppy.img.xz` (2.2 GB compressed, 9.1 GB written) and its
-  `SHA256SUMS` come from [Hugging Face](https://huggingface.co/1bit-MONSTER/1bit-OS) - the image is too
+  `SHA256SUMS` come from [Hugging Face](https://huggingface.co/1bit-MONSTER/1bit-OS) (the repository is
+  private until this release is published, so from then on that link is the download) - the image is too
   big for a GitHub release asset, which is capped at 2 GiB - and it is Secure Boot signed. Check the
   checksum, write it to a stick of 16 GB or more (`xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX
   bs=4M conv=fsync status=progress`, or balenaEtcher/Rufus in DD mode, which take the `.xz` directly),

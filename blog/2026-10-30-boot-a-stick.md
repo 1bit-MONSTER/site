@@ -26,7 +26,8 @@ Ryzen AI MAX+ 395 (Strix Halo) machine:
 1. Download the 1bit OS image from the [releases page](https://github.com/1bit-MONSTER/engine/releases).
    > **Update (2026-11-02):** the image itself now comes from **Hugging Face**, not the GitHub release:
    > [`1bit-os-puppy.img.xz`](https://huggingface.co/1bit-MONSTER/1bit-OS), 2.2 GB compressed / 9.1 GB
-   > written, with its `SHA256SUMS` - a GitHub release asset is capped at 2 GiB. Fetch both, run
+   > written, with its `SHA256SUMS` - a GitHub release asset is capped at 2 GiB, and the repository is
+   > private until v2026.44 is published. Fetch both, run
    > `sha256sum -c SHA256SUMS --ignore-missing`, then
    > `xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress` (balenaEtcher
    > and Rufus in DD mode take the `.xz` directly, on a stick of 16 GB or more). The releases page keeps
