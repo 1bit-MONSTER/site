@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 tags: milestones, npu, hrx, vulkan, zinc
-summary: Three days in: the engine runs on the NPU, HRX, Vulkan and ZINC inside Lemonade, each step verified on Strix Halo.
+summary: Three days in: the engine runs on the XDNA 2 NPU, HRX, Vulkan and ZINC inside Lemonade, each step verified on Strix Halo; HRX passes 791 backend-op tests.
 
 title: The first week: NPU, HRX, Vulkan, ZINC
 # The first week of 1bit engine

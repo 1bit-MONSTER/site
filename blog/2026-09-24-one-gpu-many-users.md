@@ -16,6 +16,7 @@ limitations under the License.
 -->
 tags: serving, batching, vulkan, rocm
 summary: Qwen3.8-27B from 1 to 24 simultaneous requests: Vulkan peaks at 50.9 tok/s with 8, ROCm reaches 68.0 with 16, and serve now grows with the load.
+title: One GPU, many users: Qwen3.8-27B batching
 
 # One GPU, many users
 

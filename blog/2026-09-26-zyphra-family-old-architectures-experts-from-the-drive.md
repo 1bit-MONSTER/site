@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 tags: zyphra, models, moe, hrx, onnx
-summary: Zyphra's whole family runs (ZAYA1-74B at 35.4 tok/s), four older architectures join, and MoE experts stream from the drive at 43-45 tok/s.
+summary: Zyphra's whole family runs (ZAYA1-74B at 35.4 tok/s), four older architectures join, and MoE experts stream from the drive at 43-45 tok/s on Strix Halo.
 
 title: Zyphra family, older archs, experts from disk
 # Zyphra's whole family, four older architectures, and experts from the drive
