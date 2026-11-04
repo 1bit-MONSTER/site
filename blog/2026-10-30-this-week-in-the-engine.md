@@ -16,7 +16,7 @@ limitations under the License.
 -->
 tags: weekly, release, lemonade, hrx, npu, 1bit-os, strix-halo, ryzen-ai-max-395
 title: Lemonade pin, 1bit OS, DeepSeek-V4.1 this week
-summary: This week's Lemonade release is the pin, the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, the HRX pin carries the DeepSeek-V4.1 port, ONNX Runtime runs in-process with our own execution provider, and the README is simple again.d the two-engine NPU stand.
+summary: This week: Lemonade's release is the pin, the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, and the HRX pin carries DeepSeek-V4.1.
 
 # This week in the engine
 

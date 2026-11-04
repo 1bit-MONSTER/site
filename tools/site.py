@@ -58,9 +58,14 @@
 # Graph and Twitter card tags with site/assets/og-card.png, and JSON-LD: the home page carries
 # the Organization, the WebSite and the engine as a SoftwareApplication; each doc page is a
 # TechArticle, each post a BlogPosting (published = the date in its file name, modified = its last
-# commit), and the two indexes are a CollectionPage and a Blog. robots.txt and sitemap.xml list
-# every page; a page's lastmod is its source file's last commit (pages.yml checks out the full
-# history for that).
+# commit), and the two indexes are a CollectionPage and a Blog. Every page but the home page also
+# carries its BreadcrumbList; a page with a "## Frequently asked questions" section, a FAQPage.
+# robots.txt and sitemap.xml list every page; a page's lastmod is its source file's last commit
+# (pages.yml checks out the full history for that). llms.txt lists every page with its description.
+#
+# Internal links: a doc page ends with its related posts and a post with its related docs and posts
+# (DOC_TAGS below); the landing pages in site/pages (PAGES_DIR below) sit in the sidebar, the docs
+# index and the home page.
 #
 # Needs python-markdown (pip install markdown).
 import datetime
@@ -89,6 +94,7 @@ SITE_REPO = "https://github.com/1bit-MONSTER/site"
 RELEASES = REPO + "/releases"
 LEMONADE = "https://github.com/lemonade-sdk/lemonade"
 DISCORD = "https://discord.gg/fa5m4Vawpa"
+HF = "https://huggingface.co/1bit-MONSTER"
 
 TAGLINE = ("One binary to rule them all: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 "
            "(Strix Halo), any model on the Radeon 8060S iGPU and the XDNA 2 NPU, inside AMD's Lemonade Server. "
@@ -113,10 +119,10 @@ PAGE_META = {
     'overview': ('What the 1bit engine is and what runs where',
      "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade."),
     'docs': ('Documentation: serve, HRX, NPU, Lemonade',
-     'Documentation for the 1bit engine: 1bit serve and its OpenAI-compatible API, Lemonade, releases, HRX, the NPU engine, DwarfStar, Laya and the model registry.'),
+     'Documentation for the 1bit engine on Strix Halo: 1bit serve and its OpenAI-compatible API, Lemonade, releases, HRX, the NPU engine, Laya and the model registry.'),
     'blog': ('Blog: build notes and measured results',
      'Notes from building the 1bit engine on AMD Strix Halo: measured results on HRX and our HIP kernels, the NPU engine, speculative decoding and quantization.'),
-    'serve': ('1bit serve: the OpenAI-compatible API',
+    'serve': ('1bit serve: OpenAI-compatible local LLM server',
      '1bit serve runs the engine behind one OpenAI-compatible API inside Lemonade: devices, model loading, strict GPU placement, --parallel, --mtp, --dflash, --laya.'),
     'lemonade': ('Lemonade Server backend: the onebit recipe',
      "How the 1bit engine runs inside AMD's Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA."),
@@ -137,14 +143,14 @@ PAGE_META = {
     'hw-gate': ('HRX hardware gate on Strix Halo',
      'The hardware gate runs every HRX pin change and hw-gate PR on a Strix Halo box before merge: kernel tests, known answers, KLD against the release pin.'),
     'architecture': ('How the 1bit engine is built',
-     "The technical map: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, DwarfStar, Laya, the hardware gate and the kernel."),
+     "The technical map of the 1bit engine: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, Laya, the hardware gate and the kernel."),
     'onnx-pack': ('The ONNX pack: weights to Q4NX, our kernels',
      "How a plain ONNX graph becomes an NPU pack for the 1bit engine: weights to Q4NX through the runtime's own packer, activations int8, one ELF per shape."),
-    'hrx': ('HRX llama.cpp on the Radeon 8060S iGPU',
+    'hrx': ('HRX llama.cpp on Radeon 8060S (gfx1151)',
      "HRX, AMD's HIP Runtime Extended, with our own HIP kernels on the Radeon 8060S iGPU: pinned sources, quant coverage, MTP and DFlash2, ternary Bonsai, BitNet."),
     'npu': ('AMD NPU on Linux: the XDNA 2 NPU engine',
      "The engine's NPU route on the Ryzen AI MAX+ 395's XDNA 2 NPU: our own runtime with full-ELF kernel sets, what matches the reference today, and measured numbers."),
-    'hybrid': ('Hybrid: NPU prefill, HRX decode',
+    'hybrid': ('Hybrid: NPU prefill, GPU decode on Strix Halo',
      '1bit serve --device hybrid processes the prompt on one device and generates on another: a prefill provider fills the KV cache, the HRX llama-server decodes.'),
     'kernel': ('Linux kernel for the Strix Halo box',
      'The kernel the Strix Halo box runs: Linux v7.3-rc4 with the IOMMU PerfOpt backports, built from our config, MOK-signed for Secure Boot, and the next-tag steps.'),
@@ -159,7 +165,7 @@ PAGE_META = {
     'registry': ('Model registry and Hugging Face census',
      "Which Hugging Face model architectures the 1bit engine runs: a registry built from the pinned backends' own code, and a daily census of the models people use."),
     'arch-gaps': ('Architecture gaps in the registry',
-     'Model architectures the registry does not map yet, with the upstream commits that add them and what each needs before the engine serves it.'),
+     'Model architectures the 1bit engine registry does not map yet, with the upstream commits that add them and what each needs before the engine serves it.'),
     'moe-streaming': ('MoE expert streaming from NVMe',
      "Running mixture-of-experts models larger than Strix Halo's 128 GB: only the experts a token routes to are read, through an expert cache and --moe-slots."),
     'tokenizers': ('Hugging Face tokenizers in the engine',
@@ -167,8 +173,45 @@ PAGE_META = {
     'PORTING': ('Porting map: private tree to public engine',
      'How the working 1bit-MONSTER engine is ported into this public repository without its history: the steps, what is done, and what stays private.'),
     'npu-leaderboard': ('NPU engine leaderboard: measured runs',
-     "One row per measured run of the engine's NPU and HRX routes on the Strix Halo box, each with its instrument, repeat count and timestamp."),
+     "One row per measured run of the engine's NPU and HRX routes on the Ryzen AI MAX+ 395 box, each with its instrument, repeat count and timestamp."),
+    'determinism': ('Determinism and log-prob agreement by route',
+     "How repeatable the engine's answers are: the same request run again on HRX, the NPU and the CPU reference, and how closely their log-probabilities agree."),
+    'hetero-prefill': ("HeteroMosaic's split prefill on Strix Halo",
+     "HeteroMosaic's iGPU plus NPU split prefill for the Ryzen AI MAX+ 395, checked on the 1bit engine's own stack: what was measured, what holds, what is next."),
 }
+
+# Landing pages kept in this repository, site/pages/<name>.md: short hubs that sum up, with links,
+# what the engine docs and the posts already say, for the searches people make (SEO-KEYWORDS.md
+# maps each search to its page). A page starts with "title: ..." (search title, the PAGE_META
+# limit), "description: ..." (the meta description), "label: ..." (its name in the sidebar) and
+# "tags: a, b" (the posts it lists as related) lines, then its "# Heading". Every number on them
+# must already be on a doc page or in a post. A "## Frequently asked questions" section made of
+# "### Question" headings, each followed by its answer, also becomes FAQPage JSON-LD (on any page).
+PAGES_DIR = ROOT / "site" / "pages"
+LANDING_ORDER = ["strix-halo", "faq"]  # their order in the sidebar, the docs index and the home page
+
+# Internal links: the post tags that belong to each doc. A doc page lists its newest related posts;
+# a post lists its related docs and the posts that share the most tags with it.
+DOC_TAGS = {
+    "hrx": {"hrx", "kernels", "amd-gpu", "radeon-8060s"},
+    "npu": {"npu", "xdna2", "amd-npu-linux", "ryzen-ai"},
+    "hybrid": {"hybrid", "zero-copy"},
+    "models": {"models", "qwen", "qwen3.8", "zyphra", "bitnet", "bonsai", "ternary", "unsloth", "rocmfpx", "quantization"},
+    "serve": {"serving", "batching", "serve", "speculative-decoding", "mtp"},
+    "lemonade": {"lemonade", "announcement"},
+    "releases": {"release", "1bit-os", "live-usb", "weekly"},
+    "laya": {"laya", "routing"},
+    "moe-streaming": {"moe"},
+    "bench": {"measurement"},
+    "onnx": {"onnx"},
+    "hw-gate": {"milestone"},
+}
+RELATED_POSTS, RELATED_DOCS = 5, 4
+
+
+def norm_tag(tag):
+    return re.sub(r"\s+", "-", tag.strip().lower())
+
 
 # top bar: (label, page name or absolute URL)
 TOP = [("Engine", "overview"), ("Docs", "docs"), ("Blog", "blog"), ("Benchmarks", "models")]
@@ -223,7 +266,7 @@ def rewrite_links(text, src, docs, labels):
         # GitHub keeps "--" where a heading had "(`--x`)"; python-markdown's toc collapses it to "-"
         if target.startswith("#"):
             return f"[{label}]({re.sub(r'-{2,}', '-', target)})"
-        if re.match(r"^[a-z]+:|^/", target):
+        if re.match(r"^[a-z]+:|^/|^[A-Za-z0-9_-]+\.(html|xml)(#|$)", target):
             return m.group(0)
         path, _, frag = target.partition("#")
         raw_frag = "#" + frag if frag else ""
@@ -316,7 +359,9 @@ AUTHOR = {"@type": "Person", "name": "bong-water-water-bong", "url": "https://gi
 ORG_ID, WEBSITE_ID, SOFTWARE_ID = SITE + "#organization", SITE + "#website", SITE + "#software"
 ORG = {"@type": "Organization", "@id": ORG_ID, "name": "1bit engine", "url": SITE,
        "logo": {"@type": "ImageObject", "url": SITE + "assets/apple-touch-icon.png", "width": 180, "height": 180},
-       "sameAs": [REPO, "https://github.com/1bit-MONSTER", DISCORD]}
+       "description": "The 1bit engine project: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo), Apache-2.0.",
+       "sameAs": [REPO, "https://github.com/1bit-MONSTER", SITE_REPO, HF, DISCORD]}
+SOURCE_ID = SITE + "#source"
 
 
 def jsonld_graph(*nodes):
@@ -338,7 +383,68 @@ def software_node():
             "license": "https://www.apache.org/licenses/LICENSE-2.0",
             "isAccessibleForFree": True,
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"},
+            "processorRequirements": "AMD Ryzen AI MAX+ 395 (Strix Halo): Radeon 8060S iGPU (gfx1151), XDNA 2 NPU",
+            "softwareHelp": {"@type": "CreativeWork", "url": page_url("docs")},
+            "featureList": ["OpenAI-compatible API through Lemonade Server", "Radeon 8060S iGPU through HRX and our own HIP kernels",
+                            "XDNA 2 NPU on Linux through our own NPU runtime", "Any GGUF quantization, including ternary BitNet b1.58",
+                            "Speculative decoding: MTP and DFlash2", "1bit OS: boots from a USB stick"],
             "author": {"@id": ORG_ID}, "publisher": {"@id": ORG_ID}, "sameAs": [REPO], "keywords": HOME_KEYWORDS}
+
+
+def source_code_node():
+    return {"@type": "SoftwareSourceCode", "@id": SOURCE_ID, "name": "1bit engine source code", "codeRepository": REPO,
+            "programmingLanguage": ["C++", "Python", "Rust"], "runtimePlatform": "Linux",
+            "license": "https://www.apache.org/licenses/LICENSE-2.0", "targetProduct": {"@id": SOFTWARE_ID},
+            "author": {"@id": ORG_ID}}
+
+
+def breadcrumb(name, *trail):
+    """BreadcrumbList from (label, page name) pairs after the home page; the last one is this page."""
+    items = [("1bit engine", "index"), *trail]
+    return {"@type": "BreadcrumbList", "@id": page_url(name) + "#breadcrumb",
+            "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": label, "item": page_url(page)}
+                                for i, (label, page) in enumerate(items)]}
+
+
+def faq_items(text):
+    """[(question, answer)] from a "## Frequently asked questions" (or "## FAQ") section of
+    "### Question" headings, each followed by its answer."""
+    m = re.search(r"^## (?:Frequently asked questions|FAQ)[ \t]*\n(.*?)(?=^## |\Z)", strip_notice(text), re.M | re.S)
+    out = []
+    for block in re.split(r"^### ", m.group(1), flags=re.M)[1:] if m else []:
+        question, _, answer = block.partition("\n")
+        # a closing "([Page](page.html), ...)" aside is for the reader of the page, not the snippet
+        answer = plain(re.sub(r"\s*\((?:\[[^\]]*\]\([^)]*\)(?:,\s*)?)+\)", "", answer.strip()))
+        if question.strip() and answer:
+            out.append((plain(question.strip()), answer))
+    return out
+
+
+def faq_node(name, items):
+    return {"@type": "FAQPage", "@id": page_url(name) + "#faq", "isPartOf": {"@id": WEBSITE_ID},
+            "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in items]}
+
+
+def split_page(text):
+    """A landing page -> ({title, description, label, tags}, the markdown from its "# Heading" on)."""
+    text, meta = strip_notice(text), {"tags": []}
+    while True:
+        m = re.match(r"\s*(title|description|label|tags):\s*(.+)\n", text)
+        if not m:
+            break
+        meta[m.group(1)] = [norm_tag(t) for t in m.group(2).split(",") if t.strip()] if m.group(1) == "tags" else m.group(2).strip()
+        text = text[m.end():]
+    for key in ("title", "description", "label"):
+        if not meta.get(key):
+            sys.exit(f"a landing page starts with title:, description: and label: lines (missing {key})")
+    return meta, text.lstrip()
+
+
+def landing_pages():
+    """{name: (meta, markdown, path)} for site/pages/*.md, LANDING_ORDER first, then by name."""
+    paths = sorted(PAGES_DIR.glob("*.md"), key=lambda p: (LANDING_ORDER.index(p.stem) if p.stem in LANDING_ORDER else len(LANDING_ORDER), p.stem)) \
+        if PAGES_DIR.is_dir() else []
+    return {p.stem: (*split_page(p.read_text()), p) for p in paths}
 
 
 def article_node(kind, name, title, description, published, modified, image=None, keywords=None):
@@ -426,7 +532,8 @@ def seo_head(name, title, description, og_type, jsonld, noindex, image=None, ima
     url = page_url(name)
     image = image or OG_IMAGE
     image_alt = image_alt or "1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server"
-    tags = [f'<link rel="canonical" href="{url}">',
+    tags = ['<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">',
+            f'<link rel="canonical" href="{url}">',
             f'<meta property="og:url" content="{url}">',
             f'<meta property="og:type" content="{og_type}">',
             '<meta property="og:locale" content="en_US">',
@@ -563,7 +670,14 @@ class Site:
         self.order = [n for _, items in self.groups for n, _ in items]
         self.labels = {n: l for _, items in self.groups for n, l in items}
         self.posts = posts()
+        self.landing = landing_pages()
+        # slug -> (date, title, normalised tags), for the related-post and related-doc links
+        self.post_info = {}
+        for date, slug, src in self.posts:
+            tags, title = split_post(src.read_text())[:2]
+            self.post_info[slug] = (date, title, {norm_tag(t) for t in tags})
         self.pages = []  # (url, lastmod) for sitemap.xml
+        self.index = []  # (url, title, description) for llms.txt
         # rewrite_links resolves README.md to the overview page and docs to their pages
         self.link_docs = dict(self.docs)
 
@@ -581,9 +695,10 @@ class Site:
 
     def write(self, name, title, main, kind, section, description=TAGLINE, extra_head="",
               og_type="website", jsonld=None, lastmod=None, noindex=False, image=None, image_alt=None, dates=None):
+        title, description = meta_title(title), meta_description(description)
         if not noindex:
             self.pages.append((page_url(name), lastmod or datetime.date.today().isoformat()))
-        title, description = meta_title(title), meta_description(description)
+            self.index.append((page_url(name), title.removesuffix(SUFFIX), description))
         if len(title) > TITLE_MAX or len(description) > DESCRIPTION_MAX:
             sys.exit(f"{name}.html: title {len(title)} > {TITLE_MAX} or description {len(description)} > {DESCRIPTION_MAX} characters")
         page = (self.template
@@ -607,10 +722,32 @@ class Site:
     def md(self, text, src):
         return render(rewrite_links(text, src, self.link_docs, self.labels))
 
+    # ── internal links ────────────────────────────────────────────────
+    def related_posts(self, tags, skip=None, n=RELATED_POSTS):
+        """The posts that share the most of these tags (newest first among equals), as html list items."""
+        scored = sorted(((len(tags & t), d, slug, title) for slug, (d, title, t) in self.post_info.items()
+                         if slug != skip and tags & t), reverse=True)[:n]
+        return "".join(f'<li><a href="blog-{slug}.html">{html.escape(title)}</a> <span class="meta">{d}</span></li>'
+                       for _, d, slug, title in scored)
+
+    def related_docs(self, tags):
+        """The doc and landing pages whose tags meet these, most shared tags first, as html list items."""
+        pages = [(len(tags & t), n, self.labels.get(n) or n) for n, t in DOC_TAGS.items() if n in self.docs and tags & t]
+        pages += [(len(tags & set(m["tags"])), n, m["label"]) for n, (m, _, _) in self.landing.items() if tags & set(m["tags"])]
+        return "".join(f'<li><a href="{n}.html">{html.escape(label)}</a></li>'
+                       for _, n, label in sorted(pages, key=lambda x: (-x[0], x[1]))[:RELATED_DOCS])
+
+    def post_related(self, slug):
+        tags = self.post_info[slug][2]
+        docs, more = self.related_docs(tags), self.related_posts(tags, skip=slug, n=3)
+        out = f'<h2 id="related-docs">Related docs</h2>\n<ul class="related">{docs}</ul>\n' if docs else ""
+        return out + (f'<h2 id="related-posts">More posts like this</h2>\n<ul class="related">{more}</ul>\n' if more else "")
+
     # ── docs ──────────────────────────────────────────────────────────
     def sidebar(self, current):
         out = ['<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">']
-        for title, items in [("Overview", [("docs", "All docs"), ("overview", "Meet the engine")])] + self.groups:
+        guides = [(n, m["label"]) for n, (m, _, _) in self.landing.items()]
+        for title, items in [("Overview", [("docs", "All docs"), ("overview", "Meet the engine"), *guides])] + self.groups:
             out.append(f'<p class="group">{html.escape(title)}</p><ul>')
             for name, label in items:
                 cur = ' aria-current="page"' if name == current else ""
@@ -629,29 +766,53 @@ class Site:
                if i + 1 < len(self.order) else "<span></span>")
         return f'<nav class="pager">{prev}{nxt}</nav>'
 
-    def doc_page(self, name, src, section="docs"):
-        text = strip_notice(src.read_text())
+    def doc_page(self, name, src, section="docs", landing=None):
+        """landing: (meta, markdown) of a site/pages page instead of an engine doc."""
+        text = landing[1] if landing else strip_notice(src.read_text())
         if name == "overview":
             # the README's link to this site is redundant on the site itself
             text = re.sub(r"^\*\*Documentation:\*\*.*\n+", "", text, count=1, flags=re.M)
             text = re.sub(r"^\*\*Site:\*\*.*\n+", "", text, count=1, flags=re.M)
+        tags = set(landing[0]["tags"]) if landing else DOC_TAGS.get(name, set())
+        related = self.related_posts(tags)
+        related = f'<h2 id="related-posts">Related posts</h2>\n<ul class="related">{related}</ul>\n' if related else ""
         main = (f'<div class="container docs">\n{self.sidebar(name)}\n<article class="docs-page prose">\n'
-                f'{self.md(text, src)}\n{self.pager(name)}\n'
+                f'{self.md(text, src)}\n{related}{self.pager(name)}\n'
                 f'<p class="source meta"><a href="{source_url(src)}">View this page\'s source on GitHub ↗</a></p>\n'
                 "</article>\n</div>")
         heading = title_of(text)
-        page_title, description = PAGE_META.get(name) or (heading, first_paragraph(text) or TAGLINE)
-        if name in PAGE_META and (len(page_title) + len(SUFFIX) > TITLE_MAX or len(description) > DESCRIPTION_MAX):
+        if landing:
+            page_title, description = landing[0]["title"], landing[0]["description"]
+        else:
+            page_title, description = PAGE_META.get(name) or (heading, first_paragraph(text) or TAGLINE)
+        if (name in PAGE_META or landing) and (len(page_title) + len(SUFFIX) > TITLE_MAX or len(description) > DESCRIPTION_MAX):
             sys.exit(f"PAGE_META[{name!r}]: title over {TITLE_MAX - len(SUFFIX)} or description over {DESCRIPTION_MAX} characters")
         published, modified = first_commit_date(src), last_commit_date(src)
         article = article_node("TechArticle", name, heading, meta_description(description), published, modified)
+        nodes = [article]
         if name == "overview":
+            crumb = breadcrumb(name, ("Engine", "overview"))
+            nodes += [software_node(), source_code_node()]
+        elif landing:
+            crumb = breadcrumb(name, (landing[0]["label"], name))
+            nodes.append(software_node())
+        else:
+            crumb = breadcrumb(name, ("Docs", "docs"), (self.labels.get(name) or heading, name))
+        if name == "overview" or landing:
             article["about"] = {"@id": SOFTWARE_ID}
+        faq = faq_items(text)
+        if faq:
+            nodes.append(faq_node(name, faq))
         self.write(name, page_title + SUFFIX, main, "doc", section, description, og_type="article",
-                   lastmod=modified, dates=(published, modified), jsonld=jsonld_graph(article))
+                   lastmod=modified, dates=(published, modified), jsonld=jsonld_graph(*nodes, crumb))
 
     def docs_index(self):
         rows = []
+        guides = [(n, m["label"], m["description"]) for n, (m, _, _) in self.landing.items()]
+        if guides:
+            rows.append('<h2>Guides</h2>\n<div class="table"><table><thead><tr><th>Page</th><th>What it covers</th></tr></thead><tbody>')
+            rows += [f'<tr><td><a href="{n}.html">{html.escape(l)}</a></td><td>{html.escape(d)}</td></tr>' for n, l, d in guides]
+            rows.append("</tbody></table></div>")
         for title, items in self.groups:
             rows.append(f"<h2>{html.escape(title)}</h2>\n<div class=\"table\"><table><thead><tr><th>Page</th><th>What it covers</th></tr></thead><tbody>")
             for name, label in items:
@@ -669,13 +830,15 @@ class Site:
             {"@type": "CollectionPage", "@id": page_url("docs") + "#page", "name": "1bit engine documentation",
              "url": page_url("docs"), "description": description, "inLanguage": "en",
              "isPartOf": {"@id": WEBSITE_ID}, "about": {"@id": SOFTWARE_ID},
-             "hasPart": [{"@type": "TechArticle", "name": l, "url": page_url(n)} for _, items in self.groups for n, l in items]}))
+             "hasPart": [{"@type": "TechArticle", "name": l, "url": page_url(n)} for _, items in self.groups for n, l in items]},
+            software_node(), breadcrumb("docs", ("Docs", "docs"))))
 
     # ── blog ──────────────────────────────────────────────────────────
     def blog(self):
         if not self.posts:
             return []
         rows = []
+        self.modified = {}
         for i, (date, slug, src) in enumerate(self.posts):
             tags, title, lead, body, summary, seo_title, _ = split_post(src.read_text())
             summary = summary or plain(lead)
@@ -696,14 +859,16 @@ class Site:
                     f'<div class="art-meta"><time datetime="{date}">{date}</time>{tag_html}</div>\n'
                     f"<h1>{html.escape(title)}</h1>\n"
                     f'<p class="lead">{self.md(lead, src)[3:-4]}</p>\n'
-                    f'<div class="prose">\n{self.md(body, src)}\n</div>\n'
+                    f'<div class="prose">\n{self.md(body, src)}\n{self.post_related(slug)}</div>\n'
                     f'<nav class="pager">{link(newer, "prev", "Newer")}{link(older, "next", "Older")}</nav>\n'
                     "</div></article>")
             modified = max(date, last_commit_date(src))
             self.write(name, (seo_title or title) + SUFFIX, main, "post", "blog", summary, og_type="article",
                        lastmod=modified, image=image, image_alt=title, dates=(date, modified, tags),
                        jsonld=jsonld_graph(article_node("BlogPosting", name, title, meta_description(summary), date, modified,
-                                                        image, ", ".join(tags))))
+                                                        image, ", ".join(tags)),
+                                           breadcrumb(name, ("Blog", "blog"), (title, name))))
+            self.modified[name] = modified
             rows.append((date, name, title, plain(lead), tags, self.md(lead + "\n\n" + body, src), summary))
 
         log = "\n".join(
@@ -724,19 +889,19 @@ class Site:
             {"@type": "Blog", "@id": page_url("blog") + "#blog", "name": "1bit engine blog", "url": page_url("blog"),
              "description": description, "inLanguage": "en", "publisher": {"@id": ORG_ID}, "isPartOf": {"@id": WEBSITE_ID},
              "blogPost": [{"@type": "BlogPosting", "headline": t, "url": page_url(n), "datePublished": d}
-                          for d, n, t, _, _, _, _ in rows]}))
+                          for d, n, t, _, _, _, _ in rows]}, breadcrumb("blog", ("Blog", "blog"))))
 
         def stamp(d):
             return d + "T00:00:00Z"
         entries = "".join(
             f"<entry><title>{html.escape(t)}</title><link href=\"{SITE}{n}.html\"/><id>{SITE}{n}.html</id>"
-            f"<published>{stamp(d)}</published><updated>{stamp(d)}</updated><summary>{html.escape(sm)}</summary>"
+            f"<published>{stamp(d)}</published><updated>{stamp(self.modified.get(n, d))}</updated><summary>{html.escape(sm)}</summary>"
             + "".join(f'<category term="{html.escape(x, quote=True)}"/>' for x in tags) +
             f"<content type=\"html\">{html.escape(b)}</content></entry>" for d, n, t, s, tags, b, sm in rows)
         (self.out / "feed.xml").write_text(
             '<?xml version="1.0" encoding="utf-8"?>\n<feed xmlns="http://www.w3.org/2005/Atom">'
             f'<title>1bit engine blog</title><link href="{SITE}"/><link rel="self" href="{SITE}feed.xml"/><id>{SITE}</id>'
-            f"<updated>{stamp(rows[0][0])}</updated><author><name>bong-water-water-bong</name></author>{entries}</feed>\n")
+            f"<updated>{stamp(max(self.modified.values(), default=rows[0][0]))}</updated><author><name>bong-water-water-bong</name></author>{entries}</feed>\n")
         return rows
 
     def archive(self):
@@ -770,6 +935,7 @@ class Site:
                  card("docs.html", "Docs", "Every device, every component, and how to run them.", "docs"),
                  card("blog.html", "Blog", "The build log: what moved over, what got faster, what broke.", "blog"),
                  card("models.html", "Benchmarks", "Measured, not projected. Every number with how it was taken.", "wiki")]
+        cards[1:1] = [card(f"{n}.html", m["label"], clip(m["description"], 120), n) for n, (m, _, _) in self.landing.items()]
         cards += [card(f"{n}.html", l, clip(first_paragraph(self.docs[n].read_text()), 120), n)
                   for _, items in self.groups for n, l in items]
         mark = ('<svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/>'
@@ -783,10 +949,11 @@ class Site:
                 f"{latest}\n</div></section>\n"
                 '<section class="section"><div class="container">\n'
                 '<span class="site-badge"><span class="dot"></span>site index</span>\n'
+                '<h2 class="index-title">Run local LLMs on Strix Halo: guides, docs and measured results</h2>\n'
                 f'<div class="site-grid">{"".join(cards)}</div>\n</div></section>')
         self.write("index", HOME_TITLE + SUFFIX, main, "home", "", description=HOME_DESCRIPTION,
                    lastmod=max(last_commit_date(ROOT / "tools" / "site.py"), self.posts_modified()),
-                   jsonld=jsonld_graph(software_node()))
+                   jsonld=jsonld_graph(software_node(), source_code_node()))
 
     # ── 404 ───────────────────────────────────────────────────────────
     def not_found(self):
@@ -812,6 +979,10 @@ class Site:
         for name, src in self.docs.items():
             self.doc_page(name, src)
         self.doc_page("overview", readme, section="overview")
+        for name, (meta, text, src) in self.landing.items():
+            if name in self.docs or name in PAGE_META:
+                sys.exit(f"site/pages/{name}.md has the name of a doc page")
+            self.doc_page(name, src, landing=(meta, text))
         self.docs_index()
         rows = self.blog()
         self.home(rows)
@@ -827,6 +998,12 @@ class Site:
             if not re.fullmatch(r"[0-9a-f]{8,128}", key):
                 sys.exit(f"INDEXNOW_KEY must be 8-128 hex digits, not {key!r}")
             (self.out / f"{key}.txt").write_text(key)
+        # llms.txt (llmstxt.org): every page with its description, for AI assistants and their crawlers
+        first = [page_url(n) for n in ("index", "overview", *self.landing, "docs", "models")]
+        lines = [f"- [{t}]({u}): {d}" for u, t, d in
+                 sorted(self.index, key=lambda x: (first.index(x[0]) if x[0] in first else len(first), x[0]))]
+        (self.out / "llms.txt").write_text(f"# 1bit engine\n\n> {TAGLINE}\n\nSource: {REPO} (Apache-2.0). "
+                                           f"Models: {HF}.\n\n## Pages\n\n" + "\n".join(lines) + "\n")
         (self.out / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}sitemap.xml\n")
         urls = "".join(f"<url><loc>{u}</loc><lastmod>{d}</lastmod></url>" for u, d in sorted(self.pages))
         (self.out / "sitemap.xml").write_text('<?xml version="1.0" encoding="utf-8"?>\n'
