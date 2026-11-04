@@ -27,7 +27,7 @@ Ryzen AI MAX+ 395 (Strix Halo) machine:
 > image they talk about is the BusyBox one (`os/mini`), which is a CI and VM target and **not** 1bit OS.
 > 1bit OS itself is Puppy Linux - `ResolutePup64`, built with woof-CE on the Ubuntu 26.04 base, with
 > Lemonade and the engine embedded and our MOK-signed kernel underneath: headless by default with a
-> `1bit OS (desktop)` boot entry, `bash`/`sudo`/`apt` working, and models and settings persisting on the
+> `1bit OS (desktop, JWM)` boot entry, `bash`/`sudo`/`apt` working, and models and settings persisting on the
 > `1BIT-DATA` partition ([1bit OS](../docs/os-v3.md)). It is not published yet; the next release carries it.
 > When it is published the image comes from **Hugging Face**, not from the GitHub release:
 > [`1bit-os-puppy.img.xz`](https://huggingface.co/1bit-MONSTER/1bit-OS), 2.2 GB compressed / 9.1 GB

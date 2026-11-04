@@ -35,8 +35,9 @@ same binary is the whole operating system when you want it to be.
   release asset, which is capped at 2 GiB - check the checksum, and write it to a stick
   of 16 GB or more (`xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`,
   or balenaEtcher/Rufus in DD mode, which take the `.xz` directly). Boot a Ryzen AI MAX+ 395 from it with Secure Boot on, and Lemonade comes up: the
-  GPU through HRX and our HIP kernels, the NPU through our own runtime. It boots **headless** - a
-  console login, no X - and the boot menu's `1bit OS (desktop)` entry brings up Puppy's desktop for
+  GPU through HRX and our HIP kernels, the NPU through our own runtime. It boots **headless** - its
+  own console, no X, which prints the box's address and how to connect to it and whose menu item 1 shows
+  the API key - and the boot menu's `1bit OS (desktop, JWM)` entry brings up Puppy's desktop for
   anyone who wants one. `bash`, `sudo` and `apt` work; models, Lemonade's config and your SSH keys
   live on the `1BIT-DATA` partition and survive a reflash. `1bit-install <disk> --yes` puts the same
   system on a disk, firmware boot entry included.
@@ -50,7 +51,7 @@ Both talk the OpenAI API on a port, and the Lemonade web app is in the box.
 | component | version |
 |---|---|
 | base | Puppy Linux `ResolutePup64` (woof-CE, Ubuntu 26.04 `resolute`), the same image live and installed |
-| boot | headless by default (console login, no X); `1bit OS (desktop)` in the menu starts JWM |
+| boot | headless by default (its own console menu, no X); `1bit OS (desktop, JWM)` in the menu starts JWM |
 | userland | `bash`, `sudo`, `apt`, `sshd`, `mokutil` |
 | persistence | `1BIT-DATA`, which is Puppy's save layer: models, Lemonade's config and cache, SSH keys |
 | engine | the release commit on [Releases](../docs/releases.md) |
