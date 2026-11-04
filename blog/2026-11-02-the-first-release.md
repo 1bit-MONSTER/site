@@ -78,7 +78,7 @@ last candidate has booted the appliance on a real Max+ 395:
 - the appliance's own gates, in QEMU: it boots on our kernel and layers its SFS (G2); `amdxdna` and
   `ec_su_axb35` are present, signed and verify against the enrolled MOK (G3); the save layer
   persists across a reboot on `1BIT-DATA` (G7); the init cannot exit, with the boot media pinned and
-  with the pin deliberately broken; `vm-check` 19 PASS / 0 FAIL with Secure Boot on
+  with the pin deliberately broken; `vm-check` with no failing row, Secure Boot on
 - **the appliance booted on the board with Secure Boot on**: shim, our grub, our signed kernel, then
   the appliance; `puppy-check` green on the box - cycle 19 came back 33 rows, 0 failed, 1 skipped
   (the skip is the desktop row on a headless entry), and cycle 20's two reds were the acceptance
