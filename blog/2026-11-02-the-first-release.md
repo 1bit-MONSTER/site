@@ -80,8 +80,11 @@ last candidate has booted the appliance on a real Max+ 395:
   persists across a reboot on `1BIT-DATA` (G7); the init cannot exit, with the boot media pinned and
   with the pin deliberately broken; `vm-check` 19 PASS / 0 FAIL with Secure Boot on
 - **the appliance booted on the board with Secure Boot on**: shim, our grub, our signed kernel, then
-  the appliance; `puppy-check` 20 of 25 rows PASS, Lemonade answering on `:13305` with its key,
-  chat 70.49 tok/s, TTFT 1.30 s, 0 `amdxdna` errors
+  the appliance; `puppy-check` green on the box - cycle 19 came back 33 rows, 0 failed, 1 skipped
+  (the skip is the desktop row on a headless entry), and cycle 20's two reds were the acceptance
+  script's own defect, engine#945, not the image - Lemonade answering on `:13305` (blank mode: it
+  ships with no key) and serving three chats on the NPU at 88.06 / 80.91 / 87.43 tok/s, TTFT
+  0.37 / 0.26 / 0.18 s
 - the release stick: written and read back byte for byte
 - `1bit-release-check` in the appliance, which is the row a release has to pass with no failure
 - an **installed system** - install to a disk, boot from it with no stick attached - run in **QEMU**;
