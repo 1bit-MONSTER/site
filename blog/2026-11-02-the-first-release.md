@@ -36,8 +36,9 @@ same binary is the whole operating system when you want it to be.
   of 16 GB or more (`xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`,
   or balenaEtcher/Rufus in DD mode, which take the `.xz` directly). Boot a Ryzen AI MAX+ 395 from it with Secure Boot on, and Lemonade comes up: the
   GPU through HRX and our HIP kernels, the NPU through our own runtime. It boots **headless** - its
-  own console, no X, which prints the box's address and how to connect to it and whose menu item 1 shows
-  the API key - and the boot menu's `1bit OS (desktop, JWM)` entry brings up Puppy's desktop for
+  own console, no X, which prints the box's address and how to connect to it, and whose menu item 1
+  turns the Lemonade API key on (the appliance ships with none, like stock Lemonade) and prints it - and
+  the boot menu's `1bit OS (desktop, JWM)` entry brings up Puppy's desktop for
   anyone who wants one. `bash`, `sudo` and `apt` work; models, Lemonade's config and your SSH keys
   live on the `1BIT-DATA` partition and survive a reflash. `1bit-install <disk> --yes` puts the same
   system on a disk, firmware boot entry included.
