@@ -112,7 +112,7 @@ Angle: the NPU and the GPU used for LLMs on plain Linux, with Secure Boot on.
 
 > The 1bit engine serves local LLMs on the Ryzen AI MAX+ 395 under Linux: the Radeon 8060S iGPU
 > through HRX, and the XDNA 2 NPU through our own runtime on the `amdxdna` driver. The
-> machine runs Linux v7.3-rc4 with the IOMMU PerfOpt backports, MOK-signed so Secure Boot stays on,
+> machine runs Linux v7.4-rc1 with the IOMMU PerfOpt backports, MOK-signed so Secure Boot stays on,
 > and the kernel config is documented. The source is Apache-2.0, and every upstream the engine
 > builds on is credited in its NOTICE: https://1bit.gg/kernel.html
 
@@ -125,7 +125,7 @@ USB-stick version is **HOLD** until the release is published.
 
 > Lemonade Server gives you a model catalog, downloads, a web UI and an OpenAI-compatible API; the
 > 1bit engine plugs into it as the `onebit` backend and runs the models on the machine's GPU and NPU.
-> The recipe passes Lemonade's own LLM test suite on HRX, 29 of 29 tests, and on Ubuntu 26.04 it
+> The recipe passes Lemonade's own LLM test suite on HRX, 31 of 31 tests, and on Ubuntu 26.04 it
 > works with the stock `lemond` from Lemonade's PPA. How to set it up:
 > https://1bit.gg/lemonade.html
 
