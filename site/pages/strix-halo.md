@@ -68,7 +68,7 @@ already at 88 tok/s, every draft model we tried was slower
 ## Lemonade Server and the OpenAI API
 
 The engine runs inside [Lemonade](lemonade.html) as its `onebit` backend, and that recipe passes
-Lemonade's own LLM test suite on HRX: 29 of 29 tests run, all pass. Lemonade is what you talk to,
+Lemonade's own LLM test suite on HRX: 31 of 31 tests run, all pass. Lemonade is what you talk to,
 with its catalog, downloads, router and web UI; [1bit serve](serve.html) exposes nothing but an
 OpenAI-compatible API, so any OpenAI client works with it. On Ubuntu 26.04 the engine plugs into the
 stock `lemond` from Lemonade's PPA.
