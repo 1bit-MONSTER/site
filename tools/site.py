@@ -148,8 +148,6 @@ PAGE_META = {
      'The kernel the Strix Halo box runs: Linux v7.4-rc1 with the IOMMU PerfOpt backports, built from our config, MOK-signed for Secure Boot, and the next-tag steps.'),
     'onnx': ('ONNX Runtime GenAI models',
      '1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.'),
-    'dwarfstar': ('DwarfStar: large MoE models with SSD experts',
-     'DwarfStar (antirez/ds4) in the 1bit engine: DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next in their own GGUFs, with expert streaming from the SSD.'),
     'laya': ('Laya router: where each request runs',
      'Laya, opt-in with 1bit serve --laya, sorts each conversation into code, prose, short answer or long document (95.5% right) and picks the backend and settings.'),
     'pm': ('Project Manager: ZAYA1-8B delegates',
@@ -212,7 +210,7 @@ TOP = [("Engine", "overview"), ("Docs", "docs"), ("Blog", "blog"), ("Benchmarks"
 NAV = [
     ("Start", [("serve", "1bit serve"), ("models", "Models measured"), ("lemonade", "Lemonade"), ("releases", "Releases"),
                ("bench", "How we measure"), ("recipes", "Recipes"), ("hw-gate", "Hardware gate")]),
-    ("Devices", [("hrx", "HRX"), ("npu", "NPU engine"), ("hybrid", "Hybrid"), ("onnx", "ONNX Runtime"), ("onnx-pack", "ONNX pack"), ("dwarfstar", "DwarfStar")]),
+    ("Devices", [("hrx", "HRX"), ("npu", "NPU engine"), ("hybrid", "Hybrid"), ("onnx", "ONNX Runtime"), ("onnx-pack", "ONNX pack")]),
     ("Components", [("laya", "Laya router"), ("pm", "Project Manager"), ("registry", "Model registry"),
                     ("arch-gaps", "Architecture gaps"), ("moe-streaming", "MoE streaming"), ("tokenizers", "Tokenizers")]),
     ("Project", [("architecture", "How the engine is built"), ("kernel", "Linux kernel"), ("npu-leaderboard", "NPU leaderboard"), ("PORTING", "Porting map")]),
