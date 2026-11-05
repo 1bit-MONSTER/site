@@ -112,7 +112,7 @@ Angle: the NPU and the GPU used for LLMs on plain Linux, with Secure Boot on.
 
 > The 1bit engine serves local LLMs on the Ryzen AI MAX+ 395 under Linux: the Radeon 8060S iGPU
 > through HRX, and the XDNA 2 NPU through our own runtime on the `amdxdna` driver. The
-> machine runs Linux v7.4-rc1 with the IOMMU PerfOpt backports, MOK-signed so Secure Boot stays on,
+> machine runs Linux v7.4-rc1, where the IOMMU PerfOpt is upstream, MOK-signed so Secure Boot stays on,
 > and the kernel config is documented. The source is Apache-2.0, and every upstream the engine
 > builds on is credited in its NOTICE: https://1bit.gg/kernel.html
 

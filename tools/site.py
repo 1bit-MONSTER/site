@@ -145,7 +145,7 @@ PAGE_META = {
     'hybrid': ('Hybrid: NPU prefill, GPU decode on Strix Halo',
      '1bit serve --device hybrid processes the prompt on one device and generates on another: a prefill provider fills the KV cache, the HRX llama-server decodes.'),
     'kernel': ('Linux kernel for the Strix Halo box',
-     'The kernel the Strix Halo box runs: Linux v7.4-rc1 with the IOMMU PerfOpt backports, built from our config, MOK-signed for Secure Boot, and the next-tag steps.'),
+     'The kernel the Strix Halo box runs: Linux v7.4-rc1 (IOMMU PerfOpt is upstream there), built from our config, MOK-signed for Secure Boot, and the next-tag steps.'),
     'onnx': ('ONNX Runtime GenAI models',
      '1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.'),
     'laya': ('Laya router: where each request runs',
