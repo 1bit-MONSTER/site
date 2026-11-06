@@ -14,8 +14,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-title: Strix Halo LLM guide: Ryzen AI MAX+ 395, Linux
-description: Run local LLMs on AMD Strix Halo (Ryzen AI MAX+ 395) on Linux: the Radeon 8060S iGPU (gfx1151) through HRX, the XDNA 2 NPU, Lemonade Server, measured.
+title: Local LLMs on Strix Halo: Ryzen AI MAX+ 395
+description: Run local LLMs on AMD Strix Halo (Ryzen AI MAX+ 395) on Linux: the Radeon 8060S iGPU through HRX, the XDNA 2 NPU, Lemonade Server, and where to start.
 label: Strix Halo guide
 tags: strix-halo, ryzen-ai-max-395, local-llm, getting-started, hrx, npu, xdna2
 
@@ -26,6 +26,36 @@ NPU and 128 GB of memory shared between them in one machine. The 1bit engine is 
 chip: it serves local LLMs on its GPU and its NPU, on Linux, behind the OpenAI-compatible API of
 AMD's [Lemonade Server](lemonade.html). This page gathers what the docs and the posts say about
 running local LLMs on it, with a link to where each fact is measured.
+
+## Start here
+
+Three ways to get a model answering on this machine, all of them the same engine: one binary, model
+agnostic, and the stick is the appliance.
+
+- **Boot the stick.** 1bit OS is Lemonade Server with the engine inside, on a USB stick that boots a
+  Ryzen AI MAX+ 395 with Secure Boot on; `1bit-install` from the live session puts the same system on an
+  internal disk or another drive ([1bit OS](os-v3.html), [Boot a stick](blog-boot-a-stick.html)).
+- **Add it to the Lemonade you already run.** The `lemonade-onebit` package adds the engine as a Lemonade
+  backend and nothing else changes ([Lemonade](lemonade.html)).
+- **Ask a model.** `1bit serve` exposes nothing but an OpenAI-compatible API, so any OpenAI client works
+  ([1bit serve](serve.html)); the models checked on this box, and what each measured, are on
+  [Models measured](models.html).
+
+Whichever you pick, the first question is whether the model fits — that is the next section, and the
+[FAQ](faq.html) answers it in two lines.
+
+## What to expect
+
+The 128 GB of memory is unified: the CPU, the Radeon 8060S and the XDNA 2 NPU share one pool, so a model
+fits by its file size rather than by a copy per device, and the context you give it adds on top. The
+measured rows include a 27B ternary model at 6.7 GiB and a 2B ternary model at 1.11 GiB, both running on
+this iGPU ([Models measured](models.html)); every ggml weight type loads, from 2-bit ternary to 4-bit
+and 8-bit quants. A mixture-of-experts model whose file is larger than memory can keep only the experts
+a token routes to and read the rest from an NVMe drive ([MoE streaming](moe-streaming.html)).
+
+What you should not expect: the NPU route is in progress — correctness first, speed next — so it is a
+second device to try beside the GPU, not a replacement for it ([NPU engine](npu.html), [Hybrid](hybrid.html)).
+Nothing here needs a cloud account, and nothing leaves the machine.
 
 ## The GPU: Radeon 8060S through HRX
 
@@ -73,14 +103,8 @@ with its catalog, downloads, router and web UI; [1bit serve](serve.html) exposes
 OpenAI-compatible API, so any OpenAI client works with it. On Ubuntu 26.04 the engine plugs into the
 stock `lemond` from Lemonade's PPA.
 
-## Ways to run it
+## Where it ships
 
-- **1bit OS from a USB stick**: Lemonade Server with the engine inside, on a stick that boots the
-  machine with Secure Boot on; `1bit-install` puts the same system on a disk
-  ([1bit OS](os-v3.html), [Boot a stick](blog-boot-a-stick.html)).
-- **On an Ubuntu that already runs Lemonade**: the `lemonade-onebit` package adds the engine as a
-  Lemonade backend ([Lemonade](lemonade.html)).
-
-Both ship on the [releases page](https://github.com/1bit-MONSTER/engine/releases) when a release has
-passed its checklist ([Releases](releases.html)). The source is Apache-2.0 on
-[GitHub](https://github.com/1bit-MONSTER/engine); questions are answered in the [FAQ](faq.html).
+The engine ships inside those packages once a release has passed its checklist ([Releases](releases.html)). The
+source is Apache-2.0 on [GitHub](https://github.com/1bit-MONSTER/engine), and questions are answered in the
+[FAQ](faq.html).
