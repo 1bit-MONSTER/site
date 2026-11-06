@@ -39,6 +39,24 @@ The AMD Ryzen AI MAX+ 395 (Strix Halo): its Radeon 8060S iGPU (`gfx1151`) and it
 Linux. Every model is checked on that machine before it ships, and the measured numbers are on
 [Models measured](models.html). The [Strix Halo guide](strix-halo.html) sums up what runs where.
 
+### How much memory does a model need?
+
+Its file size, plus the context you give it: the CPU, the GPU and the NPU share one 128 GB pool, so
+there is no second copy for the second device. The measured rows include a 27B ternary model at
+6.7 GiB and a 2B ternary model at 1.11 GiB ([Models measured](models.html)).
+
+### Which models fit in 128 GB?
+
+Anything whose file fits there, which covers every row of the measured table, up to 27B-class models
+at 4-bit. A mixture-of-experts model larger than that keeps only the experts a prompt routes to and
+streams the rest from an NVMe drive ([MoE streaming](moe-streaming.html)).
+
+### Does it run on Windows?
+
+No: the engine, its HRX llama.cpp build and its NPU route are built and measured on Linux, and there
+is no Windows package ([Releases](releases.html)). Lemonade Server has its own Windows backends, so
+on Windows you get Lemonade without the 1bit engine ([Lemonade](lemonade.html)).
+
 ### Does it work with the OpenAI API?
 
 Yes. `1bit serve` exposes nothing but an OpenAI-compatible API, so any OpenAI client works with it,
