@@ -154,6 +154,8 @@ PAGE_META = {
      "1bit serve --pm makes the served model the engine's Project Manager: ZAYA1-8B routes every request and delegates to expert models over the same OpenAI API."),
     'registry': ('Model registry and Hugging Face census',
      "Which Hugging Face model architectures the 1bit engine runs: a registry built from the pinned backends' own code, and a daily census of the models people use."),
+    'model-pins': ('Model pins: the upstream revisions we hold',
+     'Which revision of each upstream model the engine serves, ships or was built from: one entry per Hugging Face repo, the bytes we hold, checked daily.'),
     'arch-gaps': ('Architecture gaps in the registry',
      'Model architectures the 1bit engine registry does not map yet, with the upstream commits that add them and what each needs before the engine serves it.'),
     'moe-streaming': ('MoE expert streaming from NVMe',
@@ -247,15 +249,14 @@ def rewrite_links(text, src, docs, labels):
     """Doc links -> page links; other repository paths -> GitHub; anything absolute unchanged."""
     here = src.parent
 
-    def fix(m):
-        label, target = m.group(1), m.group(2)
+    def fix_link(label, target):
         # a label that is just the file name reads better as the page's name
         path_label = re.fullmatch(r"(?:docs/)?([A-Za-z0-9_-]+)\.md", label.strip("`"))
         # GitHub keeps "--" where a heading had "(`--x`)"; python-markdown's toc collapses it to "-"
         if target.startswith("#"):
             return f"[{label}]({re.sub(r'-{2,}', '-', target)})"
         if re.match(r"^[a-z]+:|^/|^[A-Za-z0-9_-]+\.(html|xml)(#|$)", target):
-            return m.group(0)
+            return f"[{label}]({target})"
         path, _, frag = target.partition("#")
         raw_frag = "#" + frag if frag else ""
         frag = "#" + re.sub(r"-{2,}", "-", frag) if frag else ""
@@ -263,7 +264,7 @@ def rewrite_links(text, src, docs, labels):
         try:
             rel = resolved.relative_to(ENGINE if resolved.is_relative_to(ENGINE) else ROOT).as_posix()
         except ValueError:
-            return m.group(0)
+            return f"[{label}]({target})"
         if rel == "README.md":
             return f"[{'Meet the engine' if path_label else label}](overview.html{frag})"
         post = re.fullmatch(r"blog/\d{4}-\d{2}-\d{2}-([a-z0-9-]+)\.md", rel)
@@ -278,6 +279,13 @@ def rewrite_links(text, src, docs, labels):
         kind = "tree" if resolved.is_dir() else "blob"
         return f"[{label}]({REPO}/{kind}/main/{rel}{raw_frag})"
 
+    def fix(m):
+        return fix_link(m.group(1), m.group(2))
+
+    # a badge link ([![alt](image)](target)) has brackets in its label, so the pattern below never
+    # sees it and the target stayed a repository path: rewrite those first, then the ordinary links.
+    text = re.sub(r"\[(!\[[^\]]*\]\([^)\s]+\))\]\(([^)\s]+)\)",
+                  lambda m: fix_link(m.group(1), m.group(2)), text)
     return re.sub(r"\[([^\]]*)\]\(([^)\s]+)\)", fix, text)
 
 
