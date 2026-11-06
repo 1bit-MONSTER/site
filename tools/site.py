@@ -43,7 +43,8 @@
 # Doc pages take their <title> and meta description from PAGE_META below (the docs live in the
 # engine repository, so the page's search text is kept here); a doc PAGE_META does not name gets
 # its heading and its first paragraph. The build stops on a title over TITLE_MAX or a description
-# over DESCRIPTION_MAX in PAGE_META, and on a page with other than one <h1>.
+# over DESCRIPTION_MAX in PAGE_META, on a page with other than one <h1>, and on a page that renders
+# fewer headings than its markdown has (a bare closing tag deletes the rest of the page — see md()).
 #
 # Visitor counts: with GOATCOUNTER set to a GoatCounter site code (pages.yml passes the
 # repository variable of that name), every page loads GoatCounter's counter, which sets
@@ -311,6 +312,18 @@ def render(text):
     # wide tables scroll on their own instead of the page
     body = body.replace("<table>", '<div class="table"><table>').replace("</table>", "</table></div>")
     return body
+
+
+def atx_headings(text):
+    """How many headings the parser should produce: ATX only, outside fenced code, indented 0-3 spaces
+    (4 or more is an indented code block). Setext headings would only make this a lower bound."""
+    n, fenced = 0, False
+    for line in text.split("\n"):
+        if line.lstrip().startswith(("```", "~~~")):
+            fenced = not fenced
+        elif not fenced and re.match(r"^ {0,3}#{1,6}\s", line):
+            n += 1
+    return n
 
 
 def analytics():
@@ -708,7 +721,15 @@ class Site:
         (self.out / f"{name}.html").write_text(page)
 
     def md(self, text, src):
-        return render(rewrite_links(text, src, self.link_docs, self.labels))
+        body = render(rewrite_links(text, src, self.link_docs, self.labels))
+        # A page that renders fewer headings than its source has was cut short: a bare closing tag
+        # ("</dev/null" in a table cell is the one that bit us) opens a raw-HTML block that swallows
+        # everything after it, and the build used to publish the truncated page as if it were whole.
+        rendered, expected = len(re.findall(r"<h[1-6][\s>]", body)), atx_headings(text)
+        if rendered < expected:
+            sys.exit(f"{src.name}: {rendered} of {expected} headings rendered — a bare closing html tag "
+                     f"(e.g. `</dev/null` in a table cell) deletes the rest of the page; write `< /dev/null`")
+        return body
 
     # ── internal links ────────────────────────────────────────────────
     def related_posts(self, tags, skip=None, n=RELATED_POSTS):
