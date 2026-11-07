@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 title: FAQ: local LLMs on Strix Halo with 1bit engine
-description: Answers about the 1bit engine: which AMD hardware it runs on, the NPU on Linux, Lemonade Server and the OpenAI API, which models, the license and 1bit OS.
+description: Answers about local LLMs with 1bit engine: how much memory a model needs, which fit in 128 GB, Linux vs Windows, the NPU, Lemonade Server, the license.
 label: FAQ
 tags: getting-started, lemonade, 1bit-os, local-llm
 
