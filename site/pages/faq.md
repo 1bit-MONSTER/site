@@ -99,7 +99,8 @@ on Ubuntu 26.04 the engine plugs into the stock `lemond` from Lemonade's PPA ([L
 
 The engine's appliance: Lemonade Server with the engine inside, on a USB stick that boots a Ryzen
 AI MAX+ 395 with Secure Boot on. `1bit-install` from the live session puts the same system on a disk
-([1bit OS](os-v3.html), [Boot a stick](blog-boot-a-stick.html), [Releases](releases.html)).
+([Install 1bit OS](install.html), [1bit OS](os-v3.html), [Boot a stick](blog-boot-a-stick.html),
+[Releases](releases.html)).
 
 ### Is it free and open source?
 
