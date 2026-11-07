@@ -44,21 +44,23 @@ Rules that hold for every page (also enforced or helped by `tools/site.py`):
 | 6 | Supported models, measured | supported models strix halo, which llm runs on ryzen ai max 395, qwen3 27b local amd, qwen3.8 27b strix halo tok/s, zaya1 8b amd, gpt-oss-20b strix halo | [models.html](https://1bit.gg/models.html) | registry.html, faq.html, blog-qwen38-27b-dflash2-and-hadamard.html |
 | 7 | Ternary and BitNet | bitnet b1.58 amd, bitnet b1.58 amd gpu, tq2_0 gguf, ternary llm npu, ternary bonsai 27b | [blog-bitnet-b158-on-hrx.html](https://1bit.gg/blog-bitnet-b158-on-hrx.html) (GPU), [blog-ternary-bonsai-on-the-npu.html](https://1bit.gg/blog-ternary-bonsai-on-the-npu.html) (NPU) | models.html, blog-smaller-files-unsloth-rocmfpx-ternary.html |
 | 8 | Speculative decoding on AMD | speculative decoding mtp amd, mtp llama.cpp amd, dflash2 qwen3.8, draft model strix halo, npu draft model | [blog-speculative-decoding-where-it-pays.html](https://1bit.gg/blog-speculative-decoding-where-it-pays.html) | blog-qwen38-27b-dflash2-and-hadamard.html, blog-the-npu-drafts-the-gpu-checks.html, serve.html |
-| 9 | LLM appliance on a USB stick | local llm usb stick, bootable llm usb, offline ai appliance, puppy linux ai, 1bit os | [blog-boot-a-stick.html](https://1bit.gg/blog-boot-a-stick.html) now; the 1bit OS doc page once engine#859 and site#16 merge | releases.html, faq.html, strix-halo.html |
+| 9 | LLM appliance on a USB stick | local llm usb stick, bootable llm usb, offline ai appliance, puppy linux ai, 1bit os | [os-v3.html](https://1bit.gg/os-v3.html) (the appliance); [install.html](https://1bit.gg/install.html) is its how-to | install.html, blog-boot-a-stick.html, releases.html, faq.html, strix-halo.html |
 | 10 | Quantization choices | which unsloth quant, ud-q4_k_xl vs ud-q5_k_xl, nvfp4 amd gpu, mxfp4 strix halo, kld quant comparison | [blog-smaller-files-unsloth-rocmfpx-ternary.html](https://1bit.gg/blog-smaller-files-unsloth-rocmfpx-ternary.html) | blog-hrx-long-prompts-and-ud-sweet-spots.html, models.html, hrx.html |
 | 11 | MoE bigger than memory | run moe larger than ram, moe expert streaming nvme, deepseek on strix halo | [moe-streaming.html](https://1bit.gg/moe-streaming.html) | blog-zyphra-family-old-architectures-experts-from-the-drive.html |
 | 12 | GPU and NPU together | npu prefill gpu decode, heteromosaic strix halo, igpu npu split prefill | [hybrid.html](https://1bit.gg/hybrid.html) | hetero-prefill.html, blog-gpu-and-npu-at-the-same-time.html |
-| 13 | Questions | is 1bit engine open source, does lemonade use the npu on linux, does it need vulkan or rocm | [faq.html](https://1bit.gg/faq.html) (FAQPage JSON-LD) | overview.html |
+| 13 | Questions | is 1bit engine open source, does lemonade use the npu on linux, does it need vulkan or rocm, how much ram for a local llm, 128gb local llm, does a local llm run on windows | [faq.html](https://1bit.gg/faq.html) (FAQPage JSON-LD) | overview.html, models.html, moe-streaming.html |
 | 14 | Brand | 1bit engine, 1bit.gg, 1bit-MONSTER engine | [index.html](https://1bit.gg/) | overview.html, docs.html, blog.html |
 
 ## Gaps, and what fills them
 
 | gap | why it is open | fill it with |
 |---|---|---|
-| A 1bit OS page for "puppy linux ai" and "offline ai appliance" | 1bit OS is described on engine#859 / site#16, not yet on main | the 1bit OS doc page (`os-v3.html`) once they merge; its PAGE_META in site#16 already carries "Puppy Linux appliance" |
 | A release page for "1bit engine download" | v2026.44 is a draft; the release post is held (`draft: true`) | the held release post, published with the release |
 | Windows searches (ryzen ai npu windows) | the engine is Linux; nothing to say that the docs say | none; Lemonade's own docs answer those |
 | Search volumes | no keyword tool was used | Google Search Console (1bit.gg as a domain property) after a month of impressions |
+
+Closed since this map was written: **the 1bit OS gap.** `os-v3.html` (what the appliance is) and `install.html` (how to
+get it) are live since engine #859 merged on 2026-11-06; site #16 is only the release post and blocks neither.
 
 ## Off-site
 
