@@ -34,7 +34,8 @@ agnostic, and the stick is the appliance.
 
 - **Boot the stick.** 1bit OS is Lemonade Server with the engine inside, on a USB stick that boots a
   Ryzen AI MAX+ 395 with Secure Boot on; `1bit-install` from the live session puts the same system on an
-  internal disk or another drive ([1bit OS](os-v3.html), [Boot a stick](blog-boot-a-stick.html)).
+  internal disk or another drive ([Install 1bit OS](install.html), [1bit OS](os-v3.html),
+  [Boot a stick](blog-boot-a-stick.html)).
 - **Add it to the Lemonade you already run.** The `lemonade-onebit` package adds the engine as a Lemonade
   backend and nothing else changes ([Lemonade](lemonade.html)).
 - **Ask a model.** `1bit serve` exposes nothing but an OpenAI-compatible API, so any OpenAI client works
