@@ -126,7 +126,7 @@ PAGE_META = {
     'serve': ('1bit serve: OpenAI-compatible local LLM server',
      '1bit serve runs the engine behind one OpenAI-compatible API inside Lemonade: devices, model loading, strict GPU placement, --parallel, --mtp, --dflash, --laya.'),
     'lemonade': ('Lemonade Server on Strix Halo with 1bit engine',
-     'Lemonade Server on Strix Halo with the 1bit engine as its onebit backend: GGUFs on the Radeon 8060S iGPU through HRX, and NPU models too.'),
+     'Lemonade Server on Strix Halo with the 1bit engine as its onebit backend: GGUFs on the Radeon 8060S iGPU through HRX, and models on the XDNA 2 NPU.'),
     'releases': ('Releases: packages, 1bit OS, checklist',
      "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist."),
     'bench': ('How the numbers are measured',
