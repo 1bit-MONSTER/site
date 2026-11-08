@@ -129,6 +129,16 @@ PAGE_META = {
      'Lemonade Server on Strix Halo with the 1bit engine as its onebit backend: GGUFs on the Radeon 8060S iGPU through HRX, and models on the XDNA 2 NPU.'),
     'releases': ('Releases: packages, 1bit OS, checklist',
      "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist."),
+    'os-v3': ('1bit OS: the Puppy Linux appliance',
+     '1bit OS is a Puppy Linux appliance: ResolutePup64 with Lemonade and the engine inside, our MOK-signed kernel, headless by default, apt, persistent 1BIT-DATA.'),
+    'install': ('Install 1bit OS: stick, internal disk, USB',
+     'How to install 1bit OS: run it from the stick with no install, 1bit-install to an internal disk or another USB drive, Secure Boot, and what each erases.'),
+    'install-any-distro': ('Install the 1bit engine on any Linux',
+     'The engine on Debian, Ubuntu, Fedora, openSUSE or Arch with Lemonade from its own package: the drop-in, the config key, the shim, and what each family needs.'),
+    'clients': ('Connect a client to Lemonade on 1bit OS',
+     'How clients reach Lemonade on 1bit OS: the address and API key, curl, the web app, Lemonade Mobile on iPhone and Android, OpenAI SDKs and the CLI.'),
+    'os-v3-live-puppy-eval': ('Why 1bit OS is Puppy: the evaluation',
+     'The measurements behind 1bit OS: image size, boot time, memory, the glibc ceiling, the kernel config gap and the package inventory that chose Puppy.'),
     'bench': ('How the numbers are measured',
      "How the engine's serve numbers are taken: tools/bench.py A/B-measures 1bit serve configurations in the same run, and a recipe earns its place by that measure."),
     'recipes': ('Recipes: tuned backend settings',
@@ -217,6 +227,10 @@ NAV = [
     ("Components", [("laya", "Laya router"), ("pm", "Project Manager"), ("registry", "Model registry"),
                     ("arch-gaps", "Architecture gaps"), ("moe-streaming", "MoE streaming"), ("tokenizers", "Tokenizers")]),
     ("Project", [("architecture", "How the engine is built"), ("kernel", "Linux kernel"), ("npu-leaderboard", "NPU leaderboard"), ("PORTING", "Porting map")]),
+    # The appliance's own pages. They were reachable only through the docs index and the sitemap, which left
+    # "how do I run this" off the sidebar of every other page (measured: 18 of 40 doc pages were not in NAV).
+    ("1bit OS", [("os-v3", "What it is"), ("install", "Install 1bit OS"), ("install-any-distro", "The engine on any Linux"),
+                 ("clients", "Connect a client"), ("os-v3-live-puppy-eval", "Why Puppy: the evaluation")]),
 ]
 
 
