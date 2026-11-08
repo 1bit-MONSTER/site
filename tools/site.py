@@ -570,7 +570,12 @@ def plain(markdown_text):
     """One paragraph of markdown as plain text."""
     text = re.sub(r"\s*\(\[[^\]]*\.md\]\([^)]*\)\)", "", markdown_text)  # "(docs/x.md)" asides
     text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
-    return re.sub(r"[`*_]", "", " ".join(text.split()))
+    # Emphasis markers are stripped, but one inside a `code span` is content: tokenizer.chat_template
+    # is an identifier, not "chat" + italic "template", and the description is what a search result shows.
+    parts = text.split("`")
+    for i in range(0, len(parts), 2):  # even indexes are outside a code span
+        parts[i] = re.sub(r"[*_]", "", parts[i])
+    return " ".join("".join(parts).split())
 
 
 def post_image(text):
