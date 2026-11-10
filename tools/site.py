@@ -972,8 +972,8 @@ class Site:
                  card("blog.html", "Blog", "The build log: what moved over, what got faster, what broke.", "blog"),
                  card("models.html", "Benchmarks", "Measured, not projected. Every number with how it was taken.", "wiki")]
         cards[1:1] = [card(f"{n}.html", m["label"], clip(m["description"], 120), n) for n, (m, _, _) in self.landing.items()]
-        cards += [card(f"{n}.html", l, clip(first_paragraph(self.docs[n].read_text()), 120), n)
-                  for _, items in self.groups for n, l in items]
+        # Owner 2026-11-09: the home page carries the minimum that gets a reader interested, not one card per
+        # doc (it had grown to 49). Every doc stays one click away, on the docs index and in the docs sidebar.
         mark = ('<svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/>'
                 '<rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/>'
                 '<rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>')
