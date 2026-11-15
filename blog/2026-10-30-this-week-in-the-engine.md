@@ -23,6 +23,12 @@ summary: This week: Lemonade's release is the pin, the 1bit OS live image passes
 The engine is pinned to this week's Lemonade release, the release candidate's checks are green,
 and two measurements this week say plainly where two slow things stand.
 
+> **Update (2026-11-02):** the "1bit OS live image" this post refers to is the BusyBox image
+> (`os/mini`), which is a CI and VM target, **not** 1bit OS. 1bit OS is a Puppy Linux appliance now -
+> `ResolutePup64` on the Ubuntu 26.04 base, Lemonade and the engine embedded, our MOK-signed kernel,
+> headless by default with a `desktop` boot entry, `apt`, and persistence on `1BIT-DATA`
+> ([1bit OS](../docs/os-v3.md)); the next release carries it.
+
 ## The release candidate
 
 - **Lemonade:** the pin moved to this week's Lemonade release

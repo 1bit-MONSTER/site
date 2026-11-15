@@ -86,8 +86,10 @@ Lemonade now starts the engine's llama-server directly: one HTTP hop instead of 
 fewer, and a quarter of a second off each model load
 ([#475](https://github.com/1bit-MONSTER/engine/pull/475)). On Ubuntu 26.04 the stock lemond from
 the Lemonade PPA can use the engine through a systemd drop-in, with no patch to Lemonade
-([#483](https://github.com/1bit-MONSTER/engine/pull/483)). The same build also ships as the 1bit OS
-image, a bootable Lemonade appliance ([the engine in Lemonade](../docs/lemonade.md)).
+([#483](https://github.com/1bit-MONSTER/engine/pull/483)). The same build also shipped as a
+bootable Lemonade appliance - the BusyBox `os/mini` image, which is a CI/VM target since 2026-11-02,
+when 1bit OS became the Puppy Linux appliance ([1bit OS](../docs/os-v3.md), [the engine in
+Lemonade](../docs/lemonade.md)).
 
 ## The NPU engine
 

@@ -23,6 +23,18 @@ summary: Write the 1bit OS image to a USB stick, boot a Ryzen AI MAX+ 395 with S
 The feedback we hear most is "keep it simple". So here is the whole setup for local LLMs on a
 Ryzen AI MAX+ 395 (Strix Halo) machine:
 
+> **Update (2026-11-02): 1bit OS is a Puppy Linux appliance now.** The steps below still hold, but the
+> image they talk about is the BusyBox one (`os/mini`), which is a CI and VM target and **not** 1bit OS.
+> 1bit OS itself is Puppy Linux - `ResolutePup64`, built with woof-CE on the Ubuntu 26.04 base, with
+> Lemonade and the engine embedded and our MOK-signed kernel underneath: headless by default with a
+> `1bit OS (desktop, JWM)` boot entry, `bash`/`sudo`/`apt` working, and models and settings persisting on the
+> `1BIT-DATA` partition ([1bit OS](../docs/os-v3.md)). It is not published yet; the next release carries it.
+> When it is published the image comes from **Hugging Face**, not from the GitHub release:
+> [`1bit-os-puppy.img.xz`](https://huggingface.co/1bit-MONSTER/1bit-OS), 2.2 GB compressed / 9.1 GB
+> written, with its `SHA256SUMS` - a GitHub release asset is capped at 2 GiB, and the repository is
+> private until that release is published. The GitHub releases page
+> keeps the `lemonade-onebit` package and the release notes.
+
 1. Download the 1bit OS image from the [releases page](https://github.com/1bit-MONSTER/engine/releases).
 2. Write it to a USB stick of 8 GB or more.
 3. Boot the machine from the stick. Secure Boot stays on; the image is signed.
