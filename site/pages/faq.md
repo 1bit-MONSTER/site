@@ -97,10 +97,12 @@ on Ubuntu 26.04 the engine plugs into the stock `lemond` from Lemonade's PPA ([L
 
 ### What is 1bit OS?
 
-The engine's appliance: Lemonade Server with the engine inside, on a USB stick that boots a Ryzen
-AI MAX+ 395 with Secure Boot on. `1bit-install` from the live session puts the same system on a disk
-([Install 1bit OS](install.html), [1bit OS](os-v3.html), [Boot a stick](blog-boot-a-stick.html),
-[Releases](releases.html)).
+The engine's appliance: a Puppy Linux system (ResolutePup64) with Lemonade Server and the engine inside,
+on a USB stick that boots a Ryzen AI MAX+ 395 with Secure Boot on. `1bit-install` from the live session
+puts the same system on a disk; on another distribution the engine comes as install packages instead
+([Install on any Linux](install-any-distro.html)). No release is published yet: it is held until every
+open engine issue is fixed ([Install 1bit OS](install.html), [1bit OS](os-v3.html),
+[Boot a stick](blog-boot-a-stick.html), [Releases](releases.html)).
 
 ### Is it free and open source?
 

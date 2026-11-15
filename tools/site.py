@@ -1020,6 +1020,20 @@ class Site:
                    "This address is not on 1bit.gg. Pages of the old 1bit.MONSTER site are kept in its archive.",
                    extra_head=f'<base href="{SITE}">', noindex=True)
 
+    def blog_redirect(self):
+        """/blog/ and /blog/index.html are addresses people type and old links use; both land on blog.html
+        (SITE-AUDIT-1115). A meta refresh plus a canonical to blog.html: GitHub Pages has no server-side
+        redirects, and the page is noindex and stays out of the sitemap so search engines keep blog.html."""
+        target = SITE + "blog.html"
+        page = ('<!doctype html>\n<html lang="en"><head><meta charset="utf-8">\n'
+                '<title>Blog · 1bit engine</title>\n'
+                f'<link rel="canonical" href="{target}">\n'
+                '<meta name="robots" content="noindex">\n'
+                f'<meta http-equiv="refresh" content="0; url={target}">\n'
+                f'</head><body><p>The blog is at <a href="{target}">{target}</a>.</p></body></html>\n')
+        (self.out / "blog").mkdir(exist_ok=True)
+        (self.out / "blog" / "index.html").write_text(page)
+
     def build(self):
         readme = ENGINE / "README.md"
         for name, src in self.docs.items():
@@ -1033,6 +1047,7 @@ class Site:
         rows = self.blog()
         self.home(rows)
         self.not_found()
+        self.blog_redirect()
         for f in ("style.css", "theme.js"):
             shutil.copy(ROOT / "site" / f, self.out / f)
         shutil.copytree(ROOT / "site" / "assets", self.out / "assets")

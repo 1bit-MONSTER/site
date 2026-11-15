@@ -32,8 +32,8 @@ running local LLMs on it, with a link to where each fact is measured.
 Three ways to get a model answering on this machine, all of them the same engine: one binary, model
 agnostic, and the stick is the appliance.
 
-- **Boot the stick.** 1bit OS is Lemonade Server with the engine inside, on a USB stick that boots a
-  Ryzen AI MAX+ 395 with Secure Boot on; `1bit-install` from the live session puts the same system on an
+- **Boot the stick.** 1bit OS is a Puppy Linux appliance with Lemonade Server and the engine inside, on a
+  USB stick that boots a Ryzen AI MAX+ 395 with Secure Boot on; `1bit-install` from the live session puts the same system on an
   internal disk or another drive ([Install 1bit OS](install.html), [1bit OS](os-v3.html),
   [Boot a stick](blog-boot-a-stick.html)).
 - **Add it to the Lemonade you already run.** The `lemonade-onebit` package adds the engine as a Lemonade
@@ -106,6 +106,8 @@ stock `lemond` from Lemonade's PPA.
 
 ## Where it ships
 
-The engine ships inside those packages once a release has passed its checklist ([Releases](releases.html)). The
+The engine ships inside those packages once a release has passed its checklist; no release is published yet,
+and it is held until every open engine issue is fixed ([Releases](releases.html)). On a distribution other
+than 1bit OS, the engine installs from packages ([Install on any Linux](install-any-distro.html)). The
 source is Apache-2.0 on [GitHub](https://github.com/1bit-MONSTER/engine), and questions are answered in the
 [FAQ](faq.html).
