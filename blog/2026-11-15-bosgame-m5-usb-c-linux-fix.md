@@ -31,7 +31,8 @@ The board has four xHCI USB controllers (PCI ids `1022:1587`, `1588`, `1589`, `1
 boot, three of them autosuspend to `D3cold` and stay there. A port whose controller is asleep does not
 report a plug, so the symptom looks electrical: no `dmesg` line, no device, and the port registers stay
 in `RxDetect`. The one controller that stays awake carries the front USB-A port, which is why that port
-works and nothing else does. Windows drives every port on the same box.
+works and nothing else does. The original report says every port works under Windows on the same box
+([engine#823](https://github.com/1bit-MONSTER/engine/issues/823)); we have not tested Windows ourselves.
 
 It is not a missing driver, and it is not a Type-C or UCSI problem. Writing `on` to each controller's
 `power/control` moves it to `D0`, and its ports come alive.
