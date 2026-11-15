@@ -1047,7 +1047,21 @@ class Site:
         return len(list(self.out.glob("*.html")))
 
 
+USAGE = "usage: python3 tools/site.py [OUTPUT_DIR]   (default: _site)"
+
+
 def main():
+    # A help flag must not be read as an output directory: `site.py --help` used to write all 72 pages
+    # into a directory literally named `--help/` (3.4 MB in the tree) and exit 0 -- a build tool that
+    # mutates the working tree when asked a question. tools/ci/tool_help_check.py in the engine repo
+    # exists for exactly this; the same shape was found in the two `oga_*` tools there.
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        print(__doc__ or USAGE)
+        return 0
+    # And an unknown flag is a usage error, not a directory named after it.
+    if len(sys.argv) > 1 and sys.argv[1].startswith("-"):
+        print(f"site.py: unknown option {sys.argv[1]!r}\n{USAGE}", file=sys.stderr)
+        return 2
     out = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "_site")
     if out.exists():
         shutil.rmtree(out)
@@ -1056,4 +1070,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
