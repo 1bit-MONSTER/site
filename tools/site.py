@@ -247,6 +247,13 @@ def posts():
             sys.exit(f"blog post names are YYYY-MM-DD-<slug>.md: {p.name}")
         if not is_draft(p):
             out.append((m.group(1), m.group(2), p))
+    # each post becomes blog-<slug>.html, so two posts with one slug would write the same page and the
+    # older would silently replace the newer (2026-11-15: a second "this-week-in-the-engine")
+    seen = {}
+    for _, slug, p in out:
+        if slug in seen:
+            sys.exit(f"two blog posts share the slug {slug!r} (blog-{slug}.html): {seen[slug].name} and {p.name}")
+        seen[slug] = p
     return sorted(out, reverse=True)
 
 
@@ -899,10 +906,13 @@ class Site:
                     f'<nav class="pager">{link(newer, "prev", "Newer")}{link(older, "next", "Older")}</nav>\n'
                     "</div></article>")
             modified = max(date, last_commit_date(src))
+            # a post's "## Frequently asked questions" section becomes FAQPage JSON-LD, as on a doc page
+            faq = faq_items(body)
             self.write(name, (seo_title or title) + SUFFIX, main, "post", "blog", summary, og_type="article",
                        lastmod=modified, image=image, image_alt=title, dates=(date, modified, tags),
                        jsonld=jsonld_graph(article_node("BlogPosting", name, title, meta_description(summary), date, modified,
                                                         image, ", ".join(tags)),
+                                           *([faq_node(name, faq)] if faq else []),
                                            breadcrumb(name, ("Blog", "blog"), (title, name))))
             self.modified[name] = modified
             rows.append((date, name, title, plain(lead), tags, self.md(lead + "\n\n" + body, src), summary))
