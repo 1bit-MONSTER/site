@@ -128,7 +128,7 @@ PAGE_META = {
     'lemonade': ('Lemonade Server on Strix Halo with 1bit engine',
      'Lemonade Server on Strix Halo with the 1bit engine as its onebit backend: GGUFs on the Radeon 8060S iGPU through HRX, and models on the XDNA 2 NPU.'),
     'releases': ('Releases: packages, 1bit OS, checklist',
-     "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist."),
+     "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and 1bit OS, the pins each is built from, and the release checklist."),
     'os-v3': ('1bit OS: the Puppy Linux appliance',
      '1bit OS is a Puppy Linux appliance: ResolutePup64 with Lemonade and the engine inside, our MOK-signed kernel, headless by default, apt, persistent 1BIT-DATA.'),
     'install': ('Install 1bit OS: stick, internal disk, USB',
