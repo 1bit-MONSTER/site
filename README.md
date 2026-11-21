@@ -18,8 +18,8 @@ limitations under the License.
 
 This repository builds [https://1bit.gg/](https://1bit.gg/), the site of the
 [1bit engine](https://github.com/1bit-MONSTER/engine): local LLM inference on the AMD Ryzen AI
-MAX+ 395 (Strix Halo) inside AMD's Lemonade Server, on the Radeon 8060S iGPU through HRX and on
-the XDNA 2 NPU.
+MAX+ 395 (Strix Halo) inside AMD's Lemonade Server, on the Radeon 8060S iGPU through HRX (moving
+to AMD's Loom model programs, model by model) and on the XDNA 2 NPU.
 
 - `tools/site.py` renders the engine's `README.md` and `docs/*.md` (checked out from
   `1bit-MONSTER/engine`) and this repository's `blog/*.md` with `site/template.html`,
