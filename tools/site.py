@@ -105,7 +105,7 @@ TAGLINE = ("One binary to rule them all: model-agnostic local LLM inference on t
 HOME_TITLE = "Strix Halo local LLM: Ryzen AI MAX+ 395, Linux"
 HOME_DESCRIPTION = ("1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside "
                     "Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.")
-HOME_KEYWORDS = ("model-agnostic LLM inference, local LLM, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, HIP kernels, XDNA 2 NPU, live USB, 1bit OS, "
+HOME_KEYWORDS = ("model-agnostic LLM inference, local LLM, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, Loom, HIP kernels, XDNA 2 NPU, live USB, 1bit OS, "
                  "Lemonade Server, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, BitNet b1.58, ternary, "
                  "Ternary-Bonsai, gpt-oss-20b, MXFP4, NVFP4, MTP, speculative decoding, 1bit OS, local AI")
 
@@ -118,11 +118,11 @@ PAGE_META = {
     'models': ('Models measured on a Ryzen AI MAX+ 395',
      'Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.'),
     'overview': ('What the 1bit engine is and what runs where',
-     "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade."),
+     "The engine's README: HRX on the Radeon 8060S iGPU, moving to Loom per model, our NPU runtime on the XDNA 2 NPU, the hybrid route, and Lemonade."),
     'docs': ('Documentation: serve, HRX, NPU, Lemonade',
      'Documentation for the 1bit engine on Strix Halo: 1bit serve and its OpenAI-compatible API, Lemonade, releases, HRX, the NPU engine, Laya and the model registry.'),
     'blog': ('Blog: build notes and measured results',
-     'Notes from building the 1bit engine on AMD Strix Halo: measured results on HRX and our HIP kernels, the NPU engine, speculative decoding and quantization.'),
+     'Notes from building the 1bit engine on AMD Strix Halo: measured results on HRX, the NPU engine, speculative decoding and quantization.'),
     'serve': ('1bit serve: OpenAI-compatible local LLM server',
      '1bit serve runs the engine behind one OpenAI-compatible API inside Lemonade: devices, model loading, strict GPU placement, --parallel, --mtp, --dflash, --laya.'),
     'lemonade': ('Lemonade Server on Strix Halo with 1bit engine',
@@ -146,11 +146,11 @@ PAGE_META = {
     'hw-gate': ('HRX hardware gate on Strix Halo',
      'The hardware gate runs every HRX pin change and hw-gate PR on a Strix Halo box before merge: kernel tests, known answers, KLD against the release pin.'),
     'architecture': ('How the 1bit engine is built',
-     "The technical map of the 1bit engine: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, Laya, the hardware gate and the kernel."),
+     "The technical map of the 1bit engine: HRX moving to Loom on the GPU, the NPU engine on our own runtime, hybrid, ONNX Runtime, Laya, the hardware gate."),
     'onnx-pack': ('The ONNX pack: weights to Q4NX, our kernels',
      "How a plain ONNX graph becomes an NPU pack for the 1bit engine: weights to Q4NX through the runtime's own packer, activations int8, one ELF per shape."),
     'hrx': ('HRX llama.cpp on Radeon 8060S (gfx1151)',
-     "HRX, AMD's HIP Runtime Extended, with our own HIP kernels on the Radeon 8060S iGPU: pinned sources, quant coverage, MTP and DFlash2, ternary Bonsai, BitNet."),
+     "HRX, AMD's HIP Runtime Extended, on the Radeon 8060S iGPU: the move to Loom per model, the llama.cpp fallback route, quant coverage, MTP, DFlash2, BitNet."),
     'npu': ('Ryzen AI NPU on Linux for local LLMs (XDNA 2)',
      "Run LLMs on the Ryzen AI MAX+ 395's XDNA 2 NPU on Linux with the 1bit engine: the models it runs today, what it measures, and what is still in progress."),
     'hybrid': ('Hybrid: NPU prefill, GPU decode on Strix Halo',
@@ -380,7 +380,7 @@ def chat_widget():
     return (f'<script src="https://context7.com/widget.js" data-library="{library}" '
             'data-color="#1779e1" data-position="bottom-right" '
             'data-placeholder="Ask about the 1bit engine docs..." '
-            'data-welcome-message="Ask anything about the 1bit engine: install, serving, HRX, HIP kernels, the NPU, Lemonade." '
+            'data-welcome-message="Ask anything about the 1bit engine: install, serving, HRX, Loom, the NPU, Lemonade." '
             'async></script>')
 
 
@@ -415,7 +415,7 @@ def software_node():
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"},
             "processorRequirements": "AMD Ryzen AI MAX+ 395 (Strix Halo): Radeon 8060S iGPU (gfx1151), XDNA 2 NPU",
             "softwareHelp": {"@type": "CreativeWork", "url": page_url("docs")},
-            "featureList": ["OpenAI-compatible API through Lemonade Server", "Radeon 8060S iGPU through HRX and our own HIP kernels",
+            "featureList": ["OpenAI-compatible API through Lemonade Server", "Radeon 8060S iGPU through AMD's HRX runtime, moving to Loom model programs",
                             "XDNA 2 NPU on Linux through our own NPU runtime", "Any GGUF quantization, including ternary BitNet b1.58",
                             "Speculative decoding: MTP and DFlash2", "1bit OS: boots from a USB stick"],
             "author": {"@id": ORG_ID}, "publisher": {"@id": ORG_ID}, "sameAs": [REPO], "keywords": HOME_KEYWORDS}

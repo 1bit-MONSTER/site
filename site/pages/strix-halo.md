@@ -60,8 +60,10 @@ Nothing here needs a cloud account, and nothing leaves the machine.
 
 ## The GPU: Radeon 8060S through HRX
 
-The engine's one GPU route is HRX: AMD's ggml-hrx with its Loom kernels, plus our own HIP kernels,
-in one llama.cpp build. HRX runs every graph node of every model and mode we test on the Strix Halo
+The engine's one GPU runtime is HRX. Today every model runs on AMD's ggml-hrx with its Loom kernels,
+plus our own HIP kernels, in one llama.cpp build. The GPU route is moving to AMD's Loom model
+programs on HRX, one model at a time once each passes an A/B and accuracy check; no model has moved
+yet, and the llama.cpp build stays as the fallback ([HRX](hrx.html#direction-loom-on-the-gpu)). HRX runs every graph node of every model and mode we test on the Strix Halo
 GPU: 43 of 43 configurations in the 2026-10-20 census, with 0 nodes on the CPU
 ([HRX](hrx.html), [Every node on the GPU](blog-every-node-on-hrx.html)). Every ggml weight type runs
 on it, including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ formats, so any GGUF

@@ -33,6 +33,10 @@ the link next to it; if a number on the site changes, change it here before post
 - **What not to discuss** in threads: how the NPU kernels or the NPU runtime work inside, kernel
   performance internals, and any reverse-engineering. The honest answer is "the NPU runtime and the
   HIP kernels ship as compiled binaries under the 1bit Binary License; the rest is Apache-2.0".
+- **The GPU route is moving to Loom** (2026-11-21): AMD's Loom model programs on HRX, one model at a
+  time once each passes an A/B and accuracy check. No model has moved yet, so the GPU numbers in the
+  drafts below are the llama.cpp route with our HIP kernels, which stays as the fallback. Say
+  "moving to", never "runs on Loom", until a model has moved ([HRX](https://1bit.gg/hrx.html#direction-loom-on-the-gpu)).
 - **The release is not published yet** (v2026.44 is a draft, [Releases](https://1bit.gg/releases.html)).
   Drafts marked **HOLD** need the published release; post them only after it is out.
 
@@ -151,7 +155,8 @@ repository; the text goes in the first comment.
 
 > First comment: I build the 1bit engine, one model-agnostic binary that serves local LLMs on the
 > AMD Ryzen AI MAX+ 395 (Strix Halo), as a backend of AMD's Lemonade Server: the Radeon 8060S
-> through HRX with our own HIP kernels, and the XDNA 2 NPU through our own runtime on Linux.
+> through AMD's HRX runtime, and the XDNA 2 NPU through our own runtime on Linux. On the GPU it is
+> moving, model by model, from our llama.cpp fork with HIP kernels to AMD's Loom model programs.
 > Measured on the machine: Qwen3.8-27B at 36.0 tok/s with MTP and 56.6 tok/s with DFlash2,
 > ZAYA1-8B at 157 tok/s, and BitNet b1.58 2B-4T at 123.4 tok/s, each with how it was taken
 > (https://1bit.gg/models.html). The source is Apache-2.0; the NPU runtime and our HIP kernels ship
@@ -163,7 +168,8 @@ repository; the text goes in the first comment.
 | question | answer in one line | page |
 |---|---|---|
 | Is it open source? | Source Apache-2.0; the NPU runtime and our HIP kernels ship compiled under the 1bit Binary License, free to use | https://1bit.gg/faq.html |
-| Does it need ROCm or Vulkan? | One GPU backend, ggml-hrx, plus our HIP kernels; what HRX does not run, Lemonade serves with its own backends | https://1bit.gg/hrx.html |
+| Does it need ROCm or Vulkan? | No: the GPU runs on AMD's HRX runtime only (ggml-hrx plus our HIP kernels today, Loom programs per model as they pass the gate); what HRX does not run, Lemonade serves with its own backends | https://1bit.gg/hrx.html |
+| Does it use Loom? | It is moving to it: a model switches to AMD's Loom programs on HRX only after an A/B and accuracy check against the current route; none has switched yet | https://1bit.gg/hrx.html#direction-loom-on-the-gpu |
 | Is the NPU actually used? | Yes, on Linux, in progress: Qwen3-0.6B decodes at 88.6 tok/s in the release gate | https://1bit.gg/npu.html |
 | How were the numbers taken? | Same-run A/B with `tools/bench.py`, and a hardware gate on every HRX pin | https://1bit.gg/bench.html |
 | Which models? | Any GGUF the HRX build loads; the checked list with numbers is one page | https://1bit.gg/models.html |

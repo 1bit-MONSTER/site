@@ -30,8 +30,10 @@ details.
 
 One binary to rule them all: a model-agnostic local LLM inference engine for the AMD Ryzen AI MAX+
 395 (Strix Halo). It serves any Hugging Face architecture, any GGUF quantization, Ryzen AI NPU packs
-and ONNX graphs as one backend of AMD's Lemonade Server, on the Radeon 8060S iGPU through HRX with
-our own HIP kernels and on the XDNA 2 NPU through our own NPU runtime ([Meet the engine](overview.html)).
+and ONNX graphs as one backend of AMD's Lemonade Server, on the Radeon 8060S iGPU through HRX and
+on the XDNA 2 NPU through our own NPU runtime ([Meet the engine](overview.html)). On the GPU it is
+moving from our llama.cpp fork with HIP kernels to AMD's Loom model programs, one model at a time
+([HRX](hrx.html#direction-loom-on-the-gpu)).
 
 ### Which hardware does it run on?
 
@@ -86,9 +88,10 @@ prompts and 56.6 tok/s with the DFlash2 drafter, ZAYA1-8B (Q4_K_M) at 157 tok/s 
 
 ### Does it use Vulkan or the ROCm backend?
 
-No. The engine is one llama.cpp build with one GPU backend, ggml-hrx, plus our HIP kernels: no
-Vulkan, ROCm backend, Metal or CUDA. What HRX does not run, Lemonade serves with its own backends
-([HRX](hrx.html)).
+No. On the GPU the engine runs AMD's HRX runtime only: today one llama.cpp build with one GPU
+backend, ggml-hrx, plus our HIP kernels, and Loom model programs on the same runtime as each model
+passes its A/B and accuracy check. No Vulkan, ROCm backend, Metal or CUDA. What HRX does not run,
+Lemonade serves with its own backends ([HRX](hrx.html)).
 
 ### Can I add it to the Lemonade Server I already run?
 
@@ -108,7 +111,7 @@ open engine issue is fixed ([Install 1bit OS](install.html), [1bit OS](os-v3.htm
 
 The source code is Apache-2.0 on [GitHub](https://github.com/1bit-MONSTER/engine). The release
 binaries also contain two proprietary components, compiled in: the 1bit NPU runtime and the 1bit HIP
-kernels for HRX, under the 1bit Binary License, free to use for any purpose and to pass on
+kernels for HRX (the fallback GPU route), under the 1bit Binary License, free to use for any purpose and to pass on
 unmodified. A build from the source without them has no NPU engine and runs HRX on the public
 kernels only ([Meet the engine](overview.html), [Releases](releases.html)).
 
