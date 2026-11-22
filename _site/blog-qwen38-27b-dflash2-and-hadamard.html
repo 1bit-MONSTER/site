@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qwen3.8-27B at 45.7 tok/s with DFlash2 · 1bit engine</title>
+<meta name="description" content="The DFlash2 drafter decodes Qwen3.8-27B at 45.7 tok/s on code through 1bit serve --dflash, 44% faster than MTP.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Qwen3.8-27B at 45.7 tok/s with DFlash2 · 1bit engine">
+<meta property="og:description" content="The DFlash2 drafter decodes Qwen3.8-27B at 45.7 tok/s on code through 1bit serve --dflash, 44% faster than MTP.">
+<link rel="canonical" href="https://1bit.gg/blog-qwen38-27b-dflash2-and-hadamard.html">
+<meta property="og:url" content="https://1bit.gg/blog-qwen38-27b-dflash2-and-hadamard.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Qwen3.8-27B at 45.7 tok/s: DFlash2 in 1bit serve, and 4-bit activations with a Hadamard rotation">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Qwen3.8-27B at 45.7 tok/s with DFlash2 · 1bit engine">
+<meta name="twitter:description" content="The DFlash2 drafter decodes Qwen3.8-27B at 45.7 tok/s on code through 1bit serve --dflash, 44% faster than MTP.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="Qwen3.8-27B at 45.7 tok/s: DFlash2 in 1bit serve, and 4-bit activations with a Hadamard rotation">
+<meta property="article:tag" content="qwen">
+<meta property="article:tag" content="speculative-decoding">
+<meta property="article:tag" content="quantization">
+<meta property="article:tag" content="rocm">
+<meta property="article:tag" content="vulkan">
+<meta property="article:published_time" content="2026-09-28">
+<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "BlogPosting", "@id": "https://1bit.gg/blog-qwen38-27b-dflash2-and-hadamard.html#article", "headline": "Qwen3.8-27B at 45.7 tok/s: DFlash2 in 1bit serve, and 4-bit activations with a Hadamard rotation", "description": "The DFlash2 drafter decodes Qwen3.8-27B at 45.7 tok/s on code through 1bit serve --dflash, 44% faster than MTP.", "url": "https://1bit.gg/blog-qwen38-27b-dflash2-and-hadamard.html", "mainEntityOfPage": "https://1bit.gg/blog-qwen38-27b-dflash2-and-hadamard.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-28", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "keywords": "qwen, speculative-decoding, quantization, rocm, vulkan"}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="post">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html">Docs</a>
+      <a href="blog.html" aria-current="page">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<article class="art"><div class="container">
+<a class="back" href="blog.html">← all posts</a>
+<div class="art-meta"><time datetime="2026-09-28">2026-09-28</time><span class="tag">qwen</span><span class="tag">speculative-decoding</span><span class="tag">quantization</span><span class="tag">rocm</span><span class="tag">vulkan</span></div>
+<h1>Qwen3.8-27B at 45.7 tok/s: DFlash2 in 1bit serve, and 4-bit activations with a Hadamard rotation</h1>
+<p class="lead">Qwen3.8-27B is a dense 27B model, and on Strix Halo its decode speed is set by memory
+bandwidth: every token reads the whole 15 GB file, so plain decode sits near 11-12 tok/s.
+Prompt processing is set by the GPU's matrix units instead. This week we pushed on both.
+Every number below was measured on Strix Halo (Ryzen AI Max+ 395, Radeon 8060S), with the
+method in the linked docs.</p>
+<div class="prose">
+<blockquote>
+<p><strong>Since 21 October 2026:</strong> the DFlash2 one-server ROCm route and the H32 format are gone from the engine; <code>--dflash</code> stays, on HRX, and Qwen3.8-27B with MTP now decodes at 36.0 / 26.8 / 29.9 tok/s (engine #487). See <a href="blog-every-node-on-hrx.html">Every node on the GPU</a>.</p>
+<p><strong>Update (2026-10-30):</strong> on HRX, the DFlash2 drafter decodes Qwen3.8-27B (UD-Q4_K_XL) at 56.6 tok/s on code prompts, against 36.0 tok/s with MTP. See <a href="models.html">Models measured</a>.</p>
+</blockquote>
+<h2 id="decode-dflash2-drafts-a-whole-block">Decode: DFlash2 drafts a whole block<a class="anchor" href="#decode-dflash2-drafts-a-whole-block" title="Permanent link">#</a></h2>
+<p>Speculative decoding breaks the bandwidth limit by guessing several tokens and checking them
+all in one pass of the big model. <code>1bit serve --mtp</code> already does this with the model's own
+MTP head. <a href="https://huggingface.co/z-lab/Qwen3.8-27B-DFlash2">DFlash2</a>, from z-lab and Inco,
+is a separate 2B draft model trained for Qwen3.8-27B. It emits a whole block of 8 tokens in
+one pass, reading the big model's hidden states, and keeps the top 16 candidates at each
+position so it can pick a coherent path through them. Upstream llama.cpp added it as
+<code>draft-dflash</code>, and the Vulkan build the engine pins already carries it.</p>
+<p>The new <code>1bit serve --dflash &lt;draft.gguf&gt;</code> wires it in. One detail mattered more than any
+other: llama-server's default draft length is 3, and DFlash only pays when it drafts full
+blocks. At length 3 it matched MTP; at full blocks it pulled well ahead. So <code>--dflash</code> now
+drafts full blocks unless you say otherwise.</p>
+<p>Qwen3.8-27B Q4_0 through <code>1bit serve --device vulkan</code>, decode tok/s on three chat prompts
+(code / prose / short), back to back:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Drafter</th>
+<th>tok/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>none</td>
+<td>11.1 / 11.8 / 12.4</td>
+</tr>
+<tr>
+<td><code>--mtp</code></td>
+<td>31.7 / 25.8 / <strong>28.2</strong></td>
+</tr>
+<tr>
+<td><code>--dflash</code> (DFlash2, Q8_0)</td>
+<td><strong>45.7 / 28.3</strong> / 17.8</td>
+</tr>
+</tbody>
+</table></div>
+<p>That is 4.1x on code, and 44% over MTP. On prose DFlash2 edges ahead. On the short prompt,
+a translation that ends after about 16 tokens, MTP still wins: there are too few tokens to
+fill blocks. The drafter runs faster in Q8_0 than in BF16 (42.5 against 38.9 tok/s on code).
+A drafted token is kept only when the model itself agrees, so the output is the model's own.
+Converting the drafter needs only the target's config and tokenizer, not its weights
+(<a href="serve.html#dflash-draft-models-dflash">1bit serve</a>).</p>
+<h2 id="prompt-processing-4-bit-activations-rotated-first">Prompt processing: 4-bit activations, rotated first<a class="anchor" href="#prompt-processing-4-bit-activations-rotated-first" title="Permanent link">#</a></h2>
+<p>On the exact int8 path, prompt processing for this model tops out near 400 tok/s. The GPU
+is not power-limited: it runs at about 158 W and 2.7 GHz through the whole prompt, and the
+matmul kernel reaches about half of the int8 matrix rate. The matrix units run int4 × int4 at
+twice the int8 rate, though, and ROCmFPX's W4A4 kernel uses exactly that instruction.</p>
+<p>We pointed that kernel at Unsloth's plain Q4_0 file. A Q4_0 weight is already a 4-bit value
+with an offset of 8, and flipping its top bit gives the same value in two's complement. So
+the weights stay exactly what Unsloth shipped, and only the activations are rounded to 4 bits.
+That is fast (461-488 tok/s) but lossy: mean KLD against the full model rose from 0.029 to
+0.084. Leaving any single group of tensors at int8 did not fix it, because the error comes from
+all of them.</p>
+<p>A Hadamard rotation fixes much of it. A few large activation values in a block of 32 force a
+coarse 4-bit scale on the other 31. Rotating each block by a 32-point Walsh-Hadamard transform
+spreads that energy evenly before rounding. We rotate the weights the same way once, offline,
+so the product is unchanged: on the exact int8 path the rotated file matches the plain one
+(KLD 0.031 against 0.029). The rotation itself runs inside the activation quantizer, as three
+lane shuffles and two in-register butterfly steps.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Qwen3.8-27B Q4_0 on ROCm</th>
+<th>pp512</th>
+<th>Mean KLD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>exact int8</td>
+<td>~400</td>
+<td>0.029</td>
+</tr>
+<tr>
+<td>W4A4</td>
+<td>461-488</td>
+<td>0.084</td>
+</tr>
+<tr>
+<td><strong>W4A4, Hadamard-rotated</strong></td>
+<td><strong>503</strong></td>
+<td><strong>0.055</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The rotation removes a third of the 4-bit error. Perplexity ends up 1.2% above the exact
+path, and the error is still nearly double. So this is measured, not shipped: the patches are
+not in the engine's pin yet (the lean-build notes of the archived repository).</p>
+<h2 id="whats-next">What's next<a class="anchor" href="#whats-next" title="Permanent link">#</a></h2>
+<p>DFlash2 is in <code>1bit serve</code> today. For prompts, the next steps are a better exact int8 matmul
+for this GPU (about 15% would reach the W4A4 numbers without the error), and rotations
+larger than 32, which spread outliers further. Packages ship on Sunday with the weekly
+release.</p>
+<p><strong>Update, later on 2026-09-28:</strong> the Hadamard route has shipped. <code>tools/hadamard_q4_0.py</code> makes the
+rotated file, <code>1bit serve</code> recognises it and runs it on the lean ROCm build by itself, and the
+Qwen3.8-27B file is published as
+<a href="https://huggingface.co/1bit-MONSTER/Qwen3.8-27B-Q4_0-H32-GGUF">1bit-MONSTER/Qwen3.8-27B-Q4_0-H32-GGUF</a>:
+pp512 509, KLD 0.055, and 440-470 tok/s on a 1,838-token prompt through <code>serve</code>
+(the lean-build notes of the archived repository).</p>
+</div>
+<nav class="pager"><a class="prev" href="blog-hrx-and-npu-direction.html"><span>Newer</span>Where the engine is going: HRX and the NPU</a><a class="next" href="blog-laya-routes-by-request-class.html"><span>Older</span>Laya routing: ask the model what it knows</a></nav>
+</div></article>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

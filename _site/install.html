@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install 1bit OS · 1bit engine</title>
+<meta name="description" content="1bit OS is the Puppy Linux appliance in os/README.md: Lemonade Server with this engine inside, our MOK-signed kernel, headless by default.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Install 1bit OS · 1bit engine">
+<meta property="og:description" content="1bit OS is the Puppy Linux appliance in os/README.md: Lemonade Server with this engine inside, our MOK-signed kernel, headless by default.">
+<link rel="canonical" href="https://1bit.gg/install.html">
+<meta property="og:url" content="https://1bit.gg/install.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Install 1bit OS · 1bit engine">
+<meta name="twitter:description" content="1bit OS is the Puppy Linux appliance in os/README.md: Lemonade Server with this engine inside, our MOK-signed kernel, headless by default.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/install.html#article", "headline": "Install 1bit OS", "description": "1bit OS is the Puppy Linux appliance in os/README.md: Lemonade Server with this engine inside, our MOK-signed kernel, headless by default.", "url": "https://1bit.gg/install.html", "mainEntityOfPage": "https://1bit.gg/install.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="clients.html">Connect a client</a></li>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="install.html" aria-current="page">Install 1bit OS</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the Puppy Linux appliance</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="install-1bit-os">Install 1bit OS<a class="anchor" href="#install-1bit-os" title="Permanent link">#</a></h1>
+<p>1bit OS is the Puppy Linux appliance in <a href="https://github.com/1bit-MONSTER/engine/blob/main/os/README.md">os/README.md</a>: Lemonade Server with this engine
+inside, our MOK-signed kernel, headless by default. It runs from the stick it was written to, and it can
+install itself onto a disk: <code>1bit-install</code> copies the system you booted, so an install downloads nothing.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>what you want</th>
+<th>how</th>
+<th>what it erases</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>try it, keep nothing</td>
+<td>boot the stick — <a href="#1-run-from-the-stick-no-install">run from the stick</a></td>
+<td>nothing on the machine</td>
+</tr>
+<tr>
+<td>run it from the internal disk</td>
+<td><code>sudo 1bit-install &lt;disk&gt; --yes</code> on the stick</td>
+<td><strong>that disk, all of it</strong></td>
+</tr>
+<tr>
+<td>carry it on another USB drive</td>
+<td>the same command onto that drive</td>
+<td><strong>that drive, all of it</strong></td>
+</tr>
+<tr>
+<td>keep the OS already on the machine</td>
+<td>not in this release — <a href="#4-keep-the-system-already-on-the-machine">see 4</a></td>
+<td>—</td>
+</tr>
+<tr>
+<td>add the engine to an existing Linux</td>
+<td>the engine package — <a href="#5-the-engine-on-an-existing-linux-advanced">see 5</a></td>
+<td>nothing</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="what-you-need">What you need<a class="anchor" href="#what-you-need" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>stick</td>
+<td><strong>16 GB or more</strong>: the image is 9,128,902,656 bytes (8.5 GiB) and the data partition takes the rest of the stick</td>
+</tr>
+<tr>
+<td>image</td>
+<td><code>1bit-os-puppy.img.xz</code> + <code>SHA256SUMS</code> from <a href="https://huggingface.co/1bit-MONSTER/1bit-OS">Hugging Face</a>; the <a href="https://github.com/1bit-MONSTER/engine/releases">releases page</a> carries the <code>lemonade-onebit</code> package and the release notes</td>
+</tr>
+<tr>
+<td>machine</td>
+<td>an AMD Ryzen AI MAX+ 395 (Strix Halo) box, the machine this release is built and tested on</td>
+</tr>
+<tr>
+<td>firmware</td>
+<td>UEFI, Secure Boot <strong>on</strong> (see <a href="#6-secure-boot-and-our-mok">6</a>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The image is on Hugging Face, not on the GitHub release, because a GitHub release asset is capped at
+2 GiB and this one is 9,128,902,656 B written (<strong>2,212,389,580 B</strong> as <code>.img.xz</code>). Fetch both files, check
+the checksum, then write it and prepare it (the last line is what puts the API key, your SSH key and any
+models on the stick — see <a href="#1-run-from-the-stick-no-install">1</a>):</p>
+<pre><code class="language-sh"># 1bit-os-puppy.img.xz and SHA256SUMS from https://huggingface.co/1bit-MONSTER/1bit-OS
+sha256sum -c SHA256SUMS --ignore-missing
+xz -dc 1bit-os-puppy.img.xz | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress
+sudo os/mini/prepare-stick.sh /dev/sdX --mint --ssh-pubkey ~/.ssh/id_ed25519.pub
+</code></pre>
+<p>Writing the <code>.img.xz</code> straight from balenaEtcher or Rufus (DD mode) is the same write with no shell
+line, but the <code>prepare-stick</code> line below is still what puts the API key on the stick.</p>
+<p><code>prepare-stick</code> writes <code>/ssh/authorized_keys</code> and a freshly minted Lemonade API key into
+<code>/lemonade/lemond.conf</code> on the stick's <code>1BIT-DATA</code> partition, and copies <code>--model</code> files into
+<code>/models</code>. A stick written with <code>dd</code> alone has <strong>no API key</strong>: the appliance boots, but Lemonade says so
+in its log and serves every endpoint unauthenticated
+(<code>Serving on non-loopback host '0.0.0.0' without an API key ... all endpoints ... are reachable from
+other machines unauthenticated</code>), which is why <code>--mint</code> is part of the protocol. That the appliance does
+not mint one itself when the file is empty is a defect of this image
+(<a href="https://github.com/1bit-MONSTER/engine/issues/867">#867</a>); until it is fixed, treat <code>--mint</code> as
+mandatory, and check a stick you did not prepare with
+<code>sudo sed -n 's/^LEMONADE_API_KEY=//p' /data/lemonade/lemond.conf</code> — an empty answer means open.</p>
+<h2 id="1-run-from-the-stick-no-install">1. Run from the stick (no install)<a class="anchor" href="#1-run-from-the-stick-no-install" title="Permanent link">#</a></h2>
+<ol>
+<li>Put the stick in the machine. On the Bosgame BeyondMax use the <strong>front USB-A</strong> port
+   (<a href="#7-the-bosgame-beyondmax-has-one-usable-usb-port">7</a>).</li>
+<li>Boot it. The default entry, <code>1bit OS (headless console, 7.3.0-rc4-1bit-perfopt+)</code>, comes up headless:
+   a console with no X. The second entry, <code>1bit OS (desktop, JWM)</code>, starts Puppy's desktop on the same
+   system; the third, <code>1bit OS - serial root shell</code>, gives a root shell on the serial port for a rack
+   machine with no monitor.</li>
+<li>Nothing on the machine is written. The system runs in RAM from the stick's squashfs
+   (<code>pfix=copy</code>); the models, Lemonade's config and cache, your SSH keys and the API key live on the
+   stick's <code>1BIT-DATA</code> partition.</li>
+</ol>
+<p>Check that it is up:</p>
+<pre><code class="language-sh">curl -s -H &quot;Authorization: Bearer $(sudo sed -n 's/^LEMONADE_API_KEY=//p' /data/lemonade/lemond.conf)&quot; \
+     http://127.0.0.1:13305/api/v1/models
+</code></pre>
+<p>That command is one of the ones measured below; a client on another machine uses the box's address
+instead of <code>127.0.0.1</code> (<a href="clients.html">Connect a client</a>).</p>
+<p><strong>What persists on the stick</strong>, all of it on <code>1BIT-DATA</code> (Puppy's save layer, <code>PUPMODE=12</code>):
+<code>models/</code>, <code>lemonade/config/</code>, <code>lemonade/cache/</code>, <code>lemonade/lemond.conf</code> (the API key), <code>ssh/</code> (host key
+and <code>authorized_keys</code>), <code>npu/kernels/</code>, <code>cache/hrx-jit/</code>. A file written elsewhere (<code>/etc</code>, <code>/root</code>, <code>/tmp</code>) lives in RAM: measured, a marker
+written in <code>/etc</code> and then <code>poweroff -f</code> was gone on the next boot, while the same boot's marker on
+<code>/data</code> was still there.</p>
+<h2 id="2-install-to-an-internal-disk">2. Install to an internal disk<a class="anchor" href="#2-install-to-an-internal-disk" title="Permanent link">#</a></h2>
+<p>From the running stick:</p>
+<pre><code class="language-sh">lsblk -o NAME,SIZE,MODEL,MOUNTPOINT      # find the disk: model and size, never the stick
+sudo 1bit-install /dev/nvme0n1 --yes
+</code></pre>
+<p><code>/dev/nvme0n1</code> is an example: <strong>pass the disk you mean to erase</strong>. The installer refuses to continue
+unless the argument is a whole disk, it is not the disk this system booted from, and none of its
+partitions is mounted — and it prints the disk's model, its size and its current partition table, then
+waits 10 seconds before writing:</p>
+<pre><code>1bit OS install
+  target : /dev/nvme0n1  (Samsung SSD 990 PRO 2TB, 2000.4 GB)
+  booted from: /dev/sda (/dev/sda2) - refused as a target
+  source : ESP /dev/sda1, frugal install + data /data
+  anything on /dev/nvme0n1 is about to be destroyed:
+    ...
+  writing in 10 s (Ctrl-C now and nothing has been touched)
+</code></pre>
+<p><strong>It erases the target disk.</strong> What it writes, in its own seven steps:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>step</th>
+<th>what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>a <strong>GPT</strong> with a 512 MiB EFI system partition (vfat, label <code>1BIT-OS</code>) and a <code>1BIT-DATA</code> ext4 partition filling the rest</td>
+</tr>
+<tr>
+<td>2</td>
+<td>the formats, <code>mkfs.vfat</code> and <code>mkfs.ext4</code> with a fresh UUID for the data partition</td>
+</tr>
+<tr>
+<td>3</td>
+<td>the boot chain copied from the stick's own ESP: <code>BOOTX64.EFI</code> (shim), <code>grubx64.efi</code>, <code>mmx64.efi</code> (MokManager) and <code>grub.cfg</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>the whole data partition — the frugal install <code>/1bit</code> (<code>vmlinuz</code>, <code>initrd.gz</code>, the four squashfs files) <strong>and</strong> <code>/data</code> (models, Lemonade's config and cache, the API key, SSH keys) — plus <code>.installed</code> and <code>install.log</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>grub.cfg</code> re-pointed at <strong>this disk</strong>: <code>search --fs-uuid &lt;uuid&gt;</code> and every entry pinned with <code>pupsfs=UUID=&lt;uuid&gt; 1bit.data=UUID=&lt;uuid&gt;</code>, because two <code>1BIT-DATA</code> labels exist once a machine is installed</td>
+</tr>
+<tr>
+<td>6</td>
+<td>a read-back: the kernel's sha256 on the new disk must equal the source's, <code>initrd.gz</code> and the SFS files must be there</td>
+</tr>
+<tr>
+<td>7</td>
+<td>a firmware boot entry via <code>efibootmgr</code>, label <code>1bit OS</code>, pointing at the new ESP, put first in <code>BootOrder</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Then power off, <strong>remove the stick</strong>, and boot. The firmware's boot menu lists <code>1bit OS</code>; if the machine
+comes up in its own menu instead of booting, pick it there once.</p>
+<blockquote>
+<p><strong>On the cycle-13 image the installed disk does not boot yet.</strong> The install itself is complete and
+correct, but two defects stop the first boot: installer step 5 writes <code>pupsfs=UUID=&lt;uuid&gt;</code>, which
+Puppy's init does not resolve (<a href="https://github.com/1bit-MONSTER/engine/issues/865">#865</a>), and step 7's
+<code>BootNext</code> lands on the firmware's own boot-manager entry instead of the new one
+(<a href="https://github.com/1bit-MONSTER/engine/issues/866">#866</a>). Both are in the appliance lane for the
+release; until they land, boot the installed disk by editing its <code>grub.cfg</code> entry to
+<code>pupsfs=1BIT-DATA 1bit.data=UUID=&lt;uuid&gt;</code> — measured to boot, with the models and the API key in place.</p>
+</blockquote>
+<p>Check the result from the installed system:</p>
+<pre><code class="language-sh">lsblk -f                                  # ESP 1BIT-OS + 1BIT-DATA on the target
+sudo blkid /dev/nvme0n1*                  # the ESP is vfat, the data partition the UUID grub pinned
+efibootmgr -v | grep &quot;1bit OS&quot;            # the firmware entry, pointing at this disk's ESP
+</code></pre>
+<p>The installer ends by telling you to run <code>1bit-release-check</code>, which says <code>INSTALLED</code> and runs the same
+rows as the stick. The install log is on the installed <code>1BIT-DATA</code> partition as <code>/install.log</code>.</p>
+<h2 id="3-install-to-another-usb-drive">3. Install to another USB drive<a class="anchor" href="#3-install-to-another-usb-drive" title="Permanent link">#</a></h2>
+<p>The same command, pointed at the drive instead of an internal disk:</p>
+<pre><code class="language-sh">lsblk -o NAME,SIZE,MODEL,TRAN              # TRAN usb: which drive is which
+sudo 1bit-install /dev/sdb --yes           # the stick is /dev/sda, so this is the other one
+</code></pre>
+<p>It is the same installer with the same refusals and the same seven steps; the target may be USB, SATA or
+NVMe, it only has to be a whole disk that is not the one you booted. Afterwards <strong>boot the machine from
+that drive</strong> (the firmware entry it wrote points at it): it is the same system, portable, with the models
+and the API key carried across.</p>
+<p>The stick you installed <em>from</em> is untouched, so you can keep it as the installer/recovery stick.</p>
+<h2 id="4-keep-the-system-already-on-the-machine">4. Keep the system already on the machine<a class="anchor" href="#4-keep-the-system-already-on-the-machine" title="Permanent link">#</a></h2>
+<p><strong>There is no dual-boot wizard in this release, and there is no "install alongside" mode.</strong> The installer
+takes one whole disk and erases it. What that means per case:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>the machine today</th>
+<th>what to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>one disk you want to keep</td>
+<td>install to a <strong>second</strong> disk (option 2), or to a USB drive (option 3) and boot that</td>
+</tr>
+<tr>
+<td>a disk with nothing you need</td>
+<td>install over it (option 2)</td>
+</tr>
+<tr>
+<td>a Windows machine you want to keep intact</td>
+<td>install to another disk or a USB drive; the appliance does not touch the Windows disk, and the firmware's own boot menu is how you go back</td>
+</tr>
+</tbody>
+</table></div>
+<p>The installer does not shrink, move or resize any partition, and it writes nothing to a disk you did not
+name. It does add its own firmware entry, <code>1bit OS</code>, which the firmware's boot menu then offers next to
+the other OS.</p>
+<h2 id="5-the-engine-on-an-existing-linux-advanced">5. The engine on an existing Linux (advanced)<a class="anchor" href="#5-the-engine-on-an-existing-linux-advanced" title="Permanent link">#</a></h2>
+<p>The supported install for this release is the appliance: 1bit OS carries the kernel, the NPU driver, the
+signed modules and the HRX runtime that the engine needs, and a plain distribution does not. What exists
+for an existing Linux:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lemonade with the engine as its backend</td>
+<td>the <code>lemonade-onebit</code> package from the releases page, for a machine already running Lemonade (<a href="lemonade.html">Lemonade</a>)</td>
+</tr>
+<tr>
+<td>the engine alone, packaged for a distribution</td>
+<td><code>scripts/mk-plugin-package.sh</code> builds <code>1bit-engine_&lt;version&gt;_amd64.deb</code> and a tarball and wires a stock Lemonade to it (PR <a href="https://github.com/1bit-MONSTER/engine/pull/860">#860</a>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Both are <strong>advanced, and not the supported path for this release</strong>: they put the engine on a system whose
+kernel, <code>amdxdna</code> driver and HSA runtime we did not choose, so the device rows of
+<a href="https://github.com/1bit-MONSTER/engine/blob/main/os/README.md">1bit-release-check</a> are yours to run. There is <strong>no PPA route in this release</strong> — it is
+parked.</p>
+<h2 id="6-secure-boot-and-our-mok">6. Secure Boot and our MOK<a class="anchor" href="#6-secure-boot-and-our-mok" title="Permanent link">#</a></h2>
+<p>The stick and the install boot with <strong>Secure Boot on</strong>: shim → our MOK-signed grub → our MOK-signed
+kernel (<code>7.3.0-rc4-1bit-perfopt+</code>) → our signed modules (<code>amdgpu</code>, <code>amdxdna</code>, <code>ec_su_axb35</code>). Verified on
+the shipped image: <code>sbverify --cert MOK-Kernel.pem /1bit/vmlinuz</code> → <code>Signature verification OK</code>.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>your machine</th>
+<th>what to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>our key is already enrolled (the box this release is tested on)</td>
+<td>nothing — boot it</td>
+</tr>
+<tr>
+<td>our key is not enrolled</td>
+<td>the firmware will refuse the kernel. <strong>Turn Secure Boot off</strong> in the firmware setup for now: the system runs, everything works, and Secure Boot is a signature check, not a feature of the appliance</td>
+</tr>
+<tr>
+<td>you want Secure Boot on anyway</td>
+<td>enroll the public key with <code>mokutil --import MOK-Kernel.der</code> from an OS already installed on that machine, reboot, and confirm in MokManager (<code>Enroll MOK</code> → <code>Continue</code> → <code>Yes</code> → password)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The release does <strong>not</strong> put the certificate on the stick — measured: the ESP carries <code>BOOTX64.EFI</code>,
+<code>grubx64.efi</code>, <code>mmx64.efi</code> and <code>grub.cfg</code>, and the image carries no <code>.der</code> file — so a machine without
+our key cannot enroll it from the stick alone. The signing key and what is signed with it are in
+<a href="kernel.html">Linux kernel</a>.</p>
+<p>Check the state on a booted system:</p>
+<pre><code class="language-sh">mokutil --sb-state          # SecureBoot enabled
+mokutil --list-enrolled | grep -i &quot;1bit\|strixhalo&quot;
+</code></pre>
+<h2 id="7-the-bosgame-beyondmax-has-one-usable-usb-port">7. The Bosgame BeyondMax has one usable USB port<a class="anchor" href="#7-the-bosgame-beyondmax-has-one-usable-usb-port" title="Permanent link">#</a></h2>
+<p>On the Bosgame BeyondMax (<code>AXB35-02</code>, BIOS 1.09) <strong>only the front USB-A port works under Linux</strong>: a drive
+plugged into the front or rear Type-C, or a rear USB-A port, produces no kernel event at all — the xHCI
+port registers stay in RxDetect, and three of the four controllers have taken no interrupt. The same
+ports work in Windows on the same box, so it is a firmware/EC gap, not a driver in this image
+(<a href="https://github.com/1bit-MONSTER/engine/issues/823">#823</a>). Boot from the front USB-A port.</p>
+<h2 id="what-was-verified-for-this-page">What was verified for this page<a class="anchor" href="#what-was-verified-for-this-page" title="Permanent link">#</a></h2>
+<p>On the cycle-13 image (<code>sha256 dcc619ff74882f484e4c7dfb373980f294ce2f39b02291fb816ac7c62776beb7</code>,
+9,128,902,656 B) in QEMU with Secure Boot on and our MOK in <code>db</code>, kernel <code>7.3.0-rc4-1bit-perfopt+</code>:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>claim</th>
+<th>measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the image boots to Lemonade with Secure Boot on</td>
+<td>boot, <code>lemond</code> on <code>0.0.0.0:13305</code>, web app on <code>/</code>, <code>ssh</code> on <code>22</code>, kernel signature OK</td>
+</tr>
+<tr>
+<td><code>1bit-install</code> refuses the disk it booted from</td>
+<td><code>1bit-install: REFUSED: /dev/sda is the disk this system booted from (/dev/sda2 is on it)</code>, exit 2, the stick's UUIDs unchanged afterwards</td>
+</tr>
+<tr>
+<td>an install to a bare disk completes</td>
+<td>all seven steps, exit 0: GPT <code>1BIT-OS</code> 512 MiB + <code>1BIT-DATA</code> 7.5 GiB, <code>grub.cfg</code> pinned to the new UUID, kernel sha256 read back equal, <code>.installed</code> and <code>install.log</code> written</td>
+</tr>
+<tr>
+<td>the firmware entry is written</td>
+<td><code>efibootmgr</code> lists <code>1bit OS</code> → <code>HD(1,GPT,&lt;new ESP&gt;)/\EFI\BOOT\BOOTX64.EFI</code> (id <code>0004</code>, not the <code>0000</code> the step's own log line printed — <a href="https://github.com/1bit-MONSTER/engine/issues/866">#866</a>)</td>
+</tr>
+<tr>
+<td>what the install copies</td>
+<td>the installed data partition holds <code>/1bit</code> (<code>vmlinuz</code>, <code>initrd.gz</code>, the four SFS), <code>/data</code> with the models, <code>lemonade/</code> and <code>ssh/</code>, and <code>.installed</code></td>
+</tr>
+<tr>
+<td>boot of the installed disk as written</td>
+<td><strong>fails</strong> on this image: init says <code>Partition UUID=&lt;uuid&gt; not found</code> and drops to the rescue console (<a href="https://github.com/1bit-MONSTER/engine/issues/865">#865</a>)</td>
+</tr>
+<tr>
+<td>boot of the same disk with <code>pupsfs=1BIT-DATA</code> (label) instead of <code>pupsfs=UUID=…</code></td>
+<td><strong>boots</strong>: <code>puppypc20143</code>, <code>/data/.installed</code> present, <code>lemond</code> up, <code>GET /api/v1/models</code> 401 without the key and 200 with it</td>
+</tr>
+<tr>
+<td>the boot device is rejected, not guessed</td>
+<td>the refusal above is by device: <code>/proc/mounts</code> names <code>/dev/sda2</code> as <code>/data</code>, and the installer resolves the disk behind it</td>
+</tr>
+<tr>
+<td><code>pmedia=usbhd</code> is not the cause</td>
+<td>the failed boot was from a USB device, where <code>pmedia=usbhd</code> is the correct media class; the label/UUID A/B above isolates the cause to the UUID form</td>
+</tr>
+</tbody>
+</table></div>
+<p>Not verified here: an install to a real internal NVMe on the hardware (the install gate in
+<a href="releases.html">Releases</a> covers it), the firmware's own boot menu on a non-QEMU machine, and
+Secure Boot enrolment on a machine without our key (the table above is the documented route, not a
+measurement of it). The image used was the cycle-13 artifact, not the next release's.</p>
+<nav class="pager"><a class="prev" href="hetero-prefill.html"><span>Previous</span>HeteroMosaic&#x27;s split prefill, checked on our stack</a><a class="next" href="os-v3-live-puppy-eval.html"><span>Next</span>Puppy as the base of 1bit OS v3: evaluation</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/install.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

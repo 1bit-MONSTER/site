@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HeteroMosaic&#x27;s split prefill · 1bit engine</title>
+<meta name="description" content="HeteroMosaic (UIUC + AMD, MICRO 2026, arXiv 2607.12839, UIUC-ChenLab/heteroMosaic, Apache-2.0) is the closest published work to a direction we already have…">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="HeteroMosaic&#x27;s split prefill · 1bit engine">
+<meta property="og:description" content="HeteroMosaic (UIUC + AMD, MICRO 2026, arXiv 2607.12839, UIUC-ChenLab/heteroMosaic, Apache-2.0) is the closest published work to a direction we already have…">
+<link rel="canonical" href="https://1bit.gg/hetero-prefill.html">
+<meta property="og:url" content="https://1bit.gg/hetero-prefill.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HeteroMosaic&#x27;s split prefill · 1bit engine">
+<meta name="twitter:description" content="HeteroMosaic (UIUC + AMD, MICRO 2026, arXiv 2607.12839, UIUC-ChenLab/heteroMosaic, Apache-2.0) is the closest published work to a direction we already have…">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-11-01">
+<meta property="article:modified_time" content="2026-11-01">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/hetero-prefill.html#article", "headline": "HeteroMosaic's split prefill, checked on our stack", "description": "HeteroMosaic (UIUC + AMD, MICRO 2026, arXiv 2607.12839, UIUC-ChenLab/heteroMosaic, Apache-2.0) is the closest published work to a direction we already have…", "url": "https://1bit.gg/hetero-prefill.html", "mainEntityOfPage": "https://1bit.gg/hetero-prefill.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-01", "dateModified": "2026-11-01", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="clients.html">Connect a client</a></li>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html" aria-current="page">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="install.html">Install 1bit OS</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the Puppy Linux appliance</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="heteromosaics-split-prefill-checked-on-our-stack">HeteroMosaic's split prefill, checked on our stack<a class="anchor" href="#heteromosaics-split-prefill-checked-on-our-stack" title="Permanent link">#</a></h1>
+<p>HeteroMosaic (UIUC + AMD, MICRO 2026, <a href="https://arxiv.org/abs/2607.12839">arXiv 2607.12839</a>,
+<a href="https://github.com/UIUC-ChenLab/heteroMosaic">UIUC-ChenLab/heteroMosaic</a>, Apache-2.0) is the closest
+published work to a direction we already have: the XDNA 2 NPU and the Radeon iGPU working on <strong>one
+prompt at the same time</strong>. On our box (Ryzen AI MAX+ 395) they report prefill <strong>1.17x over iGPU-only</strong>,
+decode neutral. This page is what of it transfers here, by measurement, and what we will not do.</p>
+<p>Nothing of their tree is built or shipped. Their prebuilt NPU binaries (<code>hw_bins/</code>, <code>npu2</code>) are not
+used, their ROCm 7.1.1 / kernel 6.11 / AOCL stack is not installed on this box, and no code was copied:
+the harness below drives <strong>our</strong> kernels — ggml-hrx <code>MUL_MAT</code> for the iGPU and our own
+<code>gemm_q4_prefill</code> (IRON/mlir-aie) for the NPU — with their design as the hypothesis.</p>
+<h2 id="what-their-design-is-read-from-the-source-not-the-abstract">What their design is (read from the source, not the abstract)<a class="anchor" href="#what-their-design-is-read-from-the-source-not-the-abstract" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>idea</th>
+<th>where</th>
+<th>what it means for us</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M-split prefill GEMM</strong></td>
+<td><code>hetero_compute.cpp:111</code> (<code>..._gemm_packed_M</code>), split at <code>:191</code>, disjoint row ranges into the same output, no join pass</td>
+<td>exploitable only if the two engines' throughputs are comparable</td>
+</tr>
+<tr>
+<td><strong>K-split</strong> for the <code>down_proj</code> shape</td>
+<td><code>hetero_compute.cpp:282</code>, two pre-split weight buffers, join = <code>output_2d.add_()</code> at <code>:444</code></td>
+<td>same throughput condition, plus a padded reduction</td>
+</tr>
+<tr>
+<td><strong>Ratio is a calibration table, not a formula</strong></td>
+<td><code>config_map</code> (<code>npuSetup.cpp:85</code>), keyed <code>(M,K,N,layer,chunk)</code>; seeded then swept by <code>py/unified_llm_w4a16/_hetero_tune.py:97-118</code>, <code>:2208-2225</code></td>
+<td>their tuned NPU share on Strix Halo is <strong>M/8</strong> (strixP 1/2, krackanP 7/8) — i.e. they expect NPU:GPU ≈ 1:7</td>
+</tr>
+<tr>
+<td><strong>One packed W4A16 layout for both engines</strong></td>
+<td>4352-byte tile = 4096 B nibble-packed 128×64 weights + 128 B bf16 scales + 128 B zeros (<code>hipkernels/w4a16_gemm_packed.cu:35-39</code>), packer <code>py/.../qwen25_14b_w4a16_model.py:662-793</code></td>
+<td>the single best idea in the paper for us: one weight copy in DRAM, consumed by HIP and by the NPU</td>
+</tr>
+<tr>
+<td><strong>DRM shareable buffers</strong></td>
+<td>HIP allocates and exports (<code>hsa_amd_portable_export_dmabuf</code>), amdxdna imports (<code>PRIME_FD_TO_HANDLE</code>) — <code>npuSetup.cpp:1913-2010</code>, handles in <code>bo_args[4]</code> at <code>:1836</code></td>
+<td>we can do this too, and we already have the export hook: <code>ggml_backend_buffer_export_dmabuf</code> (<code>ggml-hrx.cpp:1125</code>)</td>
+</tr>
+<tr>
+<td><strong>Chunked prefill + host dispatcher</strong></td>
+<td>per-chunk HIP streams (<code>unified_llm_w4a16.cpp:2179-2260</code>), NPU work in <code>std::async</code> threads gated by a 16-event pool (<code>hetero_compute.cpp:36-41</code>) spinning on <code>hipEventQuery</code> (<code>npuSetup.cpp:1852-1872</code>)</td>
+<td>the "scheduler" is a mutex (<code>npu_mutex</code>, <code>npuSetup.cpp:1827</code>) plus hand-tuned <code>stage_bubbles</code> delays in the config; there is no coalescing thread in the code</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two things the paper's summary gets wrong about the code, worth having straight because they change
+what we would port: requests are <strong>not</strong> coalesced at run time (one global mutex serialises the array;
+only PDI/instruction contexts are shared), and cross-engine ordering is <strong>host-side polling of a HIP
+event</strong>, because amdxdna has no wait-on-HIP-fence. The NPU submission also rebuilds two command BOs
+per GEMM call (<code>npu_matmul_func.cpp:325-430</code>).</p>
+<h2 id="what-we-measured">What we measured<a class="anchor" href="#what-we-measured" title="Permanent link">#</a></h2>
+<p>Harness <code>~/mosaic-bench/mosaic_bench</code> (ours): one process, the engine's ggml-hrx <code>MUL_MAT</code> on <code>HRX0</code>
+for the iGPU and our <code>gemm_q4_prefill</code> NPU kernel through XRT (T=256 rows/launch), each alone and then
+both concurrently with rows split. Shapes are Qwen3-0.6B and Qwen3-4B prefill GEMMs, <code>M</code> = 256 / 2048 /
+16384 prompt tokens. Every run under <code>npu-hold</code> outside <code>gpu-hold</code>, one ticket at a time. The NPU side
+was validated against the kernel's own fp64 fixture first (<code>rel_fro=2.22e-3</code>, their gate 5e-3), so the
+timings are of a correct kernel.</p>
+<p><strong>iGPU alone</strong> (HRX, Q4_K weights, ms / TFLOP-s):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>shape</th>
+<th>model</th>
+<th>M=256</th>
+<th>M=2048</th>
+<th>M=16384</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>up_gate 2560×9728</td>
+<td>4B</td>
+<td>0.383 / 29.1</td>
+<td>2.80 / 36.4</td>
+<td>20.03 / 40.7</td>
+</tr>
+<tr>
+<td>down 9728×2560</td>
+<td>4B</td>
+<td>0.489 / 26.1</td>
+<td>3.38 / 29.5</td>
+<td>21.21 / 38.5</td>
+</tr>
+<tr>
+<td>up_gate 1024×3072</td>
+<td>0.6B</td>
+<td>0.455 / 3.5</td>
+<td>0.60 / 21.2</td>
+<td>8.58 / 11.9</td>
+</tr>
+<tr>
+<td>down 3072×1024</td>
+<td>0.6B</td>
+<td>0.274 / 5.9</td>
+<td>0.67 / 19.3</td>
+<td>4.03 / 25.6</td>
+</tr>
+</tbody>
+</table></div>
+<p>Independent anchor, not my microbench: <code>llama-bench -p 2048 -n 0 --device HRX0</code> on Qwen3-4B-Q4_K_M =
+<strong>1372.8 tok/s</strong>, i.e. 11.0 TFLOP/s for the whole prefill with attention and dequant included. The
+single-op numbers above are upper bounds; the anchor is what a split would actually compete with.</p>
+<p><strong>NPU alone</strong> (our <code>gemm_q4_prefill</code>, T=256): per-tile time is flat in M — 8.61-8.66 ms for the 4B
+shapes, 1.15-1.30 ms for the 0.6B shapes — so <strong>1.47-1.58 TFLOP/s</strong> (4B) and 1.24-1.40 TFLOP/s (0.6B),
+and total NPU time is <code>ceil(M/256) × tile</code>. It is weight-stream bound: the design refetches the whole
+weight column for every T-tile, which is why the per-tile time tracks K·N and not T.</p>
+<p><strong>Together (M-split, wall clock, best ratio per shape):</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>shape</th>
+<th>M</th>
+<th>iGPU alone</th>
+<th>best split</th>
+<th>speed-up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4B up_gate</td>
+<td>16384</td>
+<td>20.03 ms</td>
+<td>m=15872, NPU 2 tiles</td>
+<td><strong>1.013x</strong></td>
+</tr>
+<tr>
+<td>4B down</td>
+<td>16384</td>
+<td>21.21 ms</td>
+<td>m=15872, NPU 2 tiles</td>
+<td>1.001x</td>
+</tr>
+<tr>
+<td>0.6B up_gate</td>
+<td>16384</td>
+<td>8.58 ms</td>
+<td>m=15872, NPU 2 tiles</td>
+<td>1.009x</td>
+</tr>
+<tr>
+<td>4B up_gate</td>
+<td>2048</td>
+<td>2.85 ms</td>
+<td>m=1792, NPU 1 tile</td>
+<td>0.32x</td>
+</tr>
+<tr>
+<td>4B down</td>
+<td>2048</td>
+<td>3.38 ms</td>
+<td>m=1792, NPU 1 tile</td>
+<td>0.41x</td>
+</tr>
+<tr>
+<td>0.6B down</td>
+<td>2048</td>
+<td>0.67 ms</td>
+<td>m=1792, NPU 1 tile</td>
+<td>0.53x</td>
+</tr>
+<tr>
+<td>any measured shape</td>
+<td>256</td>
+<td>0.16-0.49 ms</td>
+<td>—</td>
+<td>≤ 0.37x</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The result: on this box the M-split never wins.</strong> It is +1.3 % at best, in the one regime where the
+NPU's share fits entirely under the iGPU's (2 tiles = 17.2 ms under 19.4 ms of GPU work), and any
+larger NPU share loses 2-12x. It is not interference — with the NPU busy the iGPU's own time does not
+move (a 16384-row GEMM costs 20.03 ms alone, and the whole split took 20.06 ms while the NPU streamed
+8.6 ms alongside; the NPU's 1.8 GB/s of weights is 1 % of DRAM bandwidth, and this matches the
+GPU-busy NPU measurement in <a href="hybrid.html">Hybrid</a>, which keeps 87 % of NPU bandwidth in the
+other direction). It is plain throughput asymmetry: <strong>our iGPU runs these GEMMs at 29-41 TFLOP/s and
+our NPU at 1.5 TFLOP/s, a 20-25x ratio</strong>, so the ceiling on any split is ~3-5 % and only at M=16384.</p>
+<p>Their 1.17x is therefore not contradicted, it is <em>out of reach for a different reason</em>: their own
+tuned NPU share (M/8 on this SoC) implies an NPU:GPU ratio near 1:7 in their stack, and their iGPU
+path is a rocWMMA W4A16 kernel, not hipBLASLt-class throughput. Our GPU side is the fast half; there
+is nothing for the NPU to take that the GPU is slow at.</p>
+<h3 id="re-measured-after-the-2026-11-01-1113-gpu-reset-the-sentence-above-is-conditional-on-the-igpus-state">Re-measured after the 2026-11-01 11:13 GPU reset: the sentence above is conditional on the iGPU's state<a class="anchor" href="#re-measured-after-the-2026-11-01-1113-gpu-reset-the-sentence-above-is-conditional-on-the-igpus-state" title="Permanent link">#</a></h3>
+<p>The table and the "never wins" verdict were measured on one boot (06:00-06:40 AST, before the reset).
+On the boot that followed the reset, the same harness, the same NPU kernel sets and the same shapes give
+a different iGPU:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>shape</th>
+<th>M</th>
+<th>iGPU, pre-reset boot</th>
+<th>iGPU, post-reset boot</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4B up_gate 2560×9728</td>
+<td>2048</td>
+<td>2.80 ms / 36.4 TFLOP-s</td>
+<td>2.88 ms / 35.4 TFLOP-s</td>
+</tr>
+<tr>
+<td></td>
+<td>16384</td>
+<td>20.03 ms / 40.7 TFLOP-s</td>
+<td><strong>65.68 ms / 12.4 TFLOP-s</strong></td>
+</tr>
+<tr>
+<td>4B down 9728×2560</td>
+<td>16384</td>
+<td>21.21 ms / 38.5</td>
+<td><strong>67.51 ms / 12.1</strong></td>
+</tr>
+<tr>
+<td>0.6B up_gate 1024×3072</td>
+<td>16384</td>
+<td>8.58 ms / 11.9</td>
+<td>12.39 ms / 8.3</td>
+</tr>
+<tr>
+<td>0.6B down 3072×1024</td>
+<td>16384</td>
+<td>4.03 ms / 25.6</td>
+<td>9.71 ms / 10.6</td>
+</tr>
+</tbody>
+</table></div>
+<p>M ≤ 2048 reproduces within 3 %, and a fresh-process M-sweep puts a hard knee between M=2048
+(36.9 TFLOP-s) and M=4096 (12.5 TFLOP-s), linear above it.</p>
+<p>The knee is a dispatch rule, not an accident: the Q4_K prefill path
+(<code>common.mul_mat.q4_k_q8_1_x4_prefill</code>) is capped at 256-2048 tokens, and Q4_K cannot use the
+split-tail relaxation because its head binds the weight in the packed Row64 layout, so every M above
+2048 rides <code>hip.dense_prefill.mm</code> instead. That alone is not a problem — on the <code>rc-2026-10-31c</code>
+binaries the same GEMM at M=16384 runs at <strong>18.6 ms / 43.95 TFLOP-s</strong> on this very boot, i.e. slightly
+better than the pre-reset numbers. The 12.4 TFLOP-s in the table above is what <em>current main</em> does
+with that kernel.</p>
+<p>That gap is a build regression, isolated by crossing the two libraries: today's <code>libggml-hrx</code> is slow
+even when driving the older <code>libhrx</code>/<code>libloomc</code>, and the older <code>libggml-hrx</code> is fast even when driving
+today's, with the same dispatch and the same kernel corpus (335 code objects) in all four arms. Both
+sides are on llama.cpp pin <code>4a58da9b0</code>, so it is build configuration rather than source. Filed as
+<a href="https://github.com/1bit-MONSTER/engine/issues/782">engine#782</a>; clocks (2895 MHz, 72-78 C) and the
+box's GTT occupancy were ruled out, several builds each.</p>
+<p>The consequence for the split is in the next table, and the honest reading of it is that a split's
+ceiling follows whatever the iGPU is currently doing — which, on main today, is 3.5x below what the
+same hardware does on the release candidate.</p>
+<p>At that 8:1 iGPU:NPU ratio the split <em>does</em> win, and at the balance point rather than at M-256:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>shape</th>
+<th>M</th>
+<th>iGPU alone</th>
+<th>best split</th>
+<th>speed-up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4B up_gate</td>
+<td>16384</td>
+<td>65.71 ms</td>
+<td>m=14848, NPU 6 tiles</td>
+<td><strong>1.098x</strong></td>
+</tr>
+<tr>
+<td>4B down</td>
+<td>16384</td>
+<td>67.66 ms</td>
+<td>m=14592, NPU 7 tiles</td>
+<td><strong>1.111x</strong></td>
+</tr>
+<tr>
+<td>0.6B up_gate</td>
+<td>16384</td>
+<td>12.73 ms</td>
+<td>m=14592, NPU 7 tiles</td>
+<td><strong>1.128x</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>One formula covers both boots: balance the iGPU's per-row time against the NPU's per-256-row-tile time.
+At 40.7 TFLOP-s that puts the optimum at m≈15800 and a 1.036x ceiling (what the earlier sweep saw as
+1.013x at m=15872); at 12.1 TFLOP-s it puts it at m≈14600 and 1.10-1.13x (measured 1.098-1.128x).
+Overlap is effectively free either way: at the optimum the wall clock is within 0.5 % of the iGPU's own
+share of the rows, and <code>amdxdna</code> logged no errors across the runs.</p>
+<p>Read together, the numbers say the split is a <em>ratio</em> question, not an NPU-quality question, and that
+the ratio is not a property of this SoC alone. They also say the split is not a mitigation: 59.8 ms of
+split on the degraded boot is still 3x slower than 20.0 ms of iGPU-only on the healthy one. A 10 % win
+taken from a 3.3x loss is not a reason to build a split dispatcher; it is a reason to keep the iGPU
+numbers of this document dated, and to re-run the ratio before anyone quotes a ceiling from it.</p>
+<h2 id="what-transfers-and-what-we-will-not-do">What transfers, and what we will not do<a class="anchor" href="#what-transfers-and-what-we-will-not-do" title="Permanent link">#</a></h2>
+<p><strong>Transfers (worth doing regardless of the split):</strong></p>
+<ul>
+<li><strong>One packed weight layout both engines read.</strong> This is the idea with real value here, and it is
+  also the answer to the hybrid route's biggest waste — the model resident twice (<code>docs/hybrid.md</code>,
+  <code>~/briefs/TZEROCOPY-STATE.md</code> row 12: a 15 GB GGUF plus a 16 GB <code>model.q4nx</code>). Their tile is a flat
+  <code>uint8</code> buffer with the scales and zeros inline, so a HIP kernel and an NPU instruction stream can
+  both consume the same bytes with no repack. Ours are two packings today (ggml Q4_K blocks for HRX,
+  Q4NX tiles for the NPU kernels).</li>
+<li><strong>The DRM buffer bridge.</strong> Measured, works, and we already own half of it (next section).</li>
+<li><strong>The dispatcher shape</strong> — one HIP stream per in-flight chunk, NPU work on its own thread, ordering
+  by a recorded event — is what our hybrid route would need anyway, and it does not need their code.</li>
+</ul>
+<p><strong>Will not do:</strong></p>
+<ul>
+<li><strong>Port their NPU binaries or their stack.</strong> Prebuilt <code>.pdi</code>/instruction blobs are theirs to ship, not
+  ours to run; our NPU route is our own full-ELF kernel sets (docs/npu.md). Their ROCm 7.1.1 / kernel
+  6.11 / AOCL pins are not this box's.</li>
+<li><strong>Build a split-prefill dispatcher before the NPU GEMM is faster.</strong> A dispatcher around a 1.5 TFLOP/s
+  NPU buys ≤ 1.3 %, measured. The precondition is an NPU prefill GEMM ~4x faster: our per-tile time is
+  weight-fetch bound, so a T&gt;256 tile with weight reuse across T is the work (roughly 4x at T=1024),
+  and only then does a ~15 % split at M=16384 become possible — still 0 at M≤2048.</li>
+<li><strong>Copy the weights to give the NPU its own layout per layer.</strong> Measured cost: 50 MiB of copies per
+  layer for the 4B up_gate (~3.6 ms at 14 GB/s) against a 1.3 % best-case gain.</li>
+</ul>
+<h2 id="the-drm-buffer-measured">The DRM buffer, measured<a class="anchor" href="#the-drm-buffer-measured" title="Permanent link">#</a></h2>
+<p><code>~/mosaic-bench/dmabuf_test.cpp</code>, 64 MiB, under <code>npu-hold</code> + <code>gpu-hold</code>:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>step</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HRX allocation → <code>ggml_backend_buffer_export_dmabuf</code> → dma-buf fd</td>
+<td>fd in <strong>0.044 ms</strong></td>
+</tr>
+<tr>
+<td>amdxdna <code>PRIME_FD_TO_HANDLE</code> + <code>GET_BO_INFO</code> + <code>mmap</code></td>
+<td><strong>0.206 ms</strong> (0.090 ms for a plain <code>hipMalloc</code>)</td>
+</tr>
+<tr>
+<td>iGPU writes → the amdxdna mapping reads, and the reverse</td>
+<td><strong>MATCH both ways</strong> over 64 MiB, one buffer</td>
+</tr>
+<tr>
+<td>bandwidth through the shared mapping</td>
+<td><strong>29.3 GB/s</strong> CPU read, vs <strong>14.0 GB/s</strong> for <code>hipMemset</code> + <code>hipMemcpy</code> D2H</td>
+</tr>
+<tr>
+<td>NPU-allocated BO → dma-buf (<code>xrt::bo::export_buffer()</code> + <code>PRIME_HANDLE_TO_FD</code>)</td>
+<td><strong>fails</strong> (XRT's own handle, ENOENT) — only iGPU-allocated buffers are shareable</td>
+</tr>
+</tbody>
+</table></div>
+<p>So the sharing half of their design is available to us today with our own export hook, and it is 2x
+the copy path. What is missing is <strong>execution on the imported buffer</strong>: our NPU kernels go through
+XRT, which allocates its own BOs and cannot bind a foreign dma-buf handle as a kernel argument.
+HeteroMosaic executes on imported handles only because it submits to amdxdna by raw ioctl
+(<code>npuSetup.cpp:1913-2010</code>), with no XRT in the path at all.</p>
+<h2 id="follow-ups-filed">Follow-ups filed<a class="anchor" href="#follow-ups-filed" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="https://github.com/1bit-MONSTER/engine/issues/753">#753</a> — dma-buf import for the NPU submission
+  path: XRT cannot bind an imported BO, so today only iGPU→NPU sharing is possible, and only for
+  buffers the NPU cannot yet execute on.</li>
+<li><a href="https://github.com/1bit-MONSTER/engine/issues/754">#754</a> — split-prefill in the hybrid route,
+  <strong>blocked on</strong> an NPU prefill GEMM with T&gt;256 weight reuse; the numbers above are the acceptance bar
+  it has to clear.</li>
+<li><code>docs/hybrid.md</code>'s "Running beside the GPU" section already covers the other direction (an NPU stream
+  under a busy GPU keeps 87 % of its bandwidth); this page adds the GPU-side view: the iGPU loses
+  &lt; 0.2 % when the NPU runs beside it.</li>
+</ul>
+<h2 id="reproducing">Reproducing<a class="anchor" href="#reproducing" title="Permanent link">#</a></h2>
+<pre><code>~/mosaic-bench/mosaic-run env ITERS=3 ./sweep.sh        # alone: HRX, NPU, first split sweep
+~/mosaic-bench/mosaic-run env ITERS=3 ./sweep2.sh       # split at the ratios that matter
+~/mosaic-bench/mosaic-run ./dmabuf_test --mode hip      # DRM bridge, HIP allocation
+~/mosaic-bench/mosaic-run ./dmabuf_test --mode hrx      # DRM bridge, HRX allocation (engine hook)
+</code></pre>
+<p><code>mosaic-run</code> sets what HRX needs on this box and takes the holds (<code>HOLDS=gpu|npu|both</code>). On the
+rebuilt box the 2026-10-01 <code>~/.local/share/1bit-canonical</code> install cannot enumerate <code>HRX0</code> at all
+(<code>hrx_gpu_initialize</code> → NOT_FOUND); the rc31c libraries plus the TheRock <code>libhsa-runtime64.so.1</code> path
+can, and that is what the numbers above used.</p>
+<p><strong>Unrun, declared:</strong> Qwen3-4B <code>q_proj</code> (4096×2560) and 0.6B <code>k</code>/<code>v</code> (1024×1024) — our prebuilt kernel
+set has no such shapes and the mlir-aie venvs that would build them are gone on this box
+(<code>~/ironenv142</code> empty, <code>~/iron</code> → a dangling link). k/v/o/x-projection shapes we did measure are the
+two biggest per model (up/gate and down = 75 % of Qwen3-4B projection FLOPs). Also unrun: K-split (the
+<code>down_proj</code> K-split path), decode (the paper reports it neutral; our NPU serves decode through a
+different kernel), and anything end-to-end through <code>serve</code>.</p>
+<p>Source of the analysis: <code>~/amd-oss/heteroMosaic</code> at <code>61714a3</code>, read-only, no build.</p>
+<nav class="pager"><a class="prev" href="determinism.html"><span>Previous</span>Determinism and cross-route log-prob agreement</a><a class="next" href="install.html"><span>Next</span>Install 1bit OS</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/hetero-prefill.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>
