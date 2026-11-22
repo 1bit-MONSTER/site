@@ -28,6 +28,8 @@ that machine.
 
 > **Update (2026-10-30):** the release candidate's checks are green: the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, and the hardware gate is green at the shipping pin; the tag and the packages are the owner's. The engine is pinned to Lemonade's weekly release. Current numbers: [Models measured](../docs/models.md); status: [Releases](../docs/releases.md).
 
+> **Update (2026-11-22):** v2026.47 is the first published release of the engine. What ships, how it was measured on the hardware and how to get it: [the v2026.47 release post](2026-11-22-v2026.47-release.md).
+
 ## 43 of 43 configurations, all on the GPU with HRX
 
 We keep a census of the models people run and the modes they run them in: a short chat, a long

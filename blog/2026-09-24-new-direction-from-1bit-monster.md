@@ -24,6 +24,8 @@ title: 1bit.MONSTER becomes 1bit engine
 
 > **Update (2026-10-30):** Vulkan, ROCm and ZINC are no longer routes of the engine (engine #306); it is HRX with our own HIP kernels plus the NPU engine, inside Lemonade, pinned to Lemonade's weekly release. See [What the engine is](../README.md).
 
+> **Update (2026-11-21):** the GPU route is moving to AMD's Loom model programs on HRX, one model at a time once each passes an A/B and accuracy gate; the llama.cpp build with ggml-hrx and our HIP kernels stays as the fallback, and the NPU engine continues. See [HRX](../docs/hrx.md#direction-loom-on-the-gpu) and [the Loom route](../docs/loom-route.md).
+
 ## What changed
 
 **A clean repository.** The engine lives in [1bit-MONSTER/engine](https://github.com/1bit-MONSTER/engine). It holds verified code only, without the development history. Each piece is ported over once it passes its end-to-end test on Strix Halo, and the [porting map](../docs/PORTING.md) shows what has moved and what is next.

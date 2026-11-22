@@ -62,8 +62,9 @@ Nothing here needs a cloud account, and nothing leaves the machine.
 
 The engine's one GPU runtime is HRX. Today every model runs on AMD's ggml-hrx with its Loom kernels,
 plus our own HIP kernels, in one llama.cpp build. The GPU route is moving to AMD's Loom model
-programs on HRX, one model at a time once each passes an A/B and accuracy check; no model has moved
-yet, and the llama.cpp build stays as the fallback ([HRX](hrx.html#direction-loom-on-the-gpu)). HRX runs every graph node of every model and mode we test on the Strix Halo
+programs on HRX, one model at a time once each passes an A/B and accuracy check. v2026.47 carries the
+first gated entry, Qwen3.8-27B, which activates only with its Loom card and `loom-serve` installed (the
+release ships neither), and the llama.cpp build stays as the fallback ([HRX](hrx.html#direction-loom-on-the-gpu)). HRX runs every graph node of every model and mode we test on the Strix Halo
 GPU: 43 of 43 configurations in the 2026-10-20 census, with 0 nodes on the CPU
 ([HRX](hrx.html), [Every node on the GPU](blog-every-node-on-hrx.html)). Every ggml weight type runs
 on it, including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ formats, so any GGUF
@@ -108,8 +109,8 @@ stock `lemond` from Lemonade's PPA.
 
 ## Where it ships
 
-The engine ships inside those packages once a release has passed its checklist; no release is published yet,
-and it is held until every open engine issue is fixed ([Releases](releases.html)). On a distribution other
+The engine ships inside those packages once a release has passed its checklist. The current release is
+[v2026.47](https://github.com/1bit-MONSTER/engine/releases/tag/v2026.47) ([Releases](releases.html)). On a distribution other
 than 1bit OS, the engine installs from packages ([Install on any Linux](install-any-distro.html)). The
 source is Apache-2.0 on [GitHub](https://github.com/1bit-MONSTER/engine), and questions are answered in the
-[FAQ](faq.html).
+[FAQ](faq.html). What each release carries is in its [release post](../../blog/2026-11-22-v2026.47-release.md).

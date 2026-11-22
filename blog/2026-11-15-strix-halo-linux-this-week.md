@@ -25,6 +25,8 @@ on Linux, fixed open issues before building anything new: from 30 open engine is
 a crash in the MTP drafter was found and fixed, the CI gained checks that catch whole classes of mistakes
 before review, and the Bosgame M5's dead USB-C ports turned out to have a one-line fix.
 
+> **Update (2026-11-22):** v2026.47 is the first published release of the engine. What ships, how it was measured on the hardware and how to get it: [the v2026.47 release post](2026-11-22-v2026.47-release.md).
+
 ## Why fix every issue first?
 
 The release is held until every issue is fixed. So from 31 October the work went to open issues first,
