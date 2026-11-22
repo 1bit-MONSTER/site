@@ -107,8 +107,8 @@ TAGLINE = ("One binary to rule them all: model-agnostic local LLM inference on t
 # The home page's search title (without the " · 1bit engine" suffix) and description. Keep the
 # description <= DESCRIPTION_MAX characters and update it with each milestone (README.md, docs/hrx.md).
 HOME_TITLE = "Strix Halo local LLM: Ryzen AI MAX+ 395, Linux"
-HOME_DESCRIPTION = ("One binary for local LLMs on the AMD Ryzen AI MAX+ 395 (Strix Halo): the GPU on HRX and Loom, "
-                    "the XDNA 2 NPU on our own engine, in Lemonade. Boot from USB.")
+HOME_DESCRIPTION = ("One binary serves every model on the AMD Ryzen AI MAX+ 395 (Strix Halo): GPU on HRX with AMD's Loom "
+                    "kernels, NPU on our own NPU engine. Boot from USB.")
 HOME_KEYWORDS = ("model-agnostic LLM inference, one binary, local LLM, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, Loom, loom-serve, "
                  "AMD NPU LLM, Ryzen AI NPU Linux, XDNA 2 NPU, live USB, boot from USB, 1bit OS, "
                  "Lemonade Server, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, BitNet b1.58, ternary, "
