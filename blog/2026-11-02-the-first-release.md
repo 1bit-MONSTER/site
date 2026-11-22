@@ -101,6 +101,10 @@ on that exact build. The rule stands: the whole gate, on the hardware, on the by
   unpacked, and the appliance is a server unless you pick the `desktop` entry.
 - The install to the board's internal disk has not run on the board yet; it has run in QEMU, live
   and installed, with the stick out.
+- In **this release** the installer wrote no firmware boot entry: remove the stick or pick the disk
+  in the firmware yourself ([#709](https://github.com/1bit-MONSTER/engine/issues/709), fixed since).
+- In **this release** the installed machine was the live image written to disk; a later release makes
+  it a full headless OS ([#712](https://github.com/1bit-MONSTER/engine/issues/712), done since).
 - Single-stream decode on Qwen3.8 is behind the fastest Strix Halo engines today. The numbers we
   publish are the ones we measured, on the [leaderboard](../docs/npu-leaderboard.md) and the
   [wiki](https://github.com/1bit-MONSTER/engine/wiki), with the command that produced each.
