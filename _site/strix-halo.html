@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strix Halo LLM guide: Ryzen AI MAX+ 395, Linux · 1bit engine</title>
+<meta name="description" content="Run local LLMs on AMD Strix Halo (Ryzen AI MAX+ 395) on Linux: the Radeon 8060S iGPU (gfx1151) through HRX, the XDNA 2 NPU, Lemonade Server, measured.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Strix Halo LLM guide: Ryzen AI MAX+ 395, Linux · 1bit engine">
+<meta property="og:description" content="Run local LLMs on AMD Strix Halo (Ryzen AI MAX+ 395) on Linux: the Radeon 8060S iGPU (gfx1151) through HRX, the XDNA 2 NPU, Lemonade Server, measured.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<link rel="canonical" href="https://1bit.gg/strix-halo.html">
+<meta property="og:url" content="https://1bit.gg/strix-halo.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Strix Halo LLM guide: Ryzen AI MAX+ 395, Linux · 1bit engine">
+<meta name="twitter:description" content="Run local LLMs on AMD Strix Halo (Ryzen AI MAX+ 395) on Linux: the Radeon 8060S iGPU (gfx1151) through HRX, the XDNA 2 NPU, Lemonade Server, measured.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-05">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "description": "The 1bit engine project: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo), Apache-2.0.", "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://github.com/1bit-MONSTER/site", "https://huggingface.co/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/strix-halo.html#article", "headline": "Local LLMs on AMD Strix Halo (Ryzen AI MAX+ 395) on Linux", "description": "Run local LLMs on AMD Strix Halo (Ryzen AI MAX+ 395) on Linux: the Radeon 8060S iGPU (gfx1151) through HRX, the XDNA 2 NPU, Lemonade Server, measured.", "url": "https://1bit.gg/strix-halo.html", "mainEntityOfPage": "https://1bit.gg/strix-halo.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-05", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "about": {"@id": "https://1bit.gg/#software"}}, {"@type": "SoftwareApplication", "@id": "https://1bit.gg/#software", "name": "1bit engine", "url": "https://1bit.gg/", "description": "One binary to rule them all: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo), any model on the Radeon 8060S iGPU and the XDNA 2 NPU, inside AMD's Lemonade Server. Boot a stick and it serves.", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "LLM inference engine", "operatingSystem": "Linux", "downloadUrl": "https://github.com/1bit-MONSTER/engine/releases", "installUrl": "https://1bit.gg/lemonade.html", "softwareRequirements": "AMD Ryzen AI MAX+ 395 (Strix Halo); Lemonade Server, the weekly Lemonade pin", "license": "https://www.apache.org/licenses/LICENSE-2.0", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"}, "processorRequirements": "AMD Ryzen AI MAX+ 395 (Strix Halo): Radeon 8060S iGPU (gfx1151), XDNA 2 NPU", "softwareHelp": {"@type": "CreativeWork", "url": "https://1bit.gg/docs.html"}, "featureList": ["OpenAI-compatible API through Lemonade Server", "Radeon 8060S iGPU through HRX and our own HIP kernels", "XDNA 2 NPU on Linux through our own NPU runtime", "Any GGUF quantization, including ternary BitNet b1.58", "Speculative decoding: MTP and DFlash2", "1bit OS: boots from a USB stick"], "author": {"@id": "https://1bit.gg/#organization"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "sameAs": ["https://github.com/1bit-MONSTER/engine"], "keywords": "model-agnostic LLM inference, local LLM, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, HIP kernels, XDNA 2 NPU, live USB, 1bit OS, Lemonade Server, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, BitNet b1.58, ternary, Ternary-Bonsai, gpt-oss-20b, MXFP4, NVFP4, MTP, speculative decoding, 1bit OS, local AI"}, {"@type": "BreadcrumbList", "@id": "https://1bit.gg/strix-halo.html#breadcrumb", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "1bit engine", "item": "https://1bit.gg/"}, {"@type": "ListItem", "position": 2, "name": "Strix Halo guide", "item": "https://1bit.gg/strix-halo.html"}]}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+<li><a href="strix-halo.html" aria-current="page">Strix Halo guide</a></li>
+<li><a href="faq.html">FAQ</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="local-llms-on-amd-strix-halo-ryzen-ai-max-395-on-linux">Local LLMs on AMD Strix Halo (Ryzen AI MAX+ 395) on Linux<a class="anchor" href="#local-llms-on-amd-strix-halo-ryzen-ai-max-395-on-linux" title="Permanent link">#</a></h1>
+<p>The AMD Ryzen AI MAX+ 395, codenamed Strix Halo, puts a Radeon 8060S iGPU (<code>gfx1151</code>), an XDNA 2
+NPU and 128 GB of memory shared between them in one machine. The 1bit engine is built for that one
+chip: it serves local LLMs on its GPU and its NPU, on Linux, behind the OpenAI-compatible API of
+AMD's <a href="lemonade.html">Lemonade Server</a>. This page gathers what the docs and the posts say about
+running local LLMs on it, with a link to where each fact is measured.</p>
+<h2 id="the-gpu-radeon-8060s-through-hrx">The GPU: Radeon 8060S through HRX<a class="anchor" href="#the-gpu-radeon-8060s-through-hrx" title="Permanent link">#</a></h2>
+<p>The engine's one GPU route is HRX: AMD's ggml-hrx with its Loom kernels, plus our own HIP kernels,
+in one llama.cpp build. HRX runs every graph node of every model and mode we test on the Strix Halo
+GPU: 43 of 43 configurations in the 2026-10-20 census, with 0 nodes on the CPU
+(<a href="hrx.html">HRX</a>, <a href="blog-every-node-on-hrx.html">Every node on the GPU</a>). Every ggml weight type runs
+on it, including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ formats, so any GGUF
+quantization loads, from Unsloth's dynamic quants to <a href="blog-bitnet-b158-on-hrx.html">BitNet b1.58</a>.</p>
+<h2 id="the-npu-xdna-2-on-linux">The NPU: XDNA 2 on Linux<a class="anchor" href="#the-npu-xdna-2-on-linux" title="Permanent link">#</a></h2>
+<p>The <a href="npu.html">NPU engine</a> runs models on the XDNA 2 NPU on Linux, on our own runtime and kernels.
+It is in progress, correctness first and speed next; Qwen3-0.6B decodes at 88.6 tok/s on it in the
+release gate. The NPU and the GPU were measured running at the same time, forty repetitions with no
+hang and no corruption (<a href="blog-gpu-and-npu-at-the-same-time.html">the measurement</a>), and the
+<a href="hybrid.html">hybrid route</a> puts the prompt on one device and the generated tokens on the other.
+PrismML's ternary Bonsai-2-27B already answers correctly on the NPU
+(<a href="blog-ternary-bonsai-on-the-npu.html">Ternary Bonsai on the NPU</a>).</p>
+<h2 id="measured-on-the-machine">Measured on the machine<a class="anchor" href="#measured-on-the-machine" title="Permanent link">#</a></h2>
+<p>Every number below was taken on a Ryzen AI MAX+ 395 at the current pins; the full table, and how
+each number is taken, are on <a href="models.html">Models measured</a> and <a href="bench.html">How we measure</a>.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>model</th>
+<th>route</th>
+<th>measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen3.8-27B, UD-Q4_K_XL</td>
+<td>HRX</td>
+<td>decode 36.0 tok/s with MTP on code prompts; 56.6 tok/s with the DFlash2 drafter</td>
+</tr>
+<tr>
+<td>Qwen3.8-Flash-Next (MoE)</td>
+<td>HRX</td>
+<td>prefill 287 tok/s, decode 24.0 tok/s</td>
+</tr>
+<tr>
+<td>Zyphra ZAYA1-8B, Q4_K_M</td>
+<td>HRX</td>
+<td>decode 157 tok/s</td>
+</tr>
+<tr>
+<td>PrismML Ternary-Bonsai-2-27B, PQ2_0</td>
+<td>HRX</td>
+<td>decode 43.3 tok/s with MTP</td>
+</tr>
+<tr>
+<td>Microsoft BitNet b1.58 2B-4T, TQ2_0</td>
+<td>HRX</td>
+<td>decode 123.4 tok/s</td>
+</tr>
+<tr>
+<td>Qwen3-0.6B</td>
+<td>NPU</td>
+<td>decode 88.6 tok/s in the release gate</td>
+</tr>
+</tbody>
+</table></div>
+<p>Speculative decoding pays on the dense models: the model's own MTP head, or a separate drafter such
+as DFlash2, guesses several tokens that the model checks in one pass. On Qwen3-Coder-30B-A3B, a MoE
+already at 88 tok/s, every draft model we tried was slower
+(<a href="blog-speculative-decoding-where-it-pays.html">Speculative decoding: where it pays</a>).</p>
+<h2 id="lemonade-server-and-the-openai-api">Lemonade Server and the OpenAI API<a class="anchor" href="#lemonade-server-and-the-openai-api" title="Permanent link">#</a></h2>
+<p>The engine runs inside <a href="lemonade.html">Lemonade</a> as its <code>onebit</code> backend, and that recipe passes
+Lemonade's own LLM test suite on HRX: 31 of 31 tests run, all pass. Lemonade is what you talk to,
+with its catalog, downloads, router and web UI; <a href="serve.html">1bit serve</a> exposes nothing but an
+OpenAI-compatible API, so any OpenAI client works with it. On Ubuntu 26.04 the engine plugs into the
+stock <code>lemond</code> from Lemonade's PPA.</p>
+<h2 id="ways-to-run-it">Ways to run it<a class="anchor" href="#ways-to-run-it" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>1bit OS from a USB stick</strong>: Lemonade Server with the engine inside, on a stick that boots the
+  machine with Secure Boot on; <code>1bit-install</code> puts the same system on a disk
+  (<a href="os-v3.html">1bit OS</a>, <a href="blog-boot-a-stick.html">Boot a stick</a>).</li>
+<li><strong>On an Ubuntu that already runs Lemonade</strong>: the <code>lemonade-onebit</code> package adds the engine as a
+  Lemonade backend (<a href="lemonade.html">Lemonade</a>).</li>
+</ul>
+<p>Both ship on the <a href="https://github.com/1bit-MONSTER/engine/releases">releases page</a> when a release has
+passed its checklist (<a href="releases.html">Releases</a>). The source is Apache-2.0 on
+<a href="https://github.com/1bit-MONSTER/engine">GitHub</a>; questions are answered in the <a href="faq.html">FAQ</a>.</p>
+<h2 id="related-posts">Related posts</h2>
+<ul class="related"><li><a href="blog-this-week-in-the-engine.html">This week in the engine</a> <span class="meta">2026-10-30</span></li><li><a href="blog-gpu-and-npu-at-the-same-time.html">The GPU and the NPU at the same time, measured</a> <span class="meta">2026-10-30</span></li><li><a href="blog-boot-a-stick.html">Boot a stick</a> <span class="meta">2026-10-30</span></li><li><a href="blog-bitnet-b158-on-hrx.html">BitNet b1.58 runs on HRX</a> <span class="meta">2026-10-30</span></li><li><a href="blog-every-node-on-hrx.html">Every node on the GPU: local LLMs on Strix Halo in Lemonade</a> <span class="meta">2026-10-21</span></li></ul>
+
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/site/pages/strix-halo.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>
