@@ -24,6 +24,8 @@ summary: The first published release of the 1bit engine. 1bit OS is a Puppy Linu
 The engine has its first published release. It is one binary with no Python in it, and the
 same binary is the whole operating system when you want it to be.
 
+> **Update (2026-11-22):** v2026.44 was never published; it stays a draft on the releases page. The first published release is v2026.47, and [its post](2026-11-22-v2026.47-release.md) supersedes this one.
+
 ## Two ways to run it
 
 - **Boot a stick.** 1bit OS is a **Puppy Linux appliance**: `ResolutePup64`, built with woof-CE on

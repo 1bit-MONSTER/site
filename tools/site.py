@@ -32,6 +32,10 @@
 # 1200x630 link-preview card in site/assets), a "title: short search title" (its <title> without
 # the " · 1bit engine" suffix, 46 characters at most; unset, the heading is cut to fit) and
 # "draft: true" (kept in blog/, not built) before its "# Title"; its first paragraph is its lead.
+# A release post also carries "version: vYYYY.WW": its BlogPosting is then "about" the engine as a
+# SoftwareApplication of that version, and the newest published release post sets the home page's
+# softwareVersion (no published release post, no softwareVersion). A slug may hold dots (v2026.47).
+# A link to a draft post renders as its label only, so a page can link a post before it publishes.
 # A dated "> **Update (YYYY-MM-DD):** ..." blockquote after the lead is how a post records a claim
 # that later changed; the post itself is not rewritten.
 #
@@ -98,14 +102,15 @@ DISCORD = "https://discord.gg/fa5m4Vawpa"
 HF = "https://huggingface.co/1bit-MONSTER"
 
 TAGLINE = ("One binary to rule them all: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 "
-           "(Strix Halo), any model on the Radeon 8060S iGPU and the XDNA 2 NPU, inside AMD's Lemonade Server. "
-           "Boot a stick and it serves.")
+           "(Strix Halo), on the Radeon 8060S iGPU through HRX and Loom and on the XDNA 2 NPU through our own NPU "
+           "engine, inside AMD's Lemonade Server. Boot a stick and it serves.")
 # The home page's search title (without the " · 1bit engine" suffix) and description. Keep the
 # description <= DESCRIPTION_MAX characters and update it with each milestone (README.md, docs/hrx.md).
 HOME_TITLE = "Strix Halo local LLM: Ryzen AI MAX+ 395, Linux"
-HOME_DESCRIPTION = ("1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside "
-                    "Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.")
-HOME_KEYWORDS = ("model-agnostic LLM inference, local LLM, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, Loom, HIP kernels, XDNA 2 NPU, live USB, 1bit OS, "
+HOME_DESCRIPTION = ("One binary for local LLMs on the AMD Ryzen AI MAX+ 395 (Strix Halo): the GPU on HRX and Loom, "
+                    "the XDNA 2 NPU on our own engine, in Lemonade. Boot from USB.")
+HOME_KEYWORDS = ("model-agnostic LLM inference, one binary, local LLM, AMD Ryzen AI MAX+ 395, Strix Halo, gfx1151, Radeon 8060S, HRX, Loom, loom-serve, "
+                 "AMD NPU LLM, Ryzen AI NPU Linux, XDNA 2 NPU, live USB, boot from USB, 1bit OS, "
                  "Lemonade Server, OpenAI-compatible API, GGUF, Qwen3.8, Zyphra ZAYA1, BitNet b1.58, ternary, "
                  "Ternary-Bonsai, gpt-oss-20b, MXFP4, NVFP4, MTP, speculative decoding, 1bit OS, local AI")
 
@@ -149,6 +154,8 @@ PAGE_META = {
      "The technical map of the 1bit engine: HRX moving to Loom on the GPU, the NPU engine on our own runtime, hybrid, ONNX Runtime, Laya, the hardware gate."),
     'onnx-pack': ('The ONNX pack: weights to Q4NX, our kernels',
      "How a plain ONNX graph becomes an NPU pack for the 1bit engine: weights to Q4NX through the runtime's own packer, activations int8, one ELF per shape."),
+    'loom-route': ('Loom on HRX: the GPU route behind 1bit serve',
+     "How 1bit serve hands a GGUF to loom-serve, AMD's Loom programs on HRX: the per-model route table, the request mapping, and the A/B and accuracy gate."),
     'hrx': ('HRX llama.cpp on Radeon 8060S (gfx1151)',
      "HRX, AMD's HIP Runtime Extended, on the Radeon 8060S iGPU: the move to Loom per model, the llama.cpp fallback route, quant coverage, MTP, DFlash2, BitNet."),
     'npu': ('Ryzen AI NPU on Linux for local LLMs (XDNA 2)',
@@ -242,7 +249,7 @@ def posts():
     """[(date, slug, path)], newest first."""
     out = []
     for p in (ROOT / "blog").glob("*.md"):
-        m = re.fullmatch(r"(\d{4}-\d{2}-\d{2})-([a-z0-9-]+)", p.stem)
+        m = re.fullmatch(r"(\d{4}-\d{2}-\d{2})-([a-z0-9][a-z0-9.-]*)", p.stem)
         if not m:
             sys.exit(f"blog post names are YYYY-MM-DD-<slug>.md: {p.name}")
         if not is_draft(p):
@@ -277,7 +284,7 @@ def rewrite_links(text, src, docs, labels):
         # GitHub keeps "--" where a heading had "(`--x`)"; python-markdown's toc collapses it to "-"
         if target.startswith("#"):
             return f"[{label}]({re.sub(r'-{2,}', '-', target)})"
-        if re.match(r"^[a-z]+:|^/|^[A-Za-z0-9_-]+\.(html|xml)(#|$)", target):
+        if re.match(r"^[a-z]+:|^/|^[A-Za-z0-9_.-]+\.(html|xml)(#|$)", target):
             return f"[{label}]({target})"
         path, _, frag = target.partition("#")
         raw_frag = "#" + frag if frag else ""
@@ -289,8 +296,13 @@ def rewrite_links(text, src, docs, labels):
             return f"[{label}]({target})"
         if rel == "README.md":
             return f"[{'Meet the engine' if path_label else label}](overview.html{frag})"
-        post = re.fullmatch(r"blog/\d{4}-\d{2}-\d{2}-([a-z0-9-]+)\.md", rel)
+        post = re.fullmatch(r"blog/\d{4}-\d{2}-\d{2}-([a-z0-9][a-z0-9.-]*)\.md", rel)
         if post:
+            if not resolved.exists():
+                sys.exit(f"link to a post that does not exist: {rel} (from {here})")
+            # a draft is not built: its label stays as text until the post publishes, never a dead link
+            if is_draft(resolved):
+                return label
             return f"[{label}](blog-{post.group(1)}.html{frag})"
         if rel.startswith("docs/") and rel.endswith(".md") and resolved.stem in docs:
             if path_label:
@@ -404,8 +416,10 @@ def website_node():
             "description": HOME_DESCRIPTION, "inLanguage": "en", "publisher": {"@id": ORG_ID}}
 
 
-def software_node():
+def software_node(version=None):
+    version = version or release_version()
     return {"@type": "SoftwareApplication", "@id": SOFTWARE_ID, "name": "1bit engine", "url": SITE,
+            **({"softwareVersion": version} if version else {}),
             "description": TAGLINE, "applicationCategory": "DeveloperApplication",
             "applicationSubCategory": "LLM inference engine", "operatingSystem": "Linux",
             "downloadUrl": RELEASES, "installUrl": SITE + "lemonade.html",
@@ -599,6 +613,21 @@ def plain(markdown_text):
     return " ".join("".join(parts).split())
 
 
+def post_version(text):
+    """A release post's engine version: an optional "version: vYYYY.WW" line before its title."""
+    m = re.search(r"^version:\s*(\S+)\s*$", strip_notice(text).split("\n# ", 1)[0], re.M)
+    return m.group(1) if m else None
+
+
+def release_version():
+    """The version of the newest published release post, or None while no release post is published."""
+    for _, _, src in posts():
+        version = post_version(src.read_text())
+        if version:
+            return version
+    return None
+
+
 def post_image(text):
     """A post's own link-preview card: an optional "image: file.png" line (site/assets, 1200x630)."""
     m = re.search(r"^image:\s*(\S+)\s*$", strip_notice(text).split("\n# ", 1)[0], re.M)
@@ -611,7 +640,7 @@ def split_post(text):
     text = strip_notice(text)
     tags, summary, seo_title, draft = [], "", "", False
     while True:
-        m = re.match(r"\s*(tags|summary|image|title|draft):\s*(.+)\n", text)
+        m = re.match(r"\s*(tags|summary|image|title|draft|version):\s*(.+)\n", text)
         if not m:
             break
         if m.group(1) == "draft":
@@ -908,10 +937,14 @@ class Site:
             modified = max(date, last_commit_date(src))
             # a post's "## Frequently asked questions" section becomes FAQPage JSON-LD, as on a doc page
             faq = faq_items(body)
+            article = article_node("BlogPosting", name, title, meta_description(summary), date, modified, image, ", ".join(tags))
+            version = post_version(src.read_text())
+            if version:
+                # a release post is about the engine at that version (the same @id as the home page's node)
+                article["about"] = software_node(version)
             self.write(name, (seo_title or title) + SUFFIX, main, "post", "blog", summary, og_type="article",
                        lastmod=modified, image=image, image_alt=title, dates=(date, modified, tags),
-                       jsonld=jsonld_graph(article_node("BlogPosting", name, title, meta_description(summary), date, modified,
-                                                        image, ", ".join(tags)),
+                       jsonld=jsonld_graph(article,
                                            *([faq_node(name, faq)] if faq else []),
                                            breadcrumb(name, ("Blog", "blog"), (title, name))))
             self.modified[name] = modified

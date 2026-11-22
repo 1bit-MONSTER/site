@@ -29,6 +29,8 @@ the clean repository on 22 September and the first published release, v2026.44. 
 number links to the post, document or commit it came from, and there is a plain list of what was
 and was not tested.
 
+> **Update (2026-11-22):** v2026.44 stayed a draft; the first published release is v2026.47. The milestones since 2 November are in [the v2026.47 release post](2026-11-22-v2026.47-release.md).
+
 The engine is Apache-2.0 and lives at
 [github.com/1bit-MONSTER/engine](https://github.com/1bit-MONSTER/engine). It is model agnostic:
 one binary serves Qwen3, Qwen3.8, ZAYA1, BitNet b1.58, ternary Bonsai-2, GLM and DeepSeek-V4.1

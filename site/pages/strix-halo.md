@@ -112,4 +112,4 @@ The engine ships inside those packages once a release has passed its checklist; 
 and it is held until every open engine issue is fixed ([Releases](releases.html)). On a distribution other
 than 1bit OS, the engine installs from packages ([Install on any Linux](install-any-distro.html)). The
 source is Apache-2.0 on [GitHub](https://github.com/1bit-MONSTER/engine), and questions are answered in the
-[FAQ](faq.html).
+[FAQ](faq.html). What each release carries is in its [release post](../../blog/2026-11-22-v2026.47-release.md).

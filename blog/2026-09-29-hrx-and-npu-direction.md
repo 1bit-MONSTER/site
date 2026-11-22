@@ -23,6 +23,8 @@ The engine is heading to AMD's HRX backend, whose kernels we write in Loom, plus
 
 > **Update (2026-10-30):** HRX met the gates of RFC #213 and the Vulkan and ROCm builds were removed (engine #306); every graph node of every model and mode we test runs on HRX with our own HIP kernels, and the NPU engine runs on our own runtime. See [HRX](../docs/hrx.md) and [NPU engine](../docs/npu.md).
 
+> **Update (2026-11-21):** the GPU route is moving to AMD's Loom model programs on HRX, one model at a time once each passes an A/B and accuracy gate; the llama.cpp build with ggml-hrx and our HIP kernels stays as the fallback, and the NPU engine continues. See [HRX](../docs/hrx.md#direction-loom-on-the-gpu) and [the Loom route](../docs/loom-route.md).
+
 A review of the Laya work[^geramyl] put it plainly: we want it on the NPU, a Vulkan version
 already exists, and the stack is HRX + Loom + NPU. That was right, and not only for Laya. Vulkan
 stays the default until HRX meets the gates in

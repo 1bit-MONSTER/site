@@ -105,7 +105,8 @@ on a USB stick that boots a Ryzen AI MAX+ 395 with Secure Boot on. `1bit-install
 puts the same system on a disk; on another distribution the engine comes as install packages instead
 ([Install on any Linux](install-any-distro.html)). No release is published yet: it is held until every
 open engine issue is fixed ([Install 1bit OS](install.html), [1bit OS](os-v3.html),
-[Boot a stick](blog-boot-a-stick.html), [Releases](releases.html)).
+[Boot a stick](blog-boot-a-stick.html), [Releases](releases.html)). What each release carries is in its
+[release post](../../blog/2026-11-22-v2026.47-release.md).
 
 ### Is it free and open source?
 
