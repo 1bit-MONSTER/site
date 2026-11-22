@@ -103,8 +103,8 @@ on Ubuntu 26.04 the engine plugs into the stock `lemond` from Lemonade's PPA ([L
 The engine's appliance: a Puppy Linux system (ResolutePup64) with Lemonade Server and the engine inside,
 on a USB stick that boots a Ryzen AI MAX+ 395 with Secure Boot on. `1bit-install` from the live session
 puts the same system on a disk; on another distribution the engine comes as install packages instead
-([Install on any Linux](install-any-distro.html)). No release is published yet: it is held until every
-open engine issue is fixed ([Install 1bit OS](install.html), [1bit OS](os-v3.html),
+([Install on any Linux](install-any-distro.html)). The current release is
+[v2026.47](https://github.com/1bit-MONSTER/engine/releases/tag/v2026.47) ([Install 1bit OS](install.html), [1bit OS](os-v3.html),
 [Boot a stick](blog-boot-a-stick.html), [Releases](releases.html)). What each release carries is in its
 [release post](../../blog/2026-11-22-v2026.47-release.md).
 

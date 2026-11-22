@@ -35,6 +35,8 @@ Ryzen AI MAX+ 395 (Strix Halo) machine:
 > private until that release is published. The GitHub releases page
 > keeps the `lemonade-onebit` package and the release notes.
 
+> **Update (2026-11-22):** v2026.47 is the first published release of the engine. What ships, how it was measured on the hardware and how to get it: [the v2026.47 release post](2026-11-22-v2026.47-release.md).
+
 1. Download the 1bit OS image from the [releases page](https://github.com/1bit-MONSTER/engine/releases).
 2. Write it to a USB stick of 8 GB or more.
 3. Boot the machine from the stick. Secure Boot stays on; the image is signed.
