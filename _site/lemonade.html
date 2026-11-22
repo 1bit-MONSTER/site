@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="How the 1bit engine runs inside AMD&#x27;s Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-09-22">
-<meta property="article:modified_time" content="2026-10-23">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/lemonade.html#article", "headline": "Lemonade", "description": "How the 1bit engine runs inside AMD's Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA.", "url": "https://1bit.gg/lemonade.html", "mainEntityOfPage": "https://1bit.gg/lemonade.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-22", "dateModified": "2026-10-23", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/lemonade.html#article", "headline": "Lemonade", "description": "How the 1bit engine runs inside AMD's Lemonade Server as the onebit backend: the recipe, one HTTP hop for GGUF models, the pinned fork and the Ubuntu 26.04 PPA.", "url": "https://1bit.gg/lemonade.html", "mainEntityOfPage": "https://1bit.gg/lemonade.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -93,6 +92,12 @@
 <li><a href="kernel.html">Linux kernel</a></li>
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
 </ul>
 </nav></details>
 <article class="docs-page prose">
@@ -134,7 +139,7 @@ so requests pass through unchanged.</p>
 command with <code>--print-backend</code>: serve makes its load-time checks (architecture, memory, recipes)
 and prints the llama-server it would start, and Lemonade starts that llama-server itself and
 talks to it directly, as it does for <code>llamacpp</code>. A request then crosses one HTTP hop instead of
-two. NPU model directories, DwarfStar, <code>--pm</code> and <code>--laya</code> still run through <code>1bit serve</code>
+two. NPU model directories, <code>--pm</code> and <code>--laya</code> still run through <code>1bit serve</code>
 (serve exits 5 for them), and <code>LEMONADE_ONEBIT_ONE_HOP=0</code> keeps serve in the path for every model
 (<a href="serve.html#one-hop-from-lemonade-print-backend">serve.md, "One hop from Lemonade"</a>).</p>
 <p>The recipe lives in our Lemonade fork,
@@ -153,13 +158,22 @@ the upstream release sync below). Before merging, rebuild and rerun the LLM suit
 (<code>test/server_llm.py --wrapped-server onebit</code>) on HRX (the checklist below has the counts;
 Vulkan passed too before RFC #213 stage 3 removed it). It is not proposed upstream yet: the plan is to embed the engine fully
 in the fork first, then propose it upstream. The fork follows upstream's releases:
-<code>.github/workflows/sync-lemonade-fork.yml</code> checks daily and merges upstream's latest
-release tag (never a pre-release or <code>main</code>), so each engine release carries the Lemonade
-release current when it was built. It
-pushes only a clean merge that still registers <code>onebit</code>; otherwise it opens a PR
-in the fork that lists the conflicts. It also keeps the fork's own copies of
-upstream's workflows disabled. Lemonade asks for an RFC
-before a new backend.</p>
+<code>.github/workflows/sync-lemonade-fork.yml</code> checks daily and <strong>ports upstream's latest
+release onto <code>main</code></strong> (never a pre-release, never <code>main</code> itself), so each engine release
+carries the Lemonade release current when it was built. It ports rather than merges
+because the fork's <code>main</code> follows upstream's <code>main</code>: a release tag is cut from a release
+branch, so merging the tag's tree would revert every commit <code>main</code> has gained since that
+branch was cut: the sync built fork #27's branch from the tag (<code>4eb0319ef</code>, 44 commits behind
+<code>main</code>), and merging the tag was 530 files, +56,326/−128,510 against <code>main</code> — a revert of all
+44, our onebit registration included. The branch was then replaced in place by the content-only port the
+<a href="https://github.com/1bit-MONSTER/lemonade/pull/27">PR</a> now shows (9 files, <code>a61ce765c</code>), and
+<a href="https://github.com/1bit-MONSTER/engine/pull/642">#642</a> changed the workflow so its fallback
+starts from <code>main</code>. Concretely: the release's
+own commits are cherry-picked onto <code>main</code> in order; a commit that applies cleanly and
+still leaves <code>onebit</code> registered is pushed to <code>main</code>; a commit the fork also changed keeps
+the fork's side, goes to a <code>sync/&lt;tag&gt;</code> branch and is listed in a PR in the fork, so a
+sync branch can never revert <code>main</code>. It also keeps the fork's own copies of upstream's
+workflows disabled. Lemonade asks for an RFC before a new backend.</p>
 <h2 id="embedding-checklist">Embedding checklist<a class="anchor" href="#embedding-checklist" title="Permanent link">#</a></h2>
 <p>What "fully embedded" still needs, measured on Strix Halo. The runs use the pinned fork
 (<code>third_party/lemonade</code>), the engine from <code>main</code>, and Lemonade's LLM suite
@@ -176,7 +190,7 @@ before a new backend.</p>
 <tr>
 <td>HRX</td>
 <td>19 / 31</td>
-<td><strong>29 / 29 run, all pass</strong> (2 skipped; release pre-check 2026-10-02, from the packaged tarballs)</td>
+<td><strong>29 / 29 run, all pass</strong> (2 skipped; 2026-10-31, through the shipped <code>lemonade-onebit-rc-2026-10-31c</code> package: <code>test/server_llm.py --wrapped-server onebit --backend hrx</code>, exit status 0)</td>
 </tr>
 <tr>
 <td>NPU</td>
@@ -218,7 +232,8 @@ before a new backend.</p>
 <p><code>echo</code> and generation parameters are skipped, because Lemonade's own llamacpp recipe
 declares neither.</p>
 <h2 id="ubuntu-2604-the-ppas-lemond">Ubuntu 26.04: the PPA's lemond<a class="anchor" href="#ubuntu-2604-the-ppas-lemond" title="Permanent link">#</a></h2>
-<p>On Ubuntu 26.04 Lemonade installs from its PPA, and that <code>lemond</code> (2026.42.1~26.04) is upstream's,
+<p>On Ubuntu 26.04 Lemonade installs from its PPA, and that <code>lemond</code> (2026.44.1~26.04 on
+2026-10-31; 2026.42.1~26.04 when this path was written) is upstream's,
 with no <code>onebit</code> recipe. The fork's Debian 13 <code>.deb</code> does not install there either: it depends
 on <code>libcpp-httplib0.41</code>, which 26.04 does not have. So on 26.04 the engine plugs into the stock
 <code>lemond</code> through the HRX recipe it already has, <code>llamacpp-hrx</code>, with no patch to Lemonade:</p>
@@ -237,6 +252,20 @@ on <code>libcpp-httplib0.41</code>, which 26.04 does not have. So on 26.04 the e
   <code>--cache-reuse 256</code>, and <code>-kvu</code> above <code>--parallel 1</code>. A variable already set in <code>lemond</code>'s
   environment wins, as it does under serve.</li>
 </ul>
+<p>That printed environment is also the only place where the save-area trio
+(<code>HSA_USE_SVM=0</code>, <code>HSA_USERPTR_FOR_PAGED_MEM=0</code>, <code>HRX_ALLOW_NO_SVM=1</code>) can reach the backend
+Lemonade starts, since the package's <code>lemond-onebit</code> launcher does not export it and neither path
+can pass <code>--hrx-cwsr-placement</code> (engine#715, fixed in #816). So it is worth asking directly:</p>
+<pre><code class="language-sh">env -u HSA_USE_SVM -u HSA_USERPTR_FOR_PAGED_MEM -u HRX_ALLOW_NO_SVM \
+  1bit serve -m &lt;model.gguf&gt; --device hrx --print-backend-env | grep -c '^HRX_ALLOW_NO_SVM=1'
+</code></pre>
+<p><code>1</code> is the pass. <code>0</code> means the one-hop backend and <code>scripts/lemonade-hrx</code>'s exec'd
+<code>llama-server</code> run without the trio, which is the configuration #715 page-faults in; nothing
+warns when it happens. Measured on Strix Halo with the trio unset in the shell:
+<code>lemonade-onebit-rc-2026-10-31c</code> (engine from before #794/#813) prints <code>0</code> and its serve log
+still says "CWSR is off; save-area placement unchanged"; <code>lemonade-onebit-rc-2026-11-01b</code>
+(save area placed in GTT by default) also prints <code>0</code>, because serve exported the trio into its
+own environment before building the plan — that is the bug #816 removes.</p>
 <p>To install:</p>
 <pre><code class="language-sh">sudo add-apt-repository ppa:lemonade-team/stable
 sudo apt install lemonade-server
@@ -255,7 +284,7 @@ did not already add the <code>lemonade</code> user to <code>render</code>, the s
 <p>Lemonade's HRX catalog (the <code>*-HRX</code> models) then runs on the engine, and so does a GGUF you
 register with <code>recipe: "llamacpp-hrx"</code>. Per-model arguments go in Lemonade's <code>hrx_args</code>, except
 the ones Lemonade sets itself (<code>-m</code>, <code>--ctx-size</code>, <code>--device</code>, <code>--port</code>, <code>--jinja</code>,
-<code>--metrics</code>). NPU model directories, DwarfStar, <code>--pm</code> and <code>--laya</code> are not
+<code>--metrics</code>). NPU model directories, <code>--pm</code> and <code>--laya</code> are not
 llama-server, so they stay with <code>/opt/1bit/1bit serve</code> (<a href="serve.html">1bit serve</a>), outside the stock
 <code>lemond</code>.</p>
 <p><a href="https://github.com/1bit-MONSTER/engine/blob/main/scripts/check-ubuntu-2604-lemond.sh">scripts/check-ubuntu-2604-lemond.sh</a> runs this whole path

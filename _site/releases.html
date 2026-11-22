@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="The 1bit engine&#x27;s releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-09-26">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/releases.html#article", "headline": "Releases", "description": "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist.", "url": "https://1bit.gg/releases.html", "mainEntityOfPage": "https://1bit.gg/releases.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-26", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/releases.html#article", "headline": "Releases", "description": "The 1bit engine's releases: the Linux tarball, the Lemonade+onebit package and the 1bit OS live image, the pins each is built from, and the release checklist.", "url": "https://1bit.gg/releases.html", "mainEntityOfPage": "https://1bit.gg/releases.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -94,17 +93,176 @@
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
 </ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
+</ul>
 </nav></details>
 <article class="docs-page prose">
 <h1 id="releases">Releases<a class="anchor" href="#releases" title="Permanent link">#</a></h1>
-<p>The first release goes out when every item on the release checklist is done; it is not published
-yet.</p>
+<p>The first release, <strong>v2026.44</strong>, is a <strong>draft</strong>: it is not published, and nothing is tagged — see
+<a href="#v202644-1-nov-2026-the-first-release-a-draft">v2026.44</a> for why, and for the candidate that replaces the one it was
+built from.</p>
 <p>1bit engine is pinned upstream: every backend it builds is a submodule at a fixed commit
 (<code>third_party/</code>), and the <code>bump-*</code> workflows open a PR whenever an upstream moves. The engine
 runs inside Lemonade, which releases on Fridays. The release run (<code>scripts/weekly.sh</code>) rebuilds
 everything from scratch at the current pins, so each release carries that week's upstreams.</p>
 <p>Releases are tagged <code>v&lt;ISO year&gt;.&lt;ISO week&gt;</code> (<code>v2026.40</code>), like Lemonade's <code>2026.39.1</code>; a second
 release in the same week gets <code>.1</code>.</p>
+<h2 id="v202644-1-nov-2026-the-first-release-a-draft">v2026.44 (1 Nov 2026) — the first release, a draft<a class="anchor" href="#v202644-1-nov-2026-the-first-release-a-draft" title="Permanent link">#</a></h2>
+<p><strong>Not published.</strong> Candidate <strong>c19</strong> (<code>rc-2026-11-01a</code>, engine <code>bcb28cc8f573</code>) passed every software gate below and
+was written to a 64 GB stick — and that is where it stopped: it was <strong>never booted on hardware and never installed on
+hardware</strong>, so the owner pulled v2026.44 back to a draft. Nothing here is a hardware result for c19.</p>
+<p>c19 is replaced by <strong>candidate 20</strong> (<code>rc-2026-11-01b</code>): built from <code>main</code> by <code>scripts/weekly.sh</code> once the issue board is
+clear, and gated with the whole checklist — the same software gates as below <strong>plus the two that decide a release</strong>: a
+live boot from the USB stick with Secure Boot on, and a full install to an internal disk, each with
+<code>1bit-release-check</code> <strong>18 checks / 0 failures</strong>. c20 is what becomes v2026.44 when the owner publishes.</p>
+<p>c19's raw image (what the <code>.img.zst</code> decompresses to): <strong>2,395,996,160 B</strong>, sha256
+<code>3c3c08c28072c534071bf87de141cf85f1f9e2b3d306c236153dcf80b3a4b588</code> — the value a stick write and its readback are
+verified against.</p>
+<p><strong>HIP kernels only:</strong> this image has no DwarfStar backend — <code>--device ds4</code> was removed (owner 2026-11-01, out of
+the tree 2026-11-02), because that route is antirez's CUDA kernels through a HIP shim plus hipBLAS, not our kernels.
+DeepSeek V4.x, GLM 5.x and Qwen3.8-Flash-Next run on <strong>HRX</strong> here, and the catalogue carries no <code>ds4</code> recipe.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>component</th>
+<th>pin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>engine</td>
+<td><code>bcb28cc8f57387865ecdbe744a7e3cdcf65eb7ad</code></td>
+</tr>
+<tr>
+<td>HRX (llama.cpp fork, ggml-hrx)</td>
+<td><code>4a58da9b087d</code></td>
+</tr>
+<tr>
+<td>hrx-system</td>
+<td><code>82804197bcbe</code></td>
+</tr>
+<tr>
+<td>HRX toolchain (ROCm/TheRock SDK)</td>
+<td><code>10.3.0a20261031</code>, <code>gfx1151</code> (<code>config/hrx-toolchain.config</code>)</td>
+</tr>
+<tr>
+<td>Lemonade Server</td>
+<td><code>2026.46.0~1.ef0f3b49</code> (our fork, the <code>onebit</code> recipe)</td>
+</tr>
+<tr>
+<td>kernel in the image</td>
+<td><code>7.3.0-rc4-1bit-perfopt</code> (IOMMU PerfOpt backports, MOK-signed)</td>
+</tr>
+<tr>
+<td>NPU kernel sets</td>
+<td>3 sealed sets, 30 kernels, every manifest signed</td>
+</tr>
+</tbody>
+</table></div>
+<p>The Lemonade pin is the sha (<code>ef0f3b49</code>), not the string around it: <code>tools/version.py</code> derives the dev version as
+<code>&lt;week&gt;.0~&lt;commit count&gt;.&lt;sha&gt;</code>, and that count is the number of commits in the <strong>checkout it was built in</strong> —
+<code>third_party/lemonade</code> is a <code>shallow = true</code> submodule, so a depth-1 clone reports <code>~1</code> for the same commit while a
+full clone reports <code>~1752</code> (both measured on 2026-11-02; c18 printed <code>~5</code>, i.e. built from a deeper clone). The <code>~N</code> is
+reproducible from the build tree, not from the release: it can differ between two candidates carrying the same code.</p>
+<p>Artifacts of the gated c19 candidate — sizes and sha256 exactly as its own <code>SHA256SUMS</code> records them:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>file</th>
+<th>size</th>
+<th>sha256</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1bit-os-v2026.44.img.zst</code></td>
+<td>395,224,089 B</td>
+<td><code>c3a132e2a4d13fbdfac5350fedd63b59232e334a25d656e960fbba3ea64572dc</code></td>
+</tr>
+<tr>
+<td><code>1bit-os-v2026.44.efi</code></td>
+<td>105,110,144 B</td>
+<td><code>57023fb8143184db9840b7bdfd25f5134f846e516dd86ffbf6260f0697b66b7a</code></td>
+</tr>
+<tr>
+<td><code>lemonade-onebit-v2026.44-linux-x86_64.tar.zst</code></td>
+<td>25,061,222 B</td>
+<td><code>c6f55c73fd34406f92dcbbf2347b545686bd99dfdc52204953296fabb1c87e31</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>What ran on <strong>c19</strong> (Strix Halo and QEMU, 1 November) — every gate except the two hardware rows:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>check</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>build, <code>ctest</code>, package</td>
+<td>PASS, <strong>54/54</strong> tests</td>
+</tr>
+<tr>
+<td>hardware gate at the candidate's pins, on the box's GPU</td>
+<td><strong>1959/1959</strong> kernel ops (76 s, 0 ring timeouts), fa-decode 6/6, KLD 5 models (6 PASS rows), needles 5 PASS rows, placement all-on-HRX</td>
+</tr>
+<tr>
+<td>NPU unit, on the box</td>
+<td><strong>82.03 tok/s</strong> (<code>oracle</code>, <code>greedy64</code>, <code>prefill</code>, <code>reproducible</code> all PASS)</td>
+</tr>
+<tr>
+<td>QEMU <code>vmtest</code> (live boot → install → boot the installed disk)</td>
+<td><strong>PASS</strong>, including <code>MODE: INSTALLED on nvme0n1</code> and the engine's llama-server running from that disk</td>
+</tr>
+<tr>
+<td>QEMU <code>vmtest-release</code> (<code>/bin/1bit-release-check</code> over SSH)</td>
+<td><strong>PASS</strong> (10 PASS, 9 SKIP, 0 FAIL — the SKIPs are the rows that need hardware a VM does not have)</td>
+</tr>
+<tr>
+<td><code>sha256sum -c SHA256SUMS</code>, <code>sbverify</code>, module/kernel identity</td>
+<td>3/3 OK, signature OK, one module tree for the shipped kernel</td>
+</tr>
+<tr>
+<td>stick write</td>
+<td>device readback <code>3c3c08c2…</code> <strong>= the image</strong>, <code>prepare-stick</code> 11/11 and <code>--check</code> exit 0, <code>/data</code> grown to the whole device</td>
+</tr>
+<tr>
+<td>no DwarfStar</td>
+<td><strong>0</strong> <code>ds4/</code> files and <strong>0</strong> <code>hipblaslt</code> references; the image's catalogue has no <code>ds4</code> recipe</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What did not run on c19: the hardware boot and the hardware install.</strong> The only hardware evidence in this document is
+candidate <strong>c18</strong>'s — a different, earlier candidate (<code>rc-2026-10-31c</code>): live USB boot with Secure Boot on,
+<code>1bit-release-check</code> <strong>18 checks / 0 failures</strong> (HRX chat 299.5 tok/s, CPU chat 178.6 tok/s, TTFT 21.8 ms), then a full
+install to the internal NVMe and a boot from it, <strong>18/0 again</strong> (HRX 301.8 tok/s, decode bench 178.3 tok/s). Those
+numbers are c18's and must not be read as a hardware result for c19 or c20.</p>
+<p>What c20 has to show before v2026.44 is published (the runbook is <code>C20-HARDWARE-TEST.md</code> in the release lane): the same
+software gates above, then a <strong>live USB boot on the board</strong> with Secure Boot on — <code>1bit-release-check</code> 18 checks, 0
+failures, with the nine hardware rows <strong>PASS rather than SKIP</strong> — and a <strong>full install</strong> with <code>1bit-install</code> (sha256
+readbacks at step 6, the expected <code>#709</code> partial SKIP at step 9), a boot from the installed disk with the stick out
+(<code>INSTALLED on nvme0n1</code>), and the same 18/0 check again.</p>
+<p>What the os/v2 pass fixed in this image, against the c18 live-USB dry run: the boot screen is quiet while the serial
+transcript keeps the kernel log (#703); the banner and <code>/etc/1bit/release-identity</code> carry the version from the shipped
+package, not a constant (#704); one boot flow with a visible timer and live network/Lemonade progress (#705); a 16x32
+console font and a full-width selection bar (#707); the sound modules are out and <code>mkimage</code> refuses unsigned modules
+(#708); <code>prepare-stick</code> grows <code>/data</code> to the stick (#706); the installer shows every step with progress, sha256
+readbacks and a <code>/data/install.log</code> (#710); the boot chain names its own data partition, so the banner says
+<code>LIVE from USB /dev/sda</code> or <code>INSTALLED on nvme0n1</code> (#711).</p>
+<p>Known issues in this image:</p>
+<ul>
+<li><strong>#709 is partial</strong>: the shipped kernel has no <code>efivarfs</code> module, so the installer cannot register a firmware boot
+  entry. It ships <code>efibootmgr</code>, does everything else, and says on screen that the disk boots as
+  <code>\EFI\BOOT\BOOTX64.EFI</code> — pick the disk in the firmware menu once, or let the firmware fall back to it. The
+  complete fix lands with 1bit OS v3 (#712).</li>
+<li>the installed appliance is still the live image on disk; the next release makes it a headless Ubuntu server (#712).</li>
+</ul>
 <h2 id="v202643-candidate-23-oct">v2026.43 (candidate, 23 Oct)<a class="anchor" href="#v202643-candidate-23-oct" title="Permanent link">#</a></h2>
 <p>Built from <code>main</code> by the release run; <strong>nothing is tagged or published yet</strong> — the owner publishes.
 The run records the artifacts, their checksums and every check's log beside the candidate build, and
@@ -155,8 +313,8 @@ the package rows below are filled from that record and are marked <em>pending</e
 <td><code>526c608197</code></td>
 </tr>
 <tr>
-<td>DwarfStar / tokenizers</td>
-<td><code>5b013dc1bb</code> / <code>3012770722</code></td>
+<td>tokenizers</td>
+<td><code>3012770722</code></td>
 </tr>
 </tbody>
 </table></div>
@@ -341,7 +499,7 @@ rehearsal at <code>v7.3</code> and linux-next <code>next-20261022</code> (<code>
 <tbody>
 <tr>
 <td><code>lemonade-onebit-&lt;tag&gt;-linux-x86_64.tar.zst</code></td>
-<td>Lemonade (<code>lemond</code>, <code>lemonade</code>, its web app) from our fork with the onebit recipe, and the engine in <code>1bit/</code>: <code>1bit</code> and every backend: HRX (and the CPU, from the same llama-server), DwarfStar, and the NPU engine's runtime (the NPU route is in progress, <a href="#the-npu-engine">below</a>). No Vulkan or ROCm llama.cpp since RFC #213 stage 3</td>
+<td>Lemonade (<code>lemond</code>, <code>lemonade</code>, its web app) from our fork with the onebit recipe, and the engine in <code>1bit/</code>: <code>1bit</code> and every backend it ships: <strong>HRX</strong> (and the CPU, from the same llama-server) and the NPU engine's runtime. DwarfStar is out of the tree since 2026-11-02 (HIP kernels only, owner decision 2026-11-01); no Vulkan or ROCm llama.cpp since RFC #213 stage 3</td>
 </tr>
 <tr>
 <td><code>1bit-os-&lt;tag&gt;.img.zst</code>, <code>1bit-os-&lt;tag&gt;.efi</code></td>
@@ -365,8 +523,9 @@ finds its libraries beside itself. Unpack the package anywhere and start Lemonad
 <pre><code class="language-sh">tar --zstd -xf lemonade-onebit-v2026.40-linux-x86_64.tar.zst
 lemonade-onebit-v2026.40/lemond-onebit           # lemond with the onebit recipe on the packaged engine
 </code></pre>
-<p>The builds target Strix Halo: the llama.cpp backends are built with <code>GGML_NATIVE</code> on its Zen 5. HRX needs TheRock in
-<code>/opt/rocm-therock</code>; the NPU needs the <code>amdxdna</code> kernel driver. The closed NPU add-ons
+<p>The builds target Strix Halo: the llama.cpp backends are built with <code>GGML_NATIVE</code> on its Zen 5. HRX builds with the
+pinned toolchain (<code>config/hrx-toolchain.config</code>, <code>scripts/fetch-rocm-sdk.sh</code>), or TheRock in <code>/opt/rocm-therock</code> when
+that is what the box has; the NPU needs the <code>amdxdna</code> kernel driver. The closed NPU add-ons
 (<a href="npu.html#add-on-routes">NPU engine</a>) are never in a release.</p>
 <h3 id="the-npu-engine">The NPU engine<a class="anchor" href="#the-npu-engine" title="Permanent link">#</a></h3>
 <p>The release is the HRX runtime with our HIP kernels and the NPU engine, all inside Lemonade. The
@@ -476,7 +635,7 @@ amdclang builds them; credited in <code>NOTICE-BINARY</code>) packed in <code>hr
 <li><strong>Licensed:</strong> <code>LICENSE</code>, <code>NOTICE</code>, <code>LICENSE-BINARY</code> and <code>NOTICE-BINARY</code> are in the tarball.</li>
 <li><strong>Libraries found:</strong> <code>ldd</code> (with <code>ROCR_VISIBLE_DEVICES=-1</code>) finds every library each packed
   program and library needs, except the TheRock runtime the package documents (HIP, hipBLAS(Lt),
-  rocBLAS, HSA, which DwarfStar links).</li>
+  rocBLAS, HSA - the same libraries the reference DwarfStar build linked).</li>
 <li><strong>Links inside:</strong> every symlink in the engine tarball and in the Lemonade + onebit tarball is
   relative and resolves inside the package (<code>pack_outside_links</code>); the <code>libggml*.so</code> -&gt;
   <code>.so.0</code> links stay links. Lemonade's build links its web app's KaTeX fonts to the build
@@ -508,8 +667,10 @@ amdclang builds them; credited in <code>NOTICE-BINARY</code>) packed in <code>hr
 <p>Before the first stage runs, <code>weekly.sh</code> checks what the machine must have (the 2026-10-19
 rehearsal found these only after the build) and stops with a message naming what is missing:</p>
 <ul>
-<li><strong>bumps, build:</strong> TheRock in <code>/opt/rocm-therock</code>, or <code>-DONEBIT_HRX_TOOLCHAIN=&lt;dir&gt;</code> in
-  <code>WEEKLY_CMAKE_ARGS</code>; <code>hipcc</code> for DwarfStar, in TheRock or <code>/opt/rocm</code>, or <code>ROCM_PATH</code>.</li>
+<li><strong>bumps, build:</strong> the pinned HRX toolchain, which <code>preflight</code> itself fetches with
+  <code>scripts/fetch-rocm-sdk.sh</code> at the pin in <code>config/hrx-toolchain.config</code> (<code>-DONEBIT_HRX_TOOLCHAIN=&lt;dir&gt;</code> in
+  <code>WEEKLY_CMAKE_ARGS</code> uses another, e.g. TheRock in <code>/opt/rocm-therock</code>); <code>hipcc</code> from that toolchain or <code>/opt/rocm</code>,
+  or <code>ROCM_PATH</code>. (The optional DwarfStar build that also wanted it is gone since 2026-11-02.)</li>
 <li><strong>package:</strong> <code>patchelf</code> (<code>scripts/package-linux.sh</code>); <code>node</code> and <code>npm</code> for Lemonade's web app
   (<code>LEMONADE_WEB_APP=1 scripts/build-lemonade.sh</code>; its <code>npm ci</code> needs the network); a readable kernel image for 1bit OS,
   <code>/boot/vmlinuz-$(uname -r)</code> or <code>VMLINUZ=&lt;copy&gt;</code> (Ubuntu's <code>/boot/vmlinuz-*</code> is root-only).
@@ -535,10 +696,6 @@ rehearsal found these only after the build) and stops with a message naming what
 <tr>
 <td><code>bump-laya/*</code></td>
 <td><code>tests/laya_route_e2e.sh</code> on the pinned checkpoint</td>
-</tr>
-<tr>
-<td><code>bump-ds4/*</code></td>
-<td>DwarfStar's routed-MoE test (<code>DS4_TEST=1 scripts/build-ds4.sh</code>)</td>
 </tr>
 <tr>
 <td><code>bump-hrx/*</code></td>

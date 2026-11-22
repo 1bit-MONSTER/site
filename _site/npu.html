@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="The engine&#x27;s NPU route on the Ryzen AI MAX+ 395&#x27;s XDNA 2 NPU: our own runtime with full-ELF kernel sets, what matches the reference today, and measured numbers.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-09-23">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/npu.html#article", "headline": "NPU engine", "description": "The engine's NPU route on the Ryzen AI MAX+ 395's XDNA 2 NPU: our own runtime with full-ELF kernel sets, what matches the reference today, and measured numbers.", "url": "https://1bit.gg/npu.html", "mainEntityOfPage": "https://1bit.gg/npu.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-23", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/npu.html#article", "headline": "NPU engine", "description": "The engine's NPU route on the Ryzen AI MAX+ 395's XDNA 2 NPU: our own runtime with full-ELF kernel sets, what matches the reference today, and measured numbers.", "url": "https://1bit.gg/npu.html", "mainEntityOfPage": "https://1bit.gg/npu.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -94,10 +93,17 @@
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
 </ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
+</ul>
 </nav></details>
 <article class="docs-page prose">
 <h1 id="npu-engine">NPU engine<a class="anchor" href="#npu-engine" title="Permanent link">#</a></h1>
-<p>The NPU engine is in progress: correctness first, speed next. Its kernels, built from source,
+<p>The NPU engine runs models on the AMD NPU (the XDNA 2 NPU of the Ryzen AI MAX+ 395) on Linux, on our own
+runtime and kernels. It is in progress: correctness first, speed next. Its kernels, built from source,
 match an fp64 reference on Qwen3-0.6B, 1.7B and 4B. The layer kernel and lm head reach cosine
 similarity 0.9999 or better at every tested position, and greedy decoding matches the reference
 token for token.
@@ -115,10 +121,51 @@ the model format, how <code>1bit serve</code> runs an NPU model, and how to buil
   model.q4nx             weights (safetensors layout, Q4NX tiles: &quot;Q4NX chunks&quot; below)
   config.json            Hugging Face config: dimensions, rope_theta, eos_token_id
   tokenizer.json         Hugging Face tokenizer
+  plan.json              the stream plan: fusion, kernel family, decode dirs (&quot;plan.json&quot; below)
   npu/                   the model's NPU kernels
 </code></pre>
 <p><code>1bit serve -m &lt;model dir&gt;</code> serves such a directory on the NPU behind the OpenAI-compatible API
 (<a href="serve.html">1bit serve</a>); inside Lemonade, that is what its <code>onebit</code> backend runs (<code>--onebit npu</code>).</p>
+<h3 id="planjson-the-stream-plan-engine-799">plan.json: the stream plan (engine #799)<a class="anchor" href="#planjson-the-stream-plan-engine-799" title="Permanent link">#</a></h3>
+<p>A model directory may carry a <strong>plan.json</strong>: the decisions the runtime used to make by looking at which
+files happened to be in <code>--kernels</code>. Three of them, and each one used to be silent:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>decision</th>
+<th>what the probe used to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fusion.gate_up</code> (<code>fused</code>/<code>split</code>)</td>
+<td>the fused <code>full_i8_GU_*</code> kernel won, and with no split kernel on disk the split layout was assumed</td>
+</tr>
+<tr>
+<td><code>kernels.tag</code> (<code>""</code>/<code>_b8</code>/<code>_pb16i</code>/<code>_t2s</code>)</td>
+<td>the artifact family came from <code>q4nx_weight_layout</code>, so a kernel dir of the other family changed which kernels ran</td>
+</tr>
+<tr>
+<td><code>decode.dirs</code></td>
+<td>the M=16 twins were looked for in <code>&lt;model&gt;/kernels-m16</code>, then <code>&lt;kernels&gt;/m16</code>, then <code>&lt;kernels&gt;</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>tools/npu_plan.py &lt;model dir&gt;</code> writes one from <code>config.json</code> plus the kernel directory (it derives layer
+roles from <code>layer_types</code> and projection shapes from the model's own dimensions, the way the forward does).
+<code>--check</code> re-generates and diffs against the file on disk, so a stale plan is a gate failure rather than a
+wrong number; <code>--print</code> shows it without writing.</p>
+<p>The forward reads the plan with <code>npu/plan/plan.h</code> and <strong>refuses by name</strong> anything it cannot honour — a
+<code>kernels.tag</code> that disagrees with the container, a sealed ELF named outside the pb16i family, a decode dir
+that is absolute or contains <code>..</code>, a layer count that disagrees with <code>layers[]</code>, or a kernel the plan names
+that is not in the directory (<code>forward init failed: plan &lt;path&gt;: this model's plan needs the QKV kernel
+"full_i8_QKV_K1024_N4096.elf" in &lt;dir&gt; (missing)</code>). A model directory <strong>without</strong> a plan keeps the probes,
+which is what makes this additive.</p>
+<p>Four plans are checked in under <code>configs/plans/</code>, one per model directory on the build box (Qwen3-0.6B,
+bonsai2-27b-NPU, bonsai2-27b-NPU-b8, bonsai2-27b-pb16i); <code>tools/npu_plan.py &lt;dir&gt; --check</code> proves the
+directory's copy still matches. <code>scripts/npu-window11.sh</code> is the gate the change passed: three fixed greedy
+prompts and the prof table, compared between a run with the plan and a run without it (<code>--compare A B</code>) —
+3/3 transcripts byte-identical and every prof row within 10%.</p>
 <h3 id="q4nx-chunks">Q4NX chunks<a class="anchor" href="#q4nx-chunks" title="Permanent link">#</a></h3>
 <p>Q4NX is <a href="https://github.com/ROCm/FastFlowLM">FastFlowLM</a>'s NPU model format (MIT), and its models on
 Hugging Face (<code>FastFlowLM/*-NPU2</code>) are Q4NX directories. A Q4NX weight is a grid of 32-row x
@@ -153,6 +200,12 @@ byte layouts).</p>
 <td><code>d * code</code></td>
 <td>Qwen3.5-4B <code>lm_head</code> and embedding</td>
 </tr>
+<tr>
+<td>2176 B</td>
+<td><strong>t2</strong>: 2-bit ternary codes, one fp16 scale per 128 columns of a row</td>
+<td><code>code * scale</code></td>
+<td>ternary models (Bonsai-2, PTQ1_0/TQ1_0 sources)</td>
+</tr>
 </tbody>
 </table></div>
 <p><strong>Q8 has two code layouts under the same chunk size.</strong> Qwen3.5-4B's lm_head (tied to the
@@ -162,16 +215,141 @@ Both containers report <code>flm_version</code> 1.0.3, and neither carries metad
 apart. Decoding tile (0, 0) of each lm_head and comparing with a GGUF of the same model
 gives correlation 0.9998 with the right layout and about 0.01 with the other. <code>npu/q4nx</code>
 decodes the first layout.</p>
-<p><code>npu/q4nx.h</code> decodes all three, and repacks Q4_K into q4_1 (exact apart from rounding
+<p><code>npu/q4nx.h</code> decodes all four, and repacks Q4_K into q4_1 (exact apart from rounding
 <code>S * scale</code> and <code>M * min</code> to bf16), so code that reads q4_1 runs Q4_K weights unchanged. Q8 does
-not fit q4_1. <code>tests/npu_q4nx_test.cpp</code> checks the decoders bit for bit against reference decoders
-on real Qwen3.5-4B and Qwen3-0.6B tiles (committed in <code>tests/golden/q4nx</code>), and the repack against
-its rounding bound.</p>
+not fit q4_1, and neither does t2 (per-128 fp16 scale against q4_1's per-32 bf16 one): a t2 tensor
+is expanded on the target, never repacked. <code>tests/npu_q4nx_test.cpp</code> checks the decoders bit for bit
+against reference decoders on real Qwen3.5-4B and Qwen3-0.6B tiles (committed in
+<code>tests/golden/q4nx</code>), and the repack against its rounding bound; t2 has its own contract test
+(<code>tests/npu_t2_layout_test.sh</code>) and oracle (<code>tests/q4nx_t2_test.py</code>).</p>
+<h4 id="the-t2-chunk-kind">The t2 chunk kind<a class="anchor" href="#the-t2-chunk-kind" title="Permanent link">#</a></h4>
+<p>A ternary model stores every weight as <code>code * d</code> with <code>code</code> in {-1, 0, +1} and one <code>d</code> per 128
+columns of a row. t2 is that, in the same 32x256 tile grid as every other chunk, at <strong>2.125
+bits/weight</strong> — the stream a 27B ternary model is meant to be read at, instead of the 4.5 b/w
+<code>pb16i</code> image (int4 codes + one int16 magnitude per 32 K) that the exact path streams today.</p>
+<pre><code>t2 tile, 2176 bytes, 32 rows (N) x 256 columns (K) of one tensor
+  [0, 2048)     2-bit codes:  byte r*64 + c/4, code c%4 at bits 2*(c%4)
+                value 0 = -1, 1 = 0, 2 = +1, 3 = reserved (no converter emits it)
+  [2048, 2176)  IEEE fp16 scales: half at 2048 + r*4 + 2*g,  g = c/128
+                                                        w[r][c] = code * scale
+</code></pre>
+<p>Tile order is the container's everywhere: row-major over the <code>[N/32][K/256]</code> grid, so one
+32-column block's whole K extent is contiguous. Geometry: <code>N % 32 == 0</code>, <code>K % 256 == 0</code>.</p>
+<p><strong>A tensor that is not whole tiles is padded, not refused-and-forgotten.</strong> The padding is code 0 with
+scale <code>0.0</code>, i.e. a weight of exactly 0: a padded K column contributes 0 to the reduction whatever the
+activation is, and a padded N row is never read. <code>tools/q4nx_t2.py</code> refuses such a tensor by default and
+pads it with <code>pad=True</code> (<code>pad_to_tile</code>). The chunk has no field for the original shape, so the padded
+shape is the tensor's shape and the consumer skips the rows the writer did not fill. All 431 ternary
+Bonsai-2 images are already whole tiles (5120 / 6144 / 17408-column rows), so this exists for GGUF
+tensors and for any projection whose width is not a multiple of 32.</p>
+<p><strong>The stored weight is the folded (post-rotation) one, and t2 carries no rotation of its own.</strong> A folded
+container's <code>W'</code> already has the block Hadamard and the per-width signs baked into the weights; the
+consumer rotates the <em>activation</em> into that basis — <code>A' = H (A . s)</code>, signs first, then the normalized
+Sylvester-Walsh butterfly, then the <code>1/sqrt(block)</code> — and never touches the weight
+(<code>npu/forward/src/q4nx_forward.cpp::hadamard_rotate</code>). So a t2 tensor holds <code>W'</code> exactly as the pb16i
+image does, the fold declaration stays where it belongs (the container's <code>q4nx_hadamard</code>,
+<code>q4nx_hadamard_block</code> and the <code>HAD1</code> sign table), and the chunk needs no pre/post-rotation flag: reading
+a t2 tensor in the wrong basis is a consumer bug, not a format one. The inverse direction (the tied
+embedding, <code>inverse_weight_names</code> in the pack) is <code>S (H y)</code>, which round-trips to the identity.</p>
+<p><strong>The scale is fp16, not bf16, and that is load bearing.</strong> Every source format already stores this
+scale as fp16 — PTQ1_0's, TQ1_0's and TQ2_0's <code>d</code> are <code>ggml_half</code>, and <code>pb16i</code>'s <code>ms * 2^e_ref</code> is an
+int16 with a per-column exponent — while bf16 has 8 significand bits against fp16's 11. Measured on
+the 431 ternary Bonsai-2 images (416 layers + the 15 MTP head tensors, 25.66 G weights):
+<strong>174,982,781 of 200,499,200 scales (87.27 %) are not bf16-representable</strong>, worst relative error
+3.89e-3; fp16 is exact on all 200,499,200. fp16 and bf16 are both two bytes, so asking for bf16 buys
+nothing and costs the bit-exact gate. A target whose arithmetic wants bf16 converts at load, in the
+kernel, and owns that rounding — the chunk keeps the exact value.</p>
+<p>A reserved code (3) decodes as <strong>0</strong>, on both paths — <code>npu/q4nx.cpp::dequant_tile</code> and <code>tools/q4nx_t2.py::unpack</code> — so a corrupt byte cannot become a weight no converter wrote, and it can never be a <code>2 * scale</code> value that no ternary encoder can produce. No converter emits one; <code>q4nx::t2_reserved()</code> counts them, and that is what a loader or a test refuses on. (An all-zero code byte is <strong>code -1</strong>, not code 0 — the value table is <code>code - 1</code>, the same convention Q2_0 uses.)</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>what</th>
+<th>measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ternary codes in the 431 images</td>
+<td>all <code>{-1, 0, +1}</code>, no reserved pattern</td>
+</tr>
+<tr>
+<td>one scale per 128 K is enough (the four per-32 magnitudes agree)</td>
+<td>100 % of blocks</td>
+</tr>
+<tr>
+<td>fp16 scale exact vs the pb16i floats</td>
+<td>200,499,200 / 200,499,200</td>
+</tr>
+<tr>
+<td>27B size</td>
+<td>pb16i 14.44 GB -&gt; <strong>t2 6.82 GB</strong> (416 layers 6.46 GB, 15 head tensors 0.36 GB)</td>
+</tr>
+<tr>
+<td>2.125 b/w</td>
+<td><code>2176*8/8192</code> exactly</td>
+</tr>
+</tbody>
+</table></div>
+<p>The oracle is bit-exact, not approximate: <code>tools/q4nx_t2.py from_pb16i</code> refuses anything it cannot
+represent exactly (a non-ternary code, magnitudes that differ inside a 128-K block, a scale that is
+not fp16-exact), and <code>tests/q4nx_t2_test.py</code> re-decodes the result and compares against the pb16i
+dequantisation of the same image, float for float, on all 431 images when they are on the machine.
+Converters: <code>from_pb16i</code> (the engine's integer-exact image), <code>from_ptq1_0</code> and <code>from_tq1_0</code> (both
+ternary with an fp16 scale, lossless). <code>from_tq2_0</code> is refused unless asked, because TQ2_0's code 3
+means <strong>+2</strong> — it is not a ternary format, and clamping it to +1 changes weights.</p>
+<h3 id="the-t2s-stream-what-the-xdna-decode-kernel-reads">The t2s stream (what the XDNA decode kernel reads)<a class="anchor" href="#the-t2s-stream-what-the-xdna-decode-kernel-reads" title="Permanent link">#</a></h3>
+<p>t2 is the container format: the decoder's byte order, for any consumer. The device does not want that
+order — the mmul takes int4 nibbles at element <code>e = r*16 + c</code> of a 16x16 block in byte <code>e/2</code> — so the
+kernel would have to transpose 2-bit codes across lanes. <code>tools/q4nx_t2s.py</code> derives the <strong>stream</strong> form
+of the same weights instead, which makes the on-core expansion a byte-local <code>1 -&gt; 2</code> map:</p>
+<pre><code>2,176 B per k=256 x n=32 tile, 2.125 b/w (pb16i 4,608 B; 27B 14.44 GB -&gt; 6.82 GB)
+[0, 2048)    2-bit codes, n-major blocks: block (nb, kb) at (nb*16 + kb)*64, and inside a block
+             byte r*4 + j holds the four codes for k = kb*16 + r, n = nb*16 + 4j + {0,1,2,3}
+[2048, 2176) int16 multiplier per 128-K block per column, [nb 2][gb 2][16 c] -- pb16i's own `ms`
+             at the granularity the model stores (pb16i repeats it 4x to reach 32-K granularity)
+expansion: out[2i] = f(c0) | f(c1)&lt;&lt;4, out[2i+1] = f(c2) | f(c3)&lt;&lt;4, f(v) = v - 1 mod 16 = {15,0,1}
+</code></pre>
+<p>The stream's contract is byte-exact against the image it came from, not statistical: <code>expand()</code> must
+reproduce the pb16i code bytes block for block (and <code>stream()</code>/<code>from_pb16i_image()</code> must agree byte for
+byte), which <code>tests/q4nx_t2s_test.py</code> checks synthetically and which was also run on the real Bonsai-2
+images (all 10,880 tiles of <code>blk_0_ffn_gate_weight.pb16i</code>, 0 of 44,564,480 code bytes differing,
+14.44 GB -&gt; 6.82 GB — the same 6.82 GB the t2 chunk reports). <code>from_pb16i_image</code> <strong>refuses</strong>, with a
+named error, an image whose four 32-K multipliers inside a 128-K block are not equal: that is the one
+thing this compaction cannot hold, and it is the thing the t2 chunk's own gate measures at 100 % of
+blocks for Bonsai-2. The n-major order also makes one <code>nb</code> (1,024 B) a single contiguous DMA run, and
+the tile itself is streamed as one 2,176-B run: 2-bit must not cost contiguous-run length.</p>
+<p>A model shipped in the <strong>t2</strong> form needs no pb16i image to feed this kernel: <code>from_t2(chunk, K, N)</code> takes
+the container's own chunk and returns the same bytes <code>from_pb16i_image()</code> returns for the image it was
+made from, by re-deriving the image with the packer's code rather than a second implementation of the
+tile order. The two forms are the same weights in <strong>different orders</strong> (t2 is k-major within each 32-row
+band, t2s is n-major within each 16x16 block: on the test fixture's 139,264 stream bytes, 135,476 differ),
+so they are never interchangeable and <code>from_t2</code> is the only crossing — the test asserts both the equality
+and that inequality, so a "simplification" that returns the chunk unchanged fails.</p>
+<h4 id="the-t2s-stream-in-the-engine-launch-path">The t2s stream in the engine (launch path)<a class="anchor" href="#the-t2s-stream-in-the-engine-launch-path" title="Permanent link">#</a></h4>
+<p>A container streams t2s when its <code>config.json</code> says <code>"q4nx_weight_layout": "t2s"</code> (with
+<code>"q4nx_weight_layout_version": 5</code>; pb16i is 4, and each layout refuses the other's version). The
+images are the pb16i sidecars' own set — <code>blk_&lt;layer&gt;_&lt;tag&gt;_weight.t2s</code> plus the <strong>unchanged</strong>
+<code>.ref</code> (<code>e_ref int16[N]</code> + mode byte, because the compaction changes neither the magnitudes nor
+e_ref) — in the directory named by <code>q4nx_t2s_dir</code> / <code>Q4NX_T2S_DIR</code>, and the kernels carry the
+<code>_t2s</code> suffix (<code>full_i8_GU_K5120_N17408_t2s.elf</code>, and the <code>_t2s_m16</code> decode family).
+<code>tools/q4nx_t2s.py</code> writes those files from either form of the same weights — <code>from_pb16i_image()</code> for a
+container that ships pb16i sidecars, <code>from_t2()</code> for one that ships only t2 chunks ("derive the t2s stream
+from a t2 chunk, so the container is enough", #830); nothing is requantised in either crossing.</p>
+<p>Everything downstream of the load is pb16i's path: the same int32/int64 accumulation, the same
+host-side single rounding, the same per-column <code>2^e_ref</code>, and the same loud refusals. The one
+difference the host must respect is the file: <code>q4nx_t2s.h</code> gives the 2,176-B tile, and a <code>.t2s</code> file
+that is not <code>tiles x 2,176</code> bytes is refused by name (never read as a pb16i image). Two independent
+checks keep the contract honest without a device: <code>tests/npu_t2s_layout_test.cpp</code> pins the tile
+against the numbers the tool measured on a real image (gate/up: 50,135,040 B of pb16i → 23,674,880 B
+of stream), and <code>tests/q4nx_t2s_test.py</code> pins the code order byte for byte.</p>
 <h3 id="from-a-gguf">From a GGUF<a class="anchor" href="#from-a-gguf" title="Permanent link">#</a></h3>
 <p><code>tools/gguf_to_q4nx.py pack &lt;model.gguf&gt; &lt;out dir&gt; --tokenizer &lt;dir&gt;</code> writes a model
-directory's <code>model.q4nx</code> and <code>config.json</code> from a GGUF (qwen3 only for now), and copies
-<code>tokenizer.json</code> from <code>--tokenizer</code>. It writes every projection and <code>lm_head</code> as q4_1
-tiles and the norms and embedding as bf16. A tied <code>lm_head</code> is made from <code>token_embd</code>.</p>
+directory's <code>model.q4nx</code> and <code>config.json</code> from a GGUF (qwen3, qwen3moe and qwen2 for now),
+and copies <code>tokenizer.json</code> from <code>--tokenizer</code>. It writes every projection and <code>lm_head</code> as
+q4_1 tiles and the norms and embedding as bf16. A tied <code>lm_head</code> is made from <code>token_embd</code>.
+A MoE model's router stays bf16 and untiled (it runs on the host, and its top-k must be the
+GGUF's own), and its routed expert stacks become one tensor per layer and projection — see
+"Routed expert stacks" below.</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -211,6 +389,40 @@ weights over the bound. The Q6_K tensors (half of <code>v_proj</code> and <code>
 <code>lm_head</code> from the Q6_K embedding) requantize to cosine 0.9969 and relative RMS error
 0.079. Served on the NPU, the repacked model decoded 24/24 greedy tokens the same as a CPU
 reference of the repacked weights, with every step's logits at cosine 0.99995 or better.</p>
+<h3 id="routed-expert-stacks">Routed expert stacks<a class="anchor" href="#routed-expert-stacks" title="Permanent link">#</a></h3>
+<p>A MoE GGUF keeps its routed experts as one three-dimensional tensor per projection
+(<code>blk.N.ffn_{gate,up,down}_exps</code>, ggml <code>[cols, rows, experts]</code>), expert <code>e</code> on rows
+<code>[e*rows, (e+1)*rows)</code> of the stream. The converter writes each stack as ONE container
+tensor — <code>model.layers.N.mlp.experts.{gate,up,down}_proj.weight</code>, <code>I8</code>, shape
+<code>[experts * rows/32, cols/256, 5120]</code> — so expert <code>e</code> is tile rows <code>[e*rows/32, (e+1)*rows/32)</code>
+of a plain tile grid: a decode step points a kernel at one expert's 192 chunks (983,040 B on
+Qwen3-30B-A3B) without any gather.</p>
+<p><code>model.q4nx</code>'s <code>__metadata__.moe</code> carries that decomposition so a caller never derives it:
+<code>experts</code>, <code>used</code>, <code>norm_topk_prob</code>, and per tensor <code>rows</code>, <code>cols</code>, <code>tile_rows</code>, <code>tile_cols</code>,
+<code>tiles</code>, <code>bytes</code> and the <strong>byte offset of every expert</strong> (<code>offsets</code>, <code>[experts]</code> entries,
+relative to the data section like every <code>data_offsets</code>). Those offsets are the list a
+per-dispatch chunk-address kernel takes (docs/npu.md, the DMA path in the engine's NPU lane).</p>
+<p>Measured on <code>Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf</code> (qwen3moe, 48 layers, 128 experts,
+top-8, expert_ffn 768, no shared expert): 579 tensors, 144 expert stacks x 128 expert
+offsets, header 302,144 B, container 19,528,322,120 B (18.19 GiB) — 18.13 GiB of it routed
+experts.</p>
+<p><strong>The top-8 boundary is razor thin.</strong> Measured with the same router tensor on the same token, the
+container's weights against the GGUF's own f32 weights: <strong>32 of 48 layers pick a different 8-expert
+set</strong>, always at the 8th slot, because the margin between rank 8 and rank 9 is <strong>1.2e-3 in
+probability in one and 2.9e-4 in the other</strong> (layer 2: expert 25 at 0.021700 vs expert 125 at
+0.020511, and the reverse). A hidden state that differs by 0.5 % — what requantising the Q6_K
+tensors costs — is enough to swap it.</p>
+<p><strong>That is a symptom, not the whole story, and the difference matters when judging a kernel.</strong>
+Re-running the same comparison with the container's routing <em>pinned</em> for the f32 pass — same expert
+ids and weights at every layer of every position — the log-prob difference does not shrink at all
+(mean |dlogp| 14.36 nats pinned against 14.29 unpinned, over 16 teacher-forced positions). So the
+routing flips are not what separates the two weight sources; the per-layer hidden state (cos
+0.993-0.9996) compounding through 48 layers is, and it changes which token wins a peaky position.
+Two things follow, and they are the operative rules here: compare implementations on <strong>aggregate</strong>
+quality (KLD over a corpus, perplexity), never single-token argmax or per-token log-probs; and gate
+a kernel with the <strong>expert ids held fixed</strong> (A row + the router's own top-k + the expected int32 per
+expert, which is what <code>tools/moe_expert_chunks.py gate</code> emits), so the gate measures the kernel and
+not the model's own sensitivity. <code>verify</code> result: see the TMOE-NPU lane's state file.</p>
 <p><code>1bit serve -m &lt;model.gguf&gt; --device npu</code> repacks a GGUF itself, caches the result under
 <code>~/.cache/1bit/q4nx/</code>, and serves it. The repack runs the engine's own <code>scripts/repack_gguf.py</code>,
 which the package ships beside <code>1bit</code> (<code>scripts/</code>, with its declared-scale guard;
@@ -239,6 +451,139 @@ dequantizing anything: <code>tools/check_q4nx_dir.py &lt;dir&gt;</code> reads th
 quantized tensor's chunk kind, and refuses an unknown chunk size or a tensor shorter than its layout
 needs. It cannot tell the two Q8 layouts apart ("Q4NX chunks", above), because the container does
 not record which one it holds.</p>
+<h3 id="from-a-ryzen-ai-oga-npu-pack">From a Ryzen AI OGA NPU pack<a class="anchor" href="#from-a-ryzen-ai-oga-npu-pack" title="Permanent link">#</a></h3>
+<p><code>1bit npu-pack import &lt;pack dir&gt; -o &lt;out dir&gt;</code> reads a pack AMD publishes for Ryzen AI
+(<code>*_rai_*_npu_*</code>: <code>model.onnx</code>, <code>model.onnx.data</code>, <code>dd_metastate_*.fconst</code>, <code>config.json</code>,
+<code>genai_config.json</code>, the tokenizer) and writes a model directory. <code>1bit npu-pack info &lt;pack dir&gt;</code>
+prints what the pack states as JSON and writes nothing. The pack's weights and its config/tokenizer
+contract are the model; the reader is written from the pack-side facts in
+<code>amd-oss/npu-re/docs/FACTS-oga-pack-weight-layout.md</code>, and no vendor library, wheel or compiled
+program is called or shipped.</p>
+<p>What converts, and how faithfully:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>pack tensor</th>
+<th>where</th>
+<th>to</th>
+<th>fidelity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model.embed_tokens.weight</code></td>
+<td><code>model.onnx.data</code>, fp16</td>
+<td>bf16</td>
+<td>fp16 → bf16 rounding (10 → 7 mantissa bits)</td>
+</tr>
+<tr>
+<td><code>lm_head</code> <code>MatMulNBits</code> (bits 4, block 128, asym)</td>
+<td><code>model.onnx.data</code></td>
+<td>q4_1 tiles</td>
+<td>codes unchanged; <code>scale = s</code> (exactly bf16 in this pack), <code>zero = -zp*s</code> (bf16 rounding)</td>
+</tr>
+<tr>
+<td><code>input_layernorm</code>, <code>post_attention_layernorm</code></td>
+<td><code>.fconst</code>, bf16 at a fixed offset</td>
+<td>bf16</td>
+<td>byte-exact</td>
+</tr>
+<tr>
+<td><code>self_attn.{q,k,v,o}_proj</code> (24 x 4)</td>
+<td><code>.fconst</code>, 34,816-byte 64-row tiles</td>
+<td>q4_1 tiles</td>
+<td>codes unchanged; <code>scale = s</code> (bf16), <code>zero = -zp*s</code> (bf16 rounding)</td>
+</tr>
+<tr>
+<td><code>self_attn.{q,k,v}_proj.bias</code> (24 x 3)</td>
+<td><code>.fconst</code>, the tiles' bias subvolumes</td>
+<td>bf16</td>
+<td>byte-exact; written only where the pack has one</td>
+</tr>
+<tr>
+<td><code>mlp.{gate,up,down}_proj</code> (24 x 3)</td>
+<td><code>.fconst</code>, MLP section</td>
+<td>—</td>
+<td><strong>refused</strong>, see below</td>
+</tr>
+<tr>
+<td><code>model.norm</code> (final)</td>
+<td>—</td>
+<td>—</td>
+<td><strong>refused</strong>, see below</td>
+</tr>
+<tr>
+<td><code>sin_cache_cos_cache</code></td>
+<td><code>model.onnx.data</code></td>
+<td>not imported</td>
+<td>the lane computes RoPE from <code>rope_theta</code> (<code>fill_rope</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>An OGA pack keeps its tensors inside the <code>If</code> branches: the top-level graph has <strong>no
+initializers</strong> and four nodes (<code>Shape</code>/<code>Constant</code>/<code>Equal</code>/<code>If</code>). The importer walks the
+subgraphs. The 4-bit decode is <code>w = (code - zp) * scale</code> with two codes per byte (low nibble
+= even k) and two zero points per byte; that decoder is checked against the pack's own data,
+because <code>tie_word_embeddings</code> makes <code>dequant(lm_head)</code> reproduce the fp16 embedding:</p>
+<pre><code>corr 0.999999, relative error 0.00070 on all 151936 x 896 weights
+controls: nibble-swapped corr -0.0008, no zero-point corr 0.8788   (both rejected)
+</code></pre>
+<p>Two facts bound what the container can hold, and both are reported, not hidden:</p>
+<ul>
+<li><strong>A bf16 zero does not always hold a f32 one.</strong> A q4_1 chunk stores bf16 scale and zero. This
+  pack's scales are already bf16 values (0 % rounded), but <code>-zp*s</code> is bf16-exact for only
+  43.5 % of 32-column groups. The residual is that rounding: 3.34e-3 relative, 2.4e-4 absolute
+  on the dequantized weights, with no code moved. Read back through <code>q4nx::dequant_tile</code> the
+  container matches the pack to that bound.</li>
+<li><strong>K is padded to the 256-column grid.</strong> Qwen2.5-0.5B has hidden 896 = 3.5 tiles, so
+  <code>lm_head</code> and q/k/v/o are stored as 4 column tiles with the last one zero-padded (codes 0,
+  scale 0, zero 0). That is 12.5 % more bytes than the pack; the true K is in the container's
+  manifest and in <code>config.json</code>, and nothing reads a padding column as a weight.</li>
+</ul>
+<h3 id="the-fconst-attention-payload">The <code>.fconst</code> attention payload<a class="anchor" href="#the-fconst-attention-payload" title="Permanent link">#</a></h3>
+<p>A layer block's attention payload sits between its two epsilon headers and is a whole number of
+<strong>64-row tiles</strong>: one tile is <code>2*(K/128) + 2</code> subvolumes of 2,176 B, a pair per (column half, K
+block of 128) plus the pair the writer puts its bias input in. Inside a weight subvolume,
+<code>[0, 2048)</code> are the quants (byte <code>(cp%4) + kk*4 + (cp/4)*512</code> holds rows <code>2*cp</code> and <code>2*cp+1</code> at
+column <code>kk</code> of the block), <code>[2048, 2064)</code> the zero points and <code>[2112, 2176)</code> 32 bf16 scales, one
+per row of the half. Codes and zero points are int4 in two's complement; the +8 an ONNX
+MatMulNBits adds cancels between the two fields, so the stored nibbles are used as they are.
+FACTS §7.13 established that layout by known-answer write and §7.15 against shipped bytes.</p>
+<p>Which tile belongs to which projection is <strong>measured, not assumed</strong>: on the shipped 0.5B pack the
+tiles' bias subvolumes matched the pack's own q/k/v bias vectors, which identifies the runs as
+k (2 tiles), q (14), v (2), o (14) — 32 tiles, the payload's whole size. A pack whose payload is
+not a whole number of tiles of that hidden size, or whose q/k/v/o row counts do not add up to the
+measured tile count, is refused by name with the numbers (<code>npu-pack info</code> reports the measurement).</p>
+<p><strong>Every tile read is its own check.</strong> Before anything is written, each tile is decoded and
+re-encoded; the encoder has to reproduce the 34,816 bytes it came from, bias slots included. That
+one comparison holds every field, index and nibble order at once, and it is why a tile whose
+fields we do not understand cannot be imported silently: on <code>Qwen2.5-0.5B-Instruct_rai_1.8.0_npu_4K</code>
+it passes <strong>768/768</strong> tiles of 24 layers. <code>tests/golden/oga_attn_tile.bin</code> is one of those tiles,
+copied verbatim from the pack by <code>tools/oga_attn_tile_golden.py</code>, so the same check runs in CI
+against the vendor writer's bytes with no vendor stack present. The fixture's identity is
+independent of this reader: the vendor packer (<code>matmulnbits_pack_const_float32</code>, <code>mladf_version
+v2</code>) reproduces the shipped tile from the arrays this decoder produces.</p>
+<p><strong>Refusals are named, and a refusal writes nothing.</strong> Without <code>--allow-incomplete</code>, a pack the
+importer cannot represent exits 3 and lists every tensor it refused with the reason, so a
+partial model never lands in a model directory by accident. With <code>--allow-incomplete</code> it writes
+what it can and records the rest in the container's <code>__metadata__</code> (<code>incomplete</code>) and in
+<code>config.json</code> (<code>q4nx_source.incomplete</code>). On the shipped <code>Qwen2.5-0.5B-Instruct_rai_1.8.0_npu_4K</code>
+that is now <strong>218 tensors, 25,136 tiles</strong> (embedding, head, 48 layer norms, 96 attention
+projections, 72 attention biases) and <strong>73 refusals</strong>: the 24 x 3 MLP projections, whose section of
+the <code>.fconst</code> is 16 subvolumes of 4,288 B per 128-row unit (64 output rows per column group, i.e. the
+vendor writer's <code>Nsubv 64</code> instance) carrying <strong>one fused gate/up tensor whose rows interleave in
+32-row chunks</strong> — the unit size and the interleave are established from the writer's own headers, the
+intra-subvolume byte order is not, and the packer this importer checks against emits only the
+2,176-byte instance for K=896, so those tiles cannot be re-encoded and byte-verified the way the
+attention tiles are; and the final norm, whose 1,856-byte tail envelope turned out to be
+<code>[eps][pad][448 f32]</code> and not an RMSNorm weight on either <code>.fconst</code>.</p>
+<p>The norms that <em>are</em> imported sit at the documented offsets, each confirmed by the epsilon that
+opens its layer block: <strong>48/48 anchors found</strong>. <code>tests/npu_pack_import_test</code> (registered as
+<code>npu_pack_import</code>, and as <code>npu_pack_import_oga</code> when <code>-DONEBIT_OGA_PACK=&lt;dir&gt;</code> is given) checks
+the decode, the tiling against <code>tests/golden/oga_pack_tiles.bin</code> — written by
+<code>tools/oga_pack_tiles_golden.py</code> with the same layout <code>tools/gguf_to_q4nx.py</code> has always used —
+the attention tile against <code>tests/golden/oga_attn_tile.bin</code>, and, against a real pack, the refusal
+list, the tile round trip, the self-check numbers and that the container opens with <code>npu::Model</code>.</p>
 <h3 id="cross-check-against-the-official-converter">Cross-check against the official converter<a class="anchor" href="#cross-check-against-the-official-converter" title="Permanent link">#</a></h3>
 <p>ROCm's <strong>FLM_Q4NX_Converter</strong> (<code>convert.py</code>) is the official gguf → Q4NX converter, and since
 2026-10 it is public and Apache-2.0; <code>scripts/repack_gguf.py</code> already drives it for the
@@ -299,6 +644,52 @@ are carried as data in <code>configs/q4nx/</code> so that gap is described rathe
 <p><code>tools/gguf_to_q4nx.py pack</code> now also looks for <code>tokenizer.json</code> beside the GGUF when
 <code>--tokenizer</code> is omitted, and warns loudly when it is still missing: a directory without it is not
 servable, and the tool used to report success anyway.</p>
+<h3 id="moe-a-host-reference-and-the-tokenizer-the-gguf-already-carries">MoE: a host reference, and the tokenizer the GGUF already carries<a class="anchor" href="#moe-a-host-reference-and-the-tokenizer-the-gguf-already-carries" title="Permanent link">#</a></h3>
+<p><code>tools/moe_q4nx_ref.py</code> is the CPU reference a MoE decode path is judged against. It reads a
+Q4NX directory and nothing else, so a disagreement is the container's or the kernel's, never a
+second copy of the weights: float32 throughout, RMSNorm, GQA attention with per-head q/k norm and
+RoPE, and the MoE block exactly as the architecture says — float32 softmax over the bf16 router
+logits, top-k, renormalised weights (<code>norm_topk_prob</code>), each chosen expert's SwiGLU streamed from
+the packed tiles. The dense tensors are cached in float32, the experts are decoded per token: the
+same streaming the device routes do.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>subcommand</th>
+<th>what it is for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tokenizer &lt;gguf&gt; &lt;dir&gt;</code></td>
+<td>build <code>tokenizer.json</code> + <code>tokenizer_config.json</code> from the GGUF's own vocabulary, merges and chat template (nothing downloaded, nothing taken from HF)</td>
+</tr>
+<tr>
+<td><code>logprobs &lt;dir&gt; --prompt ...</code></td>
+<td>one greedy completion as JSON</td>
+</tr>
+<tr>
+<td><code>serve &lt;dir&gt; --port 18110</code></td>
+<td>an OpenAI-compatible endpoint with <code>logprobs</code>, so <code>tools/logprob_agree.py</code> can compare it with another route</td>
+</tr>
+<tr>
+<td><code>agree &lt;dir&gt; --route URL</code></td>
+<td>the same 8 prompts, but <strong>teacher-forced</strong>: the other route's own generated ids are scored by this forward, so every position it produced is compared, not only the positions where both routes happened to emit the same token</td>
+</tr>
+<tr>
+<td><code>selftest</code></td>
+<td>the numerics a bug would silently pass</td>
+</tr>
+</tbody>
+</table></div>
+<p>On <code>Qwen3-Coder-30B-A3B (Q4NX)</code>: for <em>"What is the capital of France? Answer in one word."</em> it
+returns <code>Paris</code>, with the top-3 next-token ids <strong>identical</strong> to the HRX route on the same GGUF
+(59604 / 12095 / 106004), the runner-ups differing by 0.33 nats at p ≈ 1e-6 — the Q6_K → q4_1
+requantisation of <code>down_proj</code>, <code>v_proj</code> and <code>lm_head</code> and nothing else. It is a <strong>reference, not a
+route</strong>: 6 s/token, and a 20-token prompt costs ~5 minutes, because a prompt's 160 expert
+selections per layer touch nearly all 128 experts and stream ~18 GB. MoE prefill belongs on the
+GPU route (<code>--moe-prefetch</code>, docs/serve.md); this is the thing that decides whether a kernel is
+right.</p>
 <h2 id="serving">Serving<a class="anchor" href="#serving" title="Permanent link">#</a></h2>
 <p>The 1bit NPU engine runs the model on the XDNA 2 NPU. With a release package that carries the NPU
 kernels (dense Qwen3: 0.6B, 1.7B and 4B):</p>
@@ -426,6 +817,14 @@ got before.</p>
 <td>the same seed and the same request give the same text; absent or <code>-1</code> seeds from the clock</td>
 </tr>
 <tr>
+<td><code>logprobs</code></td>
+<td><code>true</code> reports each generated token's log-probability on <code>/v1/chat/completions</code> (streamed or not); the values are the raw distribution, before <code>top_k</code>/<code>top_p</code>/<code>temperature</code> and before any grammar mask, as OpenAI and vLLM report them</td>
+</tr>
+<tr>
+<td><code>top_logprobs</code></td>
+<td><code>0</code>-<code>100</code> alternatives per token, highest raw logit first; needs <code>logprobs: true</code></td>
+</tr>
+<tr>
 <td><code>stop</code></td>
 <td>up to 4 strings: generation stops before the first match, and the tail is held back so a stop split across two tokens still matches</td>
 </tr>
@@ -435,12 +834,26 @@ got before.</p>
 </tr>
 <tr>
 <td><code>response_format</code></td>
-<td><code>{"type": "json_object"}</code> constrains the answer to JSON; <code>{"type": "json_schema"}</code> is a 400</td>
+<td><code>{"type": "json_object"}</code> constrains the answer to JSON; <code>{"type": "json_schema", "json_schema": {"schema": …}}</code> constrains it to that JSON Schema</td>
 </tr>
 </tbody>
 </table></div>
-<p>A field the route cannot honour is a 400 whose <code>error.message</code> says why ("<code>json_schema</code> needs a
-schema-to-GBNF converter this route does not have", "<code>gbnf: unterminated literal at line 1</code>"),
+<p><code>logprobs</code> keeps OpenAI's shape: non-streamed, every entry is <code>choices[0].logprobs.content[i] =
+{token, logprob, top_logprobs: [{token, logprob}]}</code>; streamed, each chunk carries the entries whose bytes that
+chunk carries, so the deltas add up to the non-streamed reply. Token text that is half a character is reported with the invalid bytes replaced, never as a failed
+request. Entries exist for <strong><code>content</code> tokens only</strong>: a reasoning delta and tool-call markup get no
+logprobs entry, because <code>app/npu_answer_parser.h</code> says where the content boundary is. The <code>/v1/completions</code> route's legacy logprobs object
+is not implemented and asking for it there is a 400, not a silently dropped field.</p>
+<p><code>json_schema</code> is compiled to a grammar before the first token, by <code>app/npu_json_schema.h</code>, so the answer
+cannot leave the schema while it is being written rather than being validated afterwards. The covered subset
+is OpenAI's structured outputs: objects (<code>properties</code>, <code>required</code>, <code>additionalProperties: false</code>), arrays
+(<code>items</code>, <code>minItems</code>, <code>maxItems</code>), <code>string</code>, <code>number</code>, <code>integer</code>, <code>boolean</code>, <code>null</code>, a type list such as
+<code>["string", "null"]</code>, <code>enum</code>, <code>const</code>, and <code>oneOf</code>/<code>anyOf</code> as alternation. Anything outside it (<code>pattern</code>,
+<code>format</code>, <code>minimum</code>/<code>maximum</code>, <code>$ref</code>, <code>allOf</code>, …) is a 400 that names the keyword: a constraint quietly
+dropped from a schema would leave the caller believing the answer was validated. Properties are generated in
+the schema's order with the required ones first, so the object's key order is fixed for a given schema.</p>
+<p>A field the route cannot honour is a 400 whose <code>error.message</code> says why ("<code>json_schema</code>: pattern is not
+supported by this route's schema-to-GBNF converter", "<code>gbnf: unterminated literal at line 1</code>"),
 never a silently ignored key. <code>finish_reason</code> is <code>length</code> when <code>max_tokens</code> ran out, and <code>stop</code> for
 an end-of-sequence token, a stop sequence or a grammar that allows nothing more.</p>
 <p>The sampler is llama.cpp's, without llama.cpp: <code>app/npu_sampling.h</code> repeats the semantics of
@@ -451,11 +864,149 @@ neither. The grammar (<code>app/npu_grammar.h</code>) is the same rule model - o
 rule, <code>ALT</code>/<code>END</code> between alternatives - as a byte-level pushdown automaton: a token is only
 sampled when its decoded text leaves the grammar alive, which is checked per token against the
 byte ranges the grammar can continue with. Both headers are device-free, and
-<code>tests/npu_sampling_test.cpp</code> runs the sampler, the parser, the JSON grammar and the request
-parser in CI without a model or an NPU.</p>
+<code>tests/npu_sampling_test.cpp</code> runs the sampler, the parser, the JSON grammar, the schema converter and the
+request parser in CI without a model or an NPU.</p>
 <pre><code>$ curl -sS localhost:8000/v1/completions -d '{&quot;prompt&quot;: &quot;The capital of France is&quot;, &quot;max_tokens&quot;: 16,
     &quot;grammar&quot;: &quot;root ::= \&quot; Paris\&quot; | \&quot; Lyon\&quot; | \&quot; Marseille\&quot;&quot;}'
 {&quot;choices&quot;:[{&quot;finish_reason&quot;:&quot;length&quot;,&quot;index&quot;:0,&quot;text&quot;:&quot; Paris&quot;},...]}
+</code></pre>
+<h3 id="decisions-v1systemone-issue-653">Decisions (<code>/v1/systemone</code>, issue #653)<a class="anchor" href="#decisions-v1systemone-issue-653" title="Permanent link">#</a></h3>
+<p>A <strong>Decision 3.0 (d3) pack</strong> does not generate text: you send a <code>state</code> and one or more questions and get
+a probability for every option. When the model directory carries the pack's decision head, <code>1bit
+forward-serve</code> serves that too, from the same process and the same weights:</p>
+<pre><code>&lt;model dir&gt;/model.q4nx            the Qwen3.5 GDN backbone, as any other model
+&lt;model dir&gt;/decision_config.json  the pack's codes, token ids, temperature, pooling
+&lt;model dir&gt;/decision.q4nx         the readout, [codes, hidden] F32 (tools/safetensors_to_q4nx.py decision)
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>route</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /v1/systemone</code> (alias <code>POST /v1/decisions</code>)</td>
+<td><code>{"state": …, "questions": {id: question}}</code> → <code>{"model", "answers": {id: answer}, "usage"}</code></td>
+</tr>
+<tr>
+<td><code>GET /v1/systemone/models</code></td>
+<td>the decision model this build serves: name, description, <code>max_input_tokens</code>, <code>modalities</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>questions</code> is an <strong>object</strong>, and its ids come back as the keys of <code>answers</code> in request order. Question
+types are <code>choice</code> (1–255 options), <code>noul</code> and <code>score</code> (2–10 ordered levels); a decision runs one backbone
+prefill per question, pools the <strong>last position's hidden state after the final norm</strong> (<code>pooling: last</code>),
+multiplies it by the readout and takes a temperature softmax over that question's options. Nothing is
+sampled and nothing is generated, so <code>usage.output_tokens</code> is always <code>0</code> and <code>input_tokens</code> is the sum of
+the answered questions' prompt lengths.</p>
+<p>The prompt is the <strong>pack's own contract</strong>, not this route's ChatML: <code>npu/systemone.h</code> renders the
+<code>State:</code>/<code>Question:</code>/<code>Options:</code> turn byte for byte from the pack's <code>d3_format.py</code> (checked against
+fixtures it generated, <code>ctest systemone_contract</code>), and <code>app/npu_systemone.h</code> wraps it in the pack's chat
+template with <code>enable_thinking=False</code> — which opens the assistant turn with an <strong>empty think block</strong>.
+Those trailing bytes are part of what the model reads, so reusing <code>chatml()</code> here would be a different
+input. <code>state</code> is parsed as ordered JSON because upstream preserves the request's key order.</p>
+<p><strong>Converting a d3 pack</strong> (engine #796) is <code>tools/safetensors_to_q4nx.py pack &lt;pack&gt; &lt;model dir&gt; --arch qwen3_5</code>
+(the arch is detected from the pack's <code>language_model.*</code> names, so <code>auto</code> is enough). It is not a rename
+job: three transforms in the pack's GDN tensors are silently wrong answers when they are wrong, so each is
+named here and covered by a known-answer test (<code>ctest safetensors_to_q4nx</code>):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>from</th>
+<th>to</th>
+<th>transform</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>linear_attn.A_log</code></td>
+<td><code>linear_attn.ssm_a</code></td>
+<td><strong><code>-exp(A_log)</code>, F32</strong> — the forward computes <code>expf(ssm_a * softplus(dt))</code>, so the raw A_log decays backwards</td>
+</tr>
+<tr>
+<td><code>linear_attn.conv1d.weight</code> <code>[CD,1,CK]</code></td>
+<td><code>linear_attn.ssm_conv1d.weight</code></td>
+<td><strong>transpose to tap-major</strong> <code>[CK,CD]</code>: the forward indexes <code>conv[j*CD + c]</code></td>
+</tr>
+<tr>
+<td><code>linear_attn.in_proj_a/b</code></td>
+<td><code>ssm_alpha_proj</code>/<code>ssm_beta_proj</code></td>
+<td>rows <strong>zero-padded to 32</strong> so they tile; the forward dequantises at the stored height and keeps the first NVH rows (<strong>q4_1 where the FLM config asks Q8_0</strong> — a deviation <code>verify</code> measures rather than hides)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The remaining names come from <code>configs/q4nx/qwen3.5_0.8b.json</code>'s <code>q4nx_name</code> column (<code>in_proj_qkv</code> →
+<code>qkv_proj</code>, <code>in_proj_z</code> → <code>self_attn.gate_proj</code>, <code>out_proj</code> → <code>ssm_out_proj</code>, <code>dt_bias</code> → <code>ssm_dt.bias</code>), and
+<code>visual.*</code> is skipped because the forward runs the text path. Two converter rules exist because of measured
+load failures, not style: the embedding keeps its <strong>2-D shape</strong> (the loader reads vocab and hidden off
+<code>shape[0]</code>/<code>shape[1]</code>), and <code>text_config</code>'s keys are <strong>lifted to the top level</strong>, because the engine reads
+<code>config.json</code> at depth 1 only. A tensor with no mapping is a refusal, never a dropped one.</p>
+<p><code>--dtype bf16</code> writes the same tensor set with <strong>no q4_1 tiles at all</strong> (every tensor keeps its source
+bf16, or the F32 a transform forces; <code>verify</code> reports 0 error rather than a loss). It is the container for
+<em>measuring</em>, not for serving: it holds the weights fixed so an engine run and a reference run differ only in
+the forward, and the cost of quantization becomes a separate delta instead of an unexplained one. The
+<code>d3-lite</code> parity row is measured that way (<code>--dtype bf16</code> vs the default <code>--dtype auto</code> container, same
+requests, against the pack's own <code>d3_runtime.py</code>).</p>
+<p>What is still missing for a real d3 row is the <strong>artifact set</strong> — but only for a <em>device</em> row. <code>NPU_INFER_HOST_GEMM=1</code>
+opens no device, so it needs no ELF: the backbone loads, answers, and serves as the numeric reference for a geometry
+whose kernels do not exist yet (this is how <code>d3-lite</code> is exercised before its six designs are built). A device row
+needs all six — <code>QKV K1024 N5120</code> (q|gate|k|v, <code>q_proj</code> carries the output gate), <code>O K2048 N1024</code> (GDN's <code>ssm_out</code>
+reuses it), <code>GU K1024 N7168</code>, <code>D K3584 N1024</code>, GDN <code>QKV K1024 N6144</code> and <code>Z K1024 N2048</code> — and without them the
+device path stops at <code>forward init failed: … this model's plan needs the QKV kernel "full_i8_QKV_K1024_N5120.elf" …
+(missing)</code>.</p>
+<p>Refusals follow the d3 server this route stands in for, so vLLM Semantic Router can point at it unchanged —
+which means <strong>422 here, not the 400 the chat route uses</strong>:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>situation</th>
+<th>answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>body is not a JSON object, an unknown field, <code>questions</code> missing/empty/not an object, an empty id</td>
+<td><code>422 {"detail": "&lt;why&gt;"}</code>, nothing runs</td>
+</tr>
+<tr>
+<td>any question is malformed (bad type, empty choice criteria, score levels out of range)</td>
+<td><code>422 {"detail": {"invalid_questions": {id: "&lt;why&gt;"}}}</code>, <strong>nothing runs</strong></td>
+</tr>
+<tr>
+<td>a question is valid but its prompt is over the limit</td>
+<td>inside <code>answers</code>: <code>{"type", "error": "max_length_exceeded", "message"}</code>, the other questions still answered, <strong>nothing truncated</strong></td>
+</tr>
+<tr>
+<td>the readout could not turn the hidden state into an answer</td>
+<td>inside <code>answers</code>: <code>error: "invalid_model_output"</code></td>
+</tr>
+<tr>
+<td><code>DECISION_API_KEY</code> is set and the bearer key is absent or wrong</td>
+<td><code>401</code>, <code>WWW-Authenticate: Bearer</code> (<code>/health</code> stays open and reports <code>"authentication": true</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The limit is the smaller of the text path's 32,768 tokens per question and the backbone's own context.
+<code>GET /health</code> gains <code>model</code>, <code>max_input_tokens</code>, <code>modalities</code> and <code>authentication</code> when a head is loaded, and
+<code>/v1/models</code> keeps its OpenAI shape (the decision list is at <code>/v1/systemone/models</code>).</p>
+<p>Not served, and refused by name rather than ignored: <code>images</code>/<code>videos</code> (the vision tower and FFmpeg are a
+separate issue), so <code>box</code>/<code>track</code>/<code>assets</code> questions cannot be asked. Also not implemented: upstream's
+"state computed once per request" optimisation (a state read once and shared by every question — it is the
+prefix cache's job, #650) and the pack's <code>noncausal_full_attention</code> attention mode, so a d3 row measured
+here is not claimed to be upstream-equal in accuracy until it is measured against it.</p>
+<p>Send the body as JSON (<code>Content-Type: application/json</code>): httplib parses an
+<code>application/x-www-form-urlencoded</code> body as a form and caps it at 8 KB, which is a 413 before this route
+sees it — that applies to every route here, and a real d3 caller (a 32k-token state is ~100 KB) hits it
+only with a client that leaves the content type at curl's default.</p>
+<p>The shape of a reply (<strong>numbers illustrative</strong> — the choice depends on the pack's readout head):</p>
+<pre><code>$ curl -sS localhost:8000/v1/systemone -H 'Content-Type: application/json' \
+    -d '{&quot;state&quot;: {&quot;route&quot;: &quot;refund&quot;, &quot;amount&quot;: 42},
+         &quot;questions&quot;: {&quot;route&quot;: {&quot;type&quot;: &quot;choice&quot;, &quot;criteria&quot;: {&quot;fast&quot;: &quot;handled today&quot;, &quot;cheap&quot;: null}}}}'
+{&quot;answers&quot;:{&quot;route&quot;:{&quot;choice&quot;:&quot;fast&quot;,&quot;confidence&quot;:0.81,&quot;probabilities&quot;:{&quot;fast&quot;:0.98,&quot;cheap&quot;:0.02},
+  &quot;type&quot;:&quot;choice&quot;}},&quot;model&quot;:&quot;d3-lite&quot;,&quot;usage&quot;:{&quot;input_tokens&quot;:96,&quot;output_tokens&quot;:0}}
 </code></pre>
 <h3 id="two-streams-on-one-npu">Two streams on one NPU<a class="anchor" href="#two-streams-on-one-npu" title="Permanent link">#</a></h3>
 <p>One process owns the NPU by default: it takes an exclusive <code>flock</code> on
@@ -601,6 +1152,35 @@ cmake -B build -G Ninja -DONEBIT_NPU=ON -DONEBIT_NPU_RT_LIB=&lt;path&gt;/libnpu_
 against (the kernel's own copy also works); nothing from the pin is built into or shipped with
 the release. <code>.github/workflows/bump-xdna.yml</code> moves the pin when run by hand, because a driver
 move means rebuilding the module on Strix Halo and checking the NPU there first.</p>
+<h3 id="the-mtp-head-fastflowlms-container-ours">The MTP head (FastFlowLM's container -&gt; ours)<a class="anchor" href="#the-mtp-head-fastflowlms-container-ours" title="Permanent link">#</a></h3>
+<p><code>tools/flm_head_import</code> (built as <code>flm-head-import</code>) turns a FastFlowLM MTP-head container
+(<code>model.mtp.q4nx</code>) into a sidecar directory of ours. The head is one Qwen3.5 full-attention layer plus an input
+fusion; the base model keeps its embedding, lm-head, tokenizer and RoPE, so this artifact is only the head.</p>
+<p>The container is safetensors-shaped and its quantised tensors are rank-3 <code>[nrb, ncb, 4736]</code> with dtype <code>"I8"</code>.
+That 4,736-byte cell <strong>is our Q4_K chunk</strong>: <code>u8 scale[g*32+n]</code> at 0, <code>u8 min[g*32+n]</code> at 256, nibbles at 512
+(byte <code>k*16 + n/2</code>, even n in the low nibble), <code>bf16 S[n]</code> at 4608, <code>bf16 M[n]</code> at 4672, and
+<code>w = q4 * (scale*S) + min*M</code>. Measured, not assumed: <code>q4nx::dequant_tile(Chunk::Q4K, …)</code> reproduces FastFlowLM's
+own decoder <strong>bit for bit</strong> on six cells recorded from six of the head's matrices (<code>tests/golden/flm-i8</code>, floats
+recorded from their published library; the layout facts are in amd-oss/npu-re
+<code>docs/FACTS-flm-q4nx-container-and-mtp-head.md</code>). Two things follow, and they are the reason this tool is small:</p>
+<ul>
+<li>the default form copies every cell <strong>unchanged</strong> — no requantisation, nothing to lose, and the import
+  self-check re-decodes each matrix from the source and from the copy and compares;</li>
+<li>
+<p>the alternative <code>--form q4_1</code> writes our mode-1 chunk (5,120 B: <code>bf16 S[256]</code>, <code>bf16 M[256]</code>, 4,096 code
+  bytes, <code>w = code*S + M</code>) through <code>q4nx::q4k_to_q4_1</code>, whose only loss is rounding <code>S*scale</code> and <code>M*min</code> to
+  bf16. The tool prints that factorisation error rather than hiding it (measured on the 27B head: 0.67 % of
+  values unchanged, max |delta| 1.2e-3, mean |delta| 6.8e-5).</p>
+<p>flm-head-import model.mtp.q4nx -o head-q4k               # cells copied unchanged
+flm-head-import model.mtp.q4nx -o head-q4_1 --form q4_1  # our mode-1 chunks</p>
+</li>
+</ul>
+<p><code>tools/flm_head_pb16i.py</code> writes the third form, the <code>pb16i</code> image (<code>npu/forward/include/q4nx_pb16i.h</code>), and it
+is the one form this head cannot have exactly: <code>pb16i</code> carries one int16 magnitude per (32 K, column) with no
+per-group bias, while the source blocks are asymmetric (<code>w = q4*S + M</code>) and their magnitudes span about 100x
+inside a column, where an int16 with an 11-bit mantissa allows about 16x. Forcing it costs a measured 11-18 %
+relative L1 residual, so the mode-1 or Q4_K forms are the ones to run; the script keeps the measurement next to
+the images it writes.</p>
 <nav class="pager"><a class="prev" href="hrx.html"><span>Previous</span>HRX</a><a class="next" href="hybrid.html"><span>Next</span>Hybrid</a></nav>
 <p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/npu.md">View this page's source on GitHub ↗</a></p>
 </article>

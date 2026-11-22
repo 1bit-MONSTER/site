@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="1bit serve --device hybrid processes the prompt on one device and generates on another: a prefill provider fills the KV cache, the HRX llama-server decodes.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-10-23">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/hybrid.html#article", "headline": "Hybrid: NPU prefill, HRX decode (--device hybrid)", "description": "1bit serve --device hybrid processes the prompt on one device and generates on another: a prefill provider fills the KV cache, the HRX llama-server decodes.", "url": "https://1bit.gg/hybrid.html", "mainEntityOfPage": "https://1bit.gg/hybrid.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-10-23", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/hybrid.html#article", "headline": "Hybrid: NPU prefill, HRX decode (--device hybrid)", "description": "1bit serve --device hybrid processes the prompt on one device and generates on another: a prefill provider fills the KV cache, the HRX llama-server decodes.", "url": "https://1bit.gg/hybrid.html", "mainEntityOfPage": "https://1bit.gg/hybrid.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html" aria-current="page">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -93,6 +92,12 @@
 <li><a href="kernel.html">Linux kernel</a></li>
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
 </ul>
 </nav></details>
 <article class="docs-page prose">
@@ -188,6 +193,48 @@ the backend's (<code>f16</code> by default), so a provider computing in another 
 match the version of the pinned llama.cpp (<code>third_party/llama.cpp</code>): the restore refuses another.</p>
 <p>Naming: <code>--prefill-provider PATH</code> or <code>ONEBIT_HYBRID_PREFILL=PATH</code>; <code>ONEBIT_HYBRID_ELFS=DIR</code> adds
 <code>--elfs DIR</code>.</p>
+<h3 id="the-shared-route-no-state-file-at-all-onebit_kv_share1">The shared route: no state file at all (<code>ONEBIT_KV_SHARE=1</code>)<a class="anchor" href="#the-shared-route-no-state-file-at-all-onebit_kv_share1" title="Permanent link">#</a></h3>
+<p>The contract above is the file route, and on Strix Halo the file is the whole cost: every byte of the
+prompt's KV is written by the provider and read back by the decoder, through the page cache, for a
+handoff that never leaves the box. <code>ONEBIT_KV_SHARE=1</code> on <code>1bit serve</code> (the child llama-server inherits
+it) replaces the file with two dma-buf fds:</p>
+<pre><code>&lt;provider&gt; --tokens &lt;ids file&gt; --model &lt;model&gt; --layout &lt;header file&gt; --fds &lt;n[,n...]&gt;
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--layout</code></td>
+<td>the header the decoder sent: <code>{"n_regions", "regions": [{"offset", "size", "layout"}], "params": {"n_ctx", "n_batch", "n_ubatch", "n_seq_max", "flash_attn", "type_k", "type_v"}}</code>. A provider builds its context from <code>params</code>; the per-region <code>layout</code> hash is what the importer checks</td>
+</tr>
+<tr>
+<td><code>--fds</code></td>
+<td>the region fds, in region order, inherited from serve (so no <code>/proc/&lt;pid&gt;/fd</code> reopening: Linux cannot reopen a dma-buf that way, measured)</td>
+</tr>
+<tr>
+<td><code>--out</code></td>
+<td>not used on this route</td>
+</tr>
+</tbody>
+</table></div>
+<p>Per request: <code>POST /slots/0?action=share {"socket": PATH}</code> makes the decoder export its KV buffers and
+hand the fds over an AF_UNIX socket that serve is listening on (<code>SCM_RIGHTS</code>, one length-prefixed JSON
+message); serve passes them to the provider as inherited descriptors; the provider maps them as its own
+KV tensors and prefills the prompt into them; <code>POST /slots/0?action=adopt {"tokens": [...]}</code> makes the
+decoder take cells 0..N-1 as positions 0..N-1 with no data movement (<code>llama_kv_cells_adopt</code>). The
+provider never writes a file, and the only bytes that cross a boundary are the fds and a few hundred
+bytes of JSON. <code>llama-kvshare-prefill</code> (llama.cpp <code>tools/kvshare-prefill</code>) is the reference provider:
+a CPU prefill, so the plumbing can be gated with no NPU; the NPU engine is the real one, mapping the
+same descriptors as XDNA BOs.</p>
+<p>Limits, so nobody reads more into the flag than it does: the region is <code>llama_kv_cache</code>, so a hybrid
+model's recurrent half (e.g. the 27B's GDN state) is not shared and <code>?action=share</code> refuses a hybrid
+cache rather than hand over half a prompt. Both sides must be the same pinned llama.cpp, the same model
+and <code>-fa</code>/<code>-c</code>/<code>-b</code>/<code>-ub</code>/KV types (<code>params</code> above); a mismatch is a refusal, not a wrong answer.</p>
 <h2 id="tests">Tests<a class="anchor" href="#tests" title="Permanent link">#</a></h2>
 <ul>
 <li><code>tests/hybrid_route.sh</code> (CTest <code>hybrid_route</code>, no model, no NPU): <code>tests/fake_backend.py</code> stands in

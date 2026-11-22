@@ -1,0 +1,1595 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>1bit engine blog</title><link href="https://1bit.gg/"/><link rel="self" href="https://1bit.gg/feed.xml"/><id>https://1bit.gg/</id><updated>2026-11-02T00:00:00Z</updated><author><name>bong-water-water-bong</name></author><entry><title>v2026.44, the first release</title><link href="https://1bit.gg/blog-the-first-release.html"/><id>https://1bit.gg/blog-the-first-release.html</id><published>2026-11-02T00:00:00Z</published><updated>2026-11-02T00:00:00Z</updated><summary>The first published release of the 1bit engine. A signed live USB that brings up the GPU, the NPU and Lemonade Server on a Ryzen AI MAX+ 395, or one tarball for an Ubuntu that already runs ROCm. What ships, how it was tested on the hardware, and what is not in it.</summary><category term="release"/><category term="v2026.44"/><category term="lemonade"/><category term="hrx"/><category term="npu"/><category term="1bit-os"/><category term="strix-halo"/><category term="ryzen-ai-max-395"/><content type="html">&lt;p&gt;The engine has its first published release. It is one binary with no Python in it, and the
+same binary is the whole operating system when you want it to be.&lt;/p&gt;
+&lt;h2 id=&quot;two-ways-to-run-it&quot;&gt;Two ways to run it&lt;a class=&quot;anchor&quot; href=&quot;#two-ways-to-run-it&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Boot a stick.&lt;/strong&gt; &lt;code&gt;1bit-os-v2026.44.img.zst&lt;/code&gt; is a live USB image, Secure Boot signed. Write it
+  to a stick of 8 GB or more, boot a Ryzen AI MAX+ 395 machine from it, and Lemonade Server is up
+  with the engine behind it: the GPU through HRX and our HIP kernels, the NPU through our own
+  runtime. &lt;code&gt;1bit-install &amp;lt;disk&amp;gt; --yes&lt;/code&gt; puts the same system on a disk.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Add it to an Ubuntu that already runs ROCm.&lt;/strong&gt; &lt;code&gt;lemonade-onebit-v2026.44-linux-x86_64.tar.zst&lt;/code&gt;
+  is Lemonade Server from our fork with the &lt;code&gt;onebit&lt;/code&gt; backend and the engine in &lt;code&gt;1bit/&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Both talk the OpenAI API on a port, and the Lemonade web app is in the box.&lt;/p&gt;
+&lt;h2 id=&quot;what-is-in-the-box&quot;&gt;What is in the box&lt;a class=&quot;anchor&quot; href=&quot;#what-is-in-the-box&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;component&lt;/th&gt;
+&lt;th&gt;version&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;engine&lt;/td&gt;
+&lt;td&gt;the release commit on &lt;a href=&quot;releases.html&quot;&gt;Releases&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;HRX (llama.cpp fork, ggml-hrx)&lt;/td&gt;
+&lt;td&gt;the pinned fork commit, listed in the release notes&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;hrx-system&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;82804197bcbe&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Lemonade Server&lt;/td&gt;
+&lt;td&gt;our fork of the current Lemonade release, &lt;code&gt;onebit&lt;/code&gt; recipe&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;kernel in the image&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;7.3.0-rc4-1bit-perfopt&lt;/code&gt;, MOK-signed&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;NPU kernel sets&lt;/td&gt;
+&lt;td&gt;sealed and signed sets&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Models in the release gate: the Qwen3.8 family (27B with MTP, Flash-Next), DeepSeek-V4.1,
+GLM 5.x, ZAYA1, Bonsai-2 on the NPU, and any GGUF the fork loads. The DwarfStar route is not in
+this release; its models are served on HRX.&lt;/p&gt;
+&lt;h2 id=&quot;how-it-was-tested-all-on-the-hardware&quot;&gt;How it was tested, all on the hardware&lt;a class=&quot;anchor&quot; href=&quot;#how-it-was-tested-all-on-the-hardware&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Every candidate goes through the same gate before a tag is cut, and the tag is cut only after the
+last candidate has booted from the stick on a real Max+ 395:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;build, &lt;code&gt;ctest&lt;/code&gt;, package&lt;/li&gt;
+&lt;li&gt;the hardware gate at the shipped pins: every kernel op against the reference, known answers,
+  KLD against the release pin, long-prompt needles at 7,000 tokens, placement checks&lt;/li&gt;
+&lt;li&gt;the NPU route through the sealed kernel sets: oracle, greedy, prefill and reproducibility&lt;/li&gt;
+&lt;li&gt;image checks (sealed sets, licences, release identity) and the VM release tests&lt;/li&gt;
+&lt;li&gt;QEMU: live boot, run, install to a disk, boot from the installed disk&lt;/li&gt;
+&lt;li&gt;the release stick: written and read back byte for byte&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;live USB boot on the board with Secure Boot on&lt;/strong&gt;, and &lt;code&gt;1bit-release-check&lt;/code&gt; run on the live
+  stick: &lt;code&gt;RESULT: PASS (19 checks, no failures)&lt;/code&gt;, read off the stick&#x27;s own &lt;code&gt;/data/release-check.log&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;an &lt;strong&gt;installed system&lt;/strong&gt; -- live boot, install to a disk, boot from the installed disk -- run in
+  &lt;strong&gt;QEMU&lt;/strong&gt;, not on the board: &lt;code&gt;RESULT: PASS (19 checks, no failures)&lt;/code&gt; and &lt;code&gt;VMTEST-RELEASE PASS (10
+  PASS, 9 SKIP, 0 FAIL)&lt;/code&gt;. The install on the hardware is the next release&#x27;s gate, not this one&#x27;s&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;One candidate was pulled back from publication last week because the stick test had not been run
+on that exact build. The rule stands: the whole gate, on the hardware, on the bytes that ship.&lt;/p&gt;
+&lt;h2 id=&quot;what-is-not-in-it-said-plainly&quot;&gt;What is not in it, said plainly&lt;a class=&quot;anchor&quot; href=&quot;#what-is-not-in-it-said-plainly&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;The installed appliance is the live image on disk. The next release makes it a full headless OS
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/712&quot;&gt;#712&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;No firmware boot entry is written by the installer on this kernel; remove the stick or pick the
+  disk in the firmware (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/709&quot;&gt;#709&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;Single-stream decode on Qwen3.8 is behind the fastest Strix Halo engines today. The numbers we
+  publish are the ones we measured, on the &lt;a href=&quot;npu-leaderboard.html&quot;&gt;leaderboard&lt;/a&gt; and the
+  &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/wiki&quot;&gt;wiki&lt;/a&gt;, with the command that produced each.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;license&quot;&gt;License&lt;a class=&quot;anchor&quot; href=&quot;#license&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Source is Apache-2.0. The release binaries also contain two proprietary components compiled in,
+the 1bit NPU runtime and the 1bit HIP kernels for HRX, under the 1bit Binary License, free to use.&lt;/p&gt;
+&lt;p&gt;Thank you to Osmantic / ODS, to the Lemonade team and to AMD&#x27;s developers.&lt;/p&gt;</content></entry><entry><title>This week in the engine</title><link href="https://1bit.gg/blog-this-week-in-the-engine.html"/><id>https://1bit.gg/blog-this-week-in-the-engine.html</id><published>2026-10-30T00:00:00Z</published><updated>2026-10-30T00:00:00Z</updated><summary>This week&#x27;s Lemonade release is the pin, the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, the HRX pin carries the DeepSeek-V4.1 port, ONNX Runtime runs in-process with our own execution provider, and the README is simple again.d the two-engine NPU stand.</summary><category term="weekly"/><category term="release"/><category term="lemonade"/><category term="hrx"/><category term="npu"/><category term="1bit-os"/><category term="strix-halo"/><category term="ryzen-ai-max-395"/><content type="html">&lt;p&gt;The engine is pinned to this week&#x27;s Lemonade release, the release candidate&#x27;s checks are green,
+and two measurements this week say plainly where two slow things stand.&lt;/p&gt;
+&lt;h2 id=&quot;the-release-candidate&quot;&gt;The release candidate&lt;a class=&quot;anchor&quot; href=&quot;#the-release-candidate&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Lemonade:&lt;/strong&gt; the pin moved to this week&#x27;s Lemonade release
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/641&quot;&gt;#641&lt;/a&gt;); the fork sync now ports a release onto
+  the fork&#x27;s main instead of checking out the tag (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/642&quot;&gt;#642&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;1bit OS:&lt;/strong&gt; the live image passes 17 of 17 checks on the board with Secure Boot on. The image
+  build now refuses an image whose kernel modules were selected for another kernel
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/638&quot;&gt;#638&lt;/a&gt;), and the weekly run signs the sealed
+  NPU kernel sets between build and package (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/648&quot;&gt;#648&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Hardware gate:&lt;/strong&gt; fully green at the shipping pin, after the HRX bump to llama.cpp
+  d8d2f5b39f22 and hrx-system 82804197bcbe (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/659&quot;&gt;#659&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The tag and the packages are the owner&#x27;s; the checklist is on &lt;a href=&quot;releases.html&quot;&gt;Releases&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;two-measurements-stated-as-they-are&quot;&gt;Two measurements, stated as they are&lt;a class=&quot;anchor&quot; href=&quot;#two-measurements-stated-as-they-are&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Flash-Next prefill.&lt;/strong&gt; Qwen3.8-Flash-Next prefills at 287 tok/s on HRX. A prefill forward takes
+about 1.8 s, of which about 1.0 s is host time between dispatches, not device time. Measured on
+the file itself, that gap is a &lt;code&gt;GET_ROWS&lt;/code&gt; the HRX backend declines, so the operation runs on the
+host and the device waits (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/572&quot;&gt;#572&lt;/a&gt;, written up in
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/646&quot;&gt;#646&lt;/a&gt; and on &lt;a href=&quot;hrx.html&quot;&gt;HRX&lt;/a&gt;). The fix is a
+kernel, not a setting.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Two engines on the NPU.&lt;/strong&gt; &lt;code&gt;--npu-streams 2&lt;/code&gt; runs a second resident engine on the NPU
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/640&quot;&gt;#640&lt;/a&gt;). With both engines on whole-array
+kernels, the aggregate throughput is 0.41x of one engine: they contend for the same array, and
+each waits for the other. Two engines need kernel sets partitioned to disjoint halves of the
+array, one column partition per engine, which is
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/656&quot;&gt;#656&lt;/a&gt;. Until then the second engine is opt-in
+and costs more than it gives.&lt;/p&gt;
+&lt;h2 id=&quot;later-the-same-day&quot;&gt;Later the same day&lt;a class=&quot;anchor&quot; href=&quot;#later-the-same-day&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;The HRX pin moved again&lt;/strong&gt;, to a fork head that carries six commits: the host-gap profiler,
+  the KV cache zero-padding repair, the DeepSeek-V4.1-Flash port, and the &lt;code&gt;GET_ROWS&lt;/code&gt; fix that
+  lets Flash-Next&#x27;s 320-million-row token table gather on the GPU instead of the CPU
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/672&quot;&gt;#672&lt;/a&gt;, fork
+  &lt;a href=&quot;https://github.com/1bit-MONSTER/llama.cpp/pull/156&quot;&gt;#156&lt;/a&gt;,
+  &lt;a href=&quot;https://github.com/1bit-MONSTER/llama.cpp/pull/159&quot;&gt;#159&lt;/a&gt;). Every pin move passes the hardware
+  gate on the board first; the recipe for a hand-raised bump is now written down
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/675&quot;&gt;#675&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ONNX Runtime runs inside the engine&lt;/strong&gt;, behind a build flag, with our own execution provider.
+  Its first proof is a MatMul on the NPU through an ORT session, repeatable, within 0.5 % of the
+  CPU provider&#x27;s result; a Quark-quantised A8W8 graph runs on it unchanged. The first whole model
+  through it is not right yet, and the write-up says so
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/647&quot;&gt;#647&lt;/a&gt;, &lt;a href=&quot;onnx.html&quot;&gt;ONNX Runtime&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;The NPU and the GPU run at the same time.&lt;/strong&gt; A reported hazard said they could not; forty
+  measured reps say they can, at a cost of about 13 % of the NPU&#x27;s weight stream while the GPU is
+  busy. The numbers are in &lt;a href=&quot;hybrid.html&quot;&gt;Hybrid&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;The README is simple again&lt;/strong&gt;: boot a stick, try it, install it; the technical map moved to
+  &lt;a href=&quot;architecture.html&quot;&gt;How the engine is built&lt;/a&gt;
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/676&quot;&gt;#676&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;The engine became a workload for AMD&#x27;s Hyperloom tuner
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/660&quot;&gt;#660&lt;/a&gt;), the daily census and bump workflows
+  now report their failures instead of failing silently
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/664&quot;&gt;#664&lt;/a&gt;,
+  &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/665&quot;&gt;#665&lt;/a&gt;), and the kernel arena that scores NPU
+  kernels against a byte-exact oracle has its public half in the tree
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/668&quot;&gt;#668&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;merged-on-30-october&quot;&gt;Merged on 30 October&lt;a class=&quot;anchor&quot; href=&quot;#merged-on-30-october&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/659&quot;&gt;#659&lt;/a&gt; Bump HRX: llama.cpp d8d2f5b39f22 + hrx-system 82804197bcbe&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/658&quot;&gt;#658&lt;/a&gt; q4nx: cross-check our packer against the official converter (#587)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/655&quot;&gt;#655&lt;/a&gt; Census 2026-10-30&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/654&quot;&gt;#654&lt;/a&gt; census-watch: pin the Q4NX converter and the d3 source, and watch both&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/649&quot;&gt;#649&lt;/a&gt; census-watch: a Q4NX pack for a family with no NPU route is an alert&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/648&quot;&gt;#648&lt;/a&gt; weekly: sign the sealed NPU kernel sets between build and package&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/646&quot;&gt;#646&lt;/a&gt; docs: where a Flash-Next prefill forward&#x27;s 1.8 s goes, and the ~1.0 s that is not HRX (engine #572)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/645&quot;&gt;#645&lt;/a&gt; tools: one entry point for the engine#612 demo&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/644&quot;&gt;#644&lt;/a&gt; docs: what the hybrid route costs at this pin, and why its row is not here (engine#612 item 3)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/643&quot;&gt;#643&lt;/a&gt; bench: HRX batched decode on Qwen3-Coder-30B-A3B at the current pin (engine#612 item 2)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/642&quot;&gt;#642&lt;/a&gt; sync-lemonade-fork: port the release onto main, never check out the tag&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/641&quot;&gt;#641&lt;/a&gt; Bump Lemonade: 1bit-MONSTER/lemonade ef0f3b490a27 (upstream release)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/640&quot;&gt;#640&lt;/a&gt; npu: --npu-streams N, the opt-in second engine, mechanism and its measured cost (engine#612)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/638&quot;&gt;#638&lt;/a&gt; mkimage: refuse an image whose modules were selected for another kernel&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/637&quot;&gt;#637&lt;/a&gt; npu: cache the dense FFN tail for GDN models by default (#587)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/636&quot;&gt;#636&lt;/a&gt; weekly: bound the bump CI wait and do not wait on a queued pr_agent&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Sources: &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/641&quot;&gt;#641&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/642&quot;&gt;#642&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/638&quot;&gt;#638&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/648&quot;&gt;#648&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/659&quot;&gt;#659&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/572&quot;&gt;#572&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/646&quot;&gt;#646&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/640&quot;&gt;#640&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/656&quot;&gt;#656&lt;/a&gt;, &lt;a href=&quot;releases.html&quot;&gt;Releases&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>Ternary Bonsai-2-27B on the Ryzen AI NPU</title><link href="https://1bit.gg/blog-ternary-bonsai-on-the-npu.html"/><id>https://1bit.gg/blog-ternary-bonsai-on-the-npu.html</id><published>2026-10-30T00:00:00Z</published><updated>2026-10-30T00:00:00Z</updated><summary>PrismML&#x27;s Ternary-Bonsai-2-27B answers correctly on the XDNA 2 NPU (cosine 0.9908, argmax identical); decode 13.3 to 4.1 s/token in a day, ceiling measured.</summary><category term="npu"/><category term="xdna2"/><category term="ternary"/><category term="bonsai"/><category term="ryzen-ai"/><category term="work-in-progress"/><category term="amd-npu-linux"/><content type="html">&lt;p&gt;PrismML&#x27;s Ternary-Bonsai-2-27B now answers correctly on the XDNA 2 NPU, and its decode went from
+11.5 to 8.87 seconds per token. This is work in progress: the model runs and is right, and it is
+slow, and the measurement says why.&lt;/p&gt;
+&lt;h2 id=&quot;correctness&quot;&gt;Correctness&lt;a class=&quot;anchor&quot; href=&quot;#correctness&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The 27B&#x27;s attention heads are stored interleaved per value head, and the same interleave shows up
+in eight weight families of the model, including the gated delta net&#x27;s swish gate. Once every
+family is read with that interleave, the NPU&#x27;s output agrees with the engine&#x27;s: cosine 0.9908
+against the engine&#x27;s reference on the device, and the argmax token is identical. The same check
+against FastFlowLM&#x27;s reference container gives 0.9305, so the NPU route now reproduces the
+engine&#x27;s answer more closely than that container does.&lt;/p&gt;
+&lt;h2 id=&quot;decode-115-to-887-stoken&quot;&gt;Decode: 11.5 to 8.87 s/token&lt;a class=&quot;anchor&quot; href=&quot;#decode-115-to-887-stoken&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Two changes, in &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/661&quot;&gt;engine #661&lt;/a&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the M=16 kernel twins: the decode kernels take 16 rows at a time instead of fewer, so a token
+  makes fewer dispatches;&lt;/li&gt;
+&lt;li&gt;no per-token re-dequant: the ternary weights are dequantized once at load, not again for every
+  token.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Together: 8.87 s/token, from 11.5 on the same file and the same device.&lt;/p&gt;
+&lt;h2 id=&quot;decode-again-887-to-41-stoken-by-weight-layout-alone&quot;&gt;Decode again: 8.87 to 4.1 s/token, by weight layout alone&lt;a class=&quot;anchor&quot; href=&quot;#decode-again-887-to-41-stoken-by-weight-layout-alone&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The same evening, one more change with no kernel edit: the weights are written to the container
+in the order the kernel&#x27;s tiles consume them, so every tile is one contiguous read instead of 64
+short runs (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/667&quot;&gt;engine #667&lt;/a&gt;). Bit-identical
+output, and the decode step went from 8.87 to 4.10 to 4.29 s/token on the same device.&lt;/p&gt;
+&lt;h2 id=&quot;where-the-ceiling-is-measured&quot;&gt;Where the ceiling is, measured&lt;a class=&quot;anchor&quot; href=&quot;#where-the-ceiling-is-measured&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A pass-through probe, the kernel&#x27;s data path with the arithmetic removed, says the layout above is
+at the limit of that data path: the device is bound by the number of tiles it moves per column, not
+by the bytes in them. Two consequences, both measured the same day. First, the file is already
+4-bit on disk, and streaming those bytes instead of dequantised 8-bit ones halves the work per
+token; that kernel path is built and byte-exact in the private kernel tree and ships when all five
+phases of the layer are through their gates. Second, the remaining distance to the stream rate our
+small-model route already reaches on this silicon is in the data path itself, which is the next
+piece of work. Until the five phases are in, the Bonsai row for the NPU stays a correctness result
+with a dated speed, not a claim.&lt;/p&gt;
+&lt;p&gt;The NPU route and its current state are on &lt;a href=&quot;npu.html&quot;&gt;NPU engine&lt;/a&gt;; the model&#x27;s HRX numbers
+(43.3 tok/s with MTP in PQ2_0) are in &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Sources: &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/661&quot;&gt;engine #661&lt;/a&gt;, &lt;a href=&quot;npu.html&quot;&gt;NPU engine&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>The GPU and the NPU at the same time, measured</title><link href="https://1bit.gg/blog-gpu-and-npu-at-the-same-time.html"/><id>https://1bit.gg/blog-gpu-and-npu-at-the-same-time.html</id><published>2026-10-30T00:00:00Z</published><updated>2026-10-30T00:00:00Z</updated><summary>Forty reps say the Radeon iGPU and the XDNA 2 NPU run together on Strix Halo with no hang and no corruption; a busy GPU costs the NPU about 13 % of its stream.</summary><category term="npu"/><category term="xdna2"/><category term="hrx"/><category term="hybrid"/><category term="strix-halo"/><category term="measurement"/><category term="amd-npu-linux"/><content type="html">&lt;p&gt;For four weeks the fleet that works on this engine ran every NPU job behind the GPU queue. The
+reason was a report from another project&#x27;s documentation: GPU and NPU work at the same time
+could hang the machine, or corrupt NPU results, while the GPU&#x27;s fabric clock (FCLK) changed level.
+The suggested fix was to hold FCLK at its top level. We never reproduced it; we just avoided it.&lt;/p&gt;
+&lt;p&gt;The hybrid route (the prompt on the NPU, the tokens on the GPU) needs both devices busy at once,
+so the question had to be settled by measurement.&lt;/p&gt;
+&lt;h2 id=&quot;method&quot;&gt;Method&lt;a class=&quot;anchor&quot; href=&quot;#method&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The NPU side is the kernel arena&#x27;s byte-exact oracle: one real decode kernel of the 27B ternary
+model, five launches per cell, every output compared byte for byte against the frozen reference.
+The GPU side is a looping &lt;code&gt;llama-bench&lt;/code&gt; on HRX (prefill 512, decode 128) started before the NPU
+runs and kept running through them. Four cells, GPU idle or busy times FCLK on auto or held at
+the top level, run twice, with the live FCLK level sampled once a second and the kernel log
+checked for GPU resets, MODE2 resets and ring timeouts after every cell. The hold cells ran
+last, and the box was returned to &lt;code&gt;auto&lt;/code&gt; and verified before the run was called done.&lt;/p&gt;
+&lt;h2 id=&quot;result&quot;&gt;Result&lt;a class=&quot;anchor&quot; href=&quot;#result&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;cell&lt;/th&gt;
+&lt;th&gt;ms per launch, median&lt;/th&gt;
+&lt;th&gt;GB/s&lt;/th&gt;
+&lt;th&gt;FCLK levels seen&lt;/th&gt;
+&lt;th&gt;byte-exact&lt;/th&gt;
+&lt;th&gt;resets&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;GPU idle, FCLK auto&lt;/td&gt;
+&lt;td&gt;10.79&lt;/td&gt;
+&lt;td&gt;8.26&lt;/td&gt;
+&lt;td&gt;5, 6 and 7, changing mid-run&lt;/td&gt;
+&lt;td&gt;5 of 5&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;GPU idle, FCLK held&lt;/td&gt;
+&lt;td&gt;10.92&lt;/td&gt;
+&lt;td&gt;8.16&lt;/td&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;5 of 5&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;GPU busy, FCLK auto&lt;/td&gt;
+&lt;td&gt;12.04&lt;/td&gt;
+&lt;td&gt;7.40&lt;/td&gt;
+&lt;td&gt;6 and 7, changing mid-run&lt;/td&gt;
+&lt;td&gt;5 of 5&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;GPU busy, FCLK held&lt;/td&gt;
+&lt;td&gt;12.01&lt;/td&gt;
+&lt;td&gt;7.42&lt;/td&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;5 of 5&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Forty reps in total, twenty of them with the GPU busy, 160 byte-exact checks, all passing, and
+zero reset or timeout lines in the kernel log in any cell, with the fabric clock demonstrably
+changing level in the middle of NPU runs. Kernel 7.3.0-rc4 with the IOMMU PerfOpt backports, SMU
+firmware 100.7.0, BIOS 1.09.&lt;/p&gt;
+&lt;p&gt;So: the hazard does not reproduce on this kernel and firmware. A busy GPU costs the NPU about 13 %
+of its weight stream, through shared memory bandwidth, and nothing else. The first pass had
+suggested that holding FCLK removes that cost; the second pass did not confirm it, so that claim
+is retracted and the box stays on &lt;code&gt;auto&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;what-changed-because-of-it&quot;&gt;What changed because of it&lt;a class=&quot;anchor&quot; href=&quot;#what-changed-because-of-it&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;NPU jobs no longer queue behind GPU jobs on the development box; they take the NPU device lock
+only. Every arena score now records whether the GPU was busy during the launch, so a 13 % dip is
+never mistaken for a kernel regression. And the hybrid route is planned around a measured 13 %,
+not around a hang. The full table is in &lt;a href=&quot;hybrid.html&quot;&gt;Hybrid&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Sources: &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/673&quot;&gt;engine #673&lt;/a&gt;, &lt;a href=&quot;hybrid.html&quot;&gt;Hybrid&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>Boot a stick</title><link href="https://1bit.gg/blog-boot-a-stick.html"/><id>https://1bit.gg/blog-boot-a-stick.html</id><published>2026-10-30T00:00:00Z</published><updated>2026-10-30T00:00:00Z</updated><summary>Write the 1bit OS image to a USB stick, boot a Ryzen AI MAX+ 395 with Secure Boot on, and Lemonade serves local LLMs on the GPU and NPU. One command installs.</summary><category term="1bit-os"/><category term="live-usb"/><category term="lemonade"/><category term="strix-halo"/><category term="ryzen-ai-max-395"/><category term="local-llm"/><category term="getting-started"/><content type="html">&lt;p&gt;The feedback we hear most is &quot;keep it simple&quot;. So here is the whole setup for local LLMs on a
+Ryzen AI MAX+ 395 (Strix Halo) machine:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Download the 1bit OS image from the &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/releases&quot;&gt;releases page&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Write it to a USB stick of 8 GB or more.&lt;/li&gt;
+&lt;li&gt;Boot the machine from the stick. Secure Boot stays on; the image is signed.&lt;/li&gt;
+&lt;li&gt;Lemonade comes up with its catalog and its web UI. Pick a model and talk to it.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If you like it, one command from the live session installs the 1bit appliance to the disk:
+&lt;code&gt;1bit-install &amp;lt;disk&amp;gt; --yes&lt;/code&gt;. It refuses to write anything until it has printed the disk it is
+about to use and waited, so a typo cannot cost you a drive. Reboot without the stick and the
+machine is the same appliance, now permanent.&lt;/p&gt;
+&lt;h2 id=&quot;what-is-on-the-stick&quot;&gt;What is on the stick&lt;a class=&quot;anchor&quot; href=&quot;#what-is-on-the-stick&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A Lemonade Server with the 1bit engine embedded as its &lt;code&gt;onebit&lt;/code&gt; backend. Lemonade is the server
+you talk to: its model catalog, its downloads, its router, its UI, its OpenAI-compatible API.
+For the models it hands to the engine, the Radeon 8060S iGPU runs them through HRX with our own
+HIP kernels and the XDNA 2 NPU runs them through our own NPU runtime. Nothing to configure,
+nothing to compile, no driver to install: the kernel on the stick is ours, built and signed for
+this hardware.&lt;/p&gt;
+&lt;p&gt;The same engine is also a package for a Lemonade you already run on Ubuntu, from the same
+releases page (&lt;a href=&quot;lemonade.html&quot;&gt;Lemonade&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;where-it-stands&quot;&gt;Where it stands&lt;a class=&quot;anchor&quot; href=&quot;#where-it-stands&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The current candidate image passes 17 of 17 checks on the board, booted from the stick with
+Secure Boot on. The release itself goes out when every item on the checklist is done; the
+checklist and the candidate&#x27;s pins are public (&lt;a href=&quot;releases.html&quot;&gt;Releases&lt;/a&gt;). The models the
+image is checked against, with the number each one measured on this hardware, are one page
+(&lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Sources: &lt;a href=&quot;https://github.com/1bit-MONSTER/engine#readme&quot;&gt;README&lt;/a&gt;, &lt;a href=&quot;releases.html&quot;&gt;Releases&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/blob/main/os/v2/README.md&quot;&gt;os/v2/README.md&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>BitNet b1.58 runs on HRX</title><link href="https://1bit.gg/blog-bitnet-b158-on-hrx.html"/><id>https://1bit.gg/blog-bitnet-b158-on-hrx.html</id><published>2026-10-30T00:00:00Z</published><updated>2026-10-30T00:00:00Z</updated><summary>Microsoft&#x27;s BitNet b1.58 2B-4T TQ2_0 GGUF runs end to end on the Radeon 8060S through HRX: perplexity 102.42 vs 102.56 on the CPU, decode 123.4 tok/s.</summary><category term="bitnet"/><category term="ternary"/><category term="hrx"/><category term="strix-halo"/><category term="local-llm"/><category term="quantization"/><category term="amd-gpu"/><category term="radeon-8060s"/><content type="html">&lt;p&gt;Microsoft&#x27;s BitNet b1.58 2B-4T, in the TQ2_0 ternary GGUF (1.11 GiB, 2.06 bits per weight), now
+runs end to end on the Radeon 8060S through HRX. Every node of the graph is on the GPU; nothing
+falls back to the CPU. Perplexity on HRX is 102.42 against 102.56 on the CPU for the same file, and
+decode is 123.4 tok/s.&lt;/p&gt;
+&lt;h2 id=&quot;what-was-measured&quot;&gt;What was measured&lt;a class=&quot;anchor&quot; href=&quot;#what-was-measured&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;check&lt;/th&gt;
+&lt;th&gt;result&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;placement&lt;/td&gt;
+&lt;td&gt;every graph node on HRX0, no CPU fallback&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;perplexity, same file&lt;/td&gt;
+&lt;td&gt;102.42 on HRX, 102.56 on the CPU&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;decode, tg128, before the repack&lt;/td&gt;
+&lt;td&gt;101.6 tok/s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;decode, tg128, after the repack&lt;/td&gt;
+&lt;td&gt;123.4 tok/s (same binary)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The TQ1_0 and TQ2_0 ternary formats were already full &lt;code&gt;mul_mat&lt;/code&gt; formats on HRX. What changed is a
+load-time step: a TQ2_0 file is repacked once, as it loads, onto the packed-ternary layout our
+decode kernel reads (&lt;a href=&quot;https://github.com/1bit-MONSTER/llama.cpp/pull/147&quot;&gt;llama.cpp fork #147&lt;/a&gt;).
+The same kernel already decodes the packed-ternary Bonsai files; BitNet&#x27;s weights now take the
+same path, which is where the 101.6 to 123.4 tok/s comes from. The binary is the same before and
+after; the file is the one Microsoft publishes.&lt;/p&gt;
+&lt;p&gt;Microsoft&#x27;s own runtime for these models, bitnet.cpp, ships no AMD GPU path, so this is a way to
+run the model on this GPU.&lt;/p&gt;
+&lt;p&gt;How to run it is the usual: &lt;code&gt;1bit serve -m &amp;lt;bitnet&amp;gt;.gguf&lt;/code&gt; picks HRX for the file. The formats the
+route covers are listed in &lt;a href=&quot;hrx.html&quot;&gt;HRX on the Radeon 8060S iGPU&lt;/a&gt;, and the number sits
+with the other models in &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Sources: &lt;a href=&quot;https://github.com/1bit-MONSTER/llama.cpp/pull/147&quot;&gt;1bit-MONSTER/llama.cpp #147&lt;/a&gt;, &lt;a href=&quot;hrx.html&quot;&gt;HRX&lt;/a&gt;, &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>Every node on the GPU: local LLMs on Strix Halo in Lemonade</title><link href="https://1bit.gg/blog-every-node-on-hrx.html"/><id>https://1bit.gg/blog-every-node-on-hrx.html</id><published>2026-10-21T00:00:00Z</published><updated>2026-10-21T00:00:00Z</updated><summary>On AMD Strix Halo, all 43 local LLM configurations we test run fully on the GPU with HRX and our HIP kernels, and Qwen3.8-27B decodes at 36 tok/s.</summary><category term="milestone"/><category term="strix-halo"/><category term="local-llm"/><category term="hrx"/><category term="lemonade"/><category term="qwen"/><category term="speculative-decoding"/><category term="release"/><content type="html">&lt;p&gt;On a Ryzen AI Max+ 395 (Strix Halo), the 1bit engine now runs every graph node of every local LLM
+and mode we test on the integrated Radeon 8060S GPU, through AMD&#x27;s HRX runtime and our own HIP
+kernels. Nothing falls back to the CPU. Here is what landed ahead of the first release, measured on
+that machine.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; the release candidate&#x27;s checks are green: the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, and the hardware gate is green at the shipping pin; the tag and the packages are the owner&#x27;s. The engine is pinned to Lemonade&#x27;s weekly release. Current numbers: &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;; status: &lt;a href=&quot;releases.html&quot;&gt;Releases&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;43-of-43-configurations-all-on-the-gpu-with-hrx&quot;&gt;43 of 43 configurations, all on the GPU with HRX&lt;a class=&quot;anchor&quot; href=&quot;#43-of-43-configurations-all-on-the-gpu-with-hrx&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We keep a census of the models people run and the modes they run them in: a short chat, a long
+prompt, a q8 KV cache, four requests in parallel, speculative decoding with MTP, embeddings and
+reranking. The models are Qwen3 0.6B, 4B and 8B, Qwen3.8-27B, Qwen3-Coder-30B-A3B,
+GLM-4.7-Flash, ZAYA1-8B, LFM2, MiniCPM, and the nomic, bge and jina embedding and reranking models.&lt;/p&gt;
+&lt;p&gt;On 20 October the census found 12 gaps, places where a node still ran on the CPU. All 12 are
+closed. The closing census: 43 of 43 runnable configurations with 0 nodes off the GPU, one graph
+split, and every request answered (&lt;a href=&quot;hrx.html&quot;&gt;how HRX runs&lt;/a&gt;;
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/476&quot;&gt;#476&lt;/a&gt;,
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/480&quot;&gt;#480&lt;/a&gt;,
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/481&quot;&gt;#481&lt;/a&gt;). Among them:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a q8_0 KV cache, with K and V or K alone, now keeps flash attention on the GPU;&lt;/li&gt;
+&lt;li&gt;four parallel requests work on LFM2, ZAYA1-8B and the Qwen3.5/3.8 family;&lt;/li&gt;
+&lt;li&gt;Qwen3.8-27B with MTP answers an 8K-token prompt;&lt;/li&gt;
+&lt;li&gt;jina-bert&#x27;s attention, with its ALiBi bias, runs on the GPU.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;qwen38-27b-speed-with-mtp-speculative-decoding&quot;&gt;Qwen3.8-27B speed with MTP speculative decoding&lt;a class=&quot;anchor&quot; href=&quot;#qwen38-27b-speed-with-mtp-speculative-decoding&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Qwen3.8-27B (UD-Q4_K_XL) with MTP speculative decoding, greedy 256-token chats:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;prompt&lt;/th&gt;
+&lt;th&gt;before&lt;/th&gt;
+&lt;th&gt;now&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;code&lt;/td&gt;
+&lt;td&gt;25.9 tok/s&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;36.0 tok/s&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;prose&lt;/td&gt;
+&lt;td&gt;20.5 tok/s&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;26.8 tok/s&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;short&lt;/td&gt;
+&lt;td&gt;21.9 tok/s&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;29.9 tok/s&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The verify step checks four tokens at once. New kernels for 2 to 8 tokens took it from 121 ms to
+88 ms (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/487&quot;&gt;#487&lt;/a&gt;). Decode without MTP is unchanged
+at 12.2 tok/s. The same model reads a 4,096-token prompt at 560 to 585 tok/s, depending on the batch size (llama-bench). How to run it:
+&lt;a href=&quot;serve.html&quot;&gt;1bit serve&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;strict-gpu-placement-by-default&quot;&gt;Strict GPU placement by default&lt;a class=&quot;anchor&quot; href=&quot;#strict-gpu-placement-by-default&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A node that quietly runs on the CPU is a slowdown nobody asked for. HRX placement is now strict by
+default: if any node of a model would run on the CPU, the load stops with one line that names the
+node, its op and its shape, and &lt;code&gt;--no-strict-device&lt;/code&gt; turns the fallback back on
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/482&quot;&gt;#482&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;The hardware gate that every pin change passes now builds our kernels into the server, checks
+that every graph of every gate model is on the GPU, adds q8 KV cache rows, and checks every kernel
+registration against its compiled code at startup
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/478&quot;&gt;#478&lt;/a&gt;,
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/484&quot;&gt;#484&lt;/a&gt;). That gate caught three bugs this week
+before they reached main (&lt;a href=&quot;hw-gate.html&quot;&gt;the hardware gate&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;The runtime also got safer: one memory budget for every buffer, coherent host reads, and after a
+GPU fault the server refuses new work and exits cleanly, so Lemonade can restart the model
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/486&quot;&gt;#486&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;inside-lemonade-on-ubuntu-2604-and-as-1bit-os&quot;&gt;Inside Lemonade, on Ubuntu 26.04 and as 1bit OS&lt;a class=&quot;anchor&quot; href=&quot;#inside-lemonade-on-ubuntu-2604-and-as-1bit-os&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Lemonade now starts the engine&#x27;s llama-server directly: one HTTP hop instead of two, one process
+fewer, and a quarter of a second off each model load
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/475&quot;&gt;#475&lt;/a&gt;). On Ubuntu 26.04 the stock lemond from
+the Lemonade PPA can use the engine through a systemd drop-in, with no patch to Lemonade
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/483&quot;&gt;#483&lt;/a&gt;). The same build also ships as the 1bit OS
+image, a bootable Lemonade appliance (&lt;a href=&quot;lemonade.html&quot;&gt;the engine in Lemonade&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;the-npu-engine&quot;&gt;The NPU engine&lt;a class=&quot;anchor&quot; href=&quot;#the-npu-engine&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The XDNA 2 NPU engine is coming along: correctness first, speed next
+(&lt;a href=&quot;npu.html&quot;&gt;NPU status&lt;/a&gt;). More in a later post.&lt;/p&gt;
+&lt;h2 id=&quot;when-it-ships&quot;&gt;When it ships&lt;a class=&quot;anchor&quot; href=&quot;#when-it-ships&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The first release goes out when every item on our release checklist is done. Three full release
+rehearsals this week (build, packages, the OS image booted in a VM, a clean build from the binary
+drop) passed end to end (&lt;a href=&quot;releases.html&quot;&gt;releases&lt;/a&gt;).&lt;/p&gt;</content></entry><entry><title>Where the engine is going: HRX and the NPU</title><link href="https://1bit.gg/blog-hrx-and-npu-direction.html"/><id>https://1bit.gg/blog-hrx-and-npu-direction.html</id><published>2026-09-29T00:00:00Z</published><updated>2026-09-29T00:00:00Z</updated><summary>Heading to HRX plus the NPU: Laya&#x27;s scorer runs on HRX at 15-16 ms a decision, W4A4 reaches MoE experts, and six GGUF architectures answer on the NPU.</summary><category term="milestone"/><category term="hrx"/><category term="npu"/><category term="laya"/><category term="rocm"/><content type="html">&lt;p&gt;The engine is heading to AMD&#x27;s HRX backend, whose kernels we write in Loom, plus the NPU.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; HRX met the gates of RFC #213 and the Vulkan and ROCm builds were removed (engine #306); every graph node of every model and mode we test runs on HRX with our own HIP kernels, and the NPU engine runs on our own runtime. See &lt;a href=&quot;hrx.html&quot;&gt;HRX&lt;/a&gt; and &lt;a href=&quot;npu.html&quot;&gt;NPU engine&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;A review of the Laya work&lt;sup id=&quot;fnref:geramyl&quot;&gt;&lt;a class=&quot;footnote-ref&quot; href=&quot;#fn:geramyl&quot;&gt;1&lt;/a&gt;&lt;/sup&gt; put it plainly: we want it on the NPU, a Vulkan version
+already exists, and the stack is HRX + Loom + NPU. That was right, and not only for Laya. Vulkan
+stays the default until HRX meets the gates in
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/discussions/213&quot;&gt;RFC #213&lt;/a&gt;: decode within 10% of Vulkan
+on the showcase models, every architecture that runs on Vulkan checked on HRX, and speculative
+decoding, several sequences per batch and vision on HRX. Here is what landed since the last
+posts, and how far HRX already is.&lt;/p&gt;
+&lt;h2 id=&quot;layas-scorer-runs-on-hrx&quot;&gt;Laya&#x27;s scorer runs on HRX&lt;a class=&quot;anchor&quot; href=&quot;#layas-scorer-runs-on-hrx&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Laya classifies each conversation as code, prose, short or a long document, and a measured
+policy picks the device (&lt;a href=&quot;blog-laya-routes-by-request-class.html&quot;&gt;previous post&lt;/a&gt;). The
+classifier is a ModernBERT encoder. It now runs through ggmlc (our fork) on HRX, with Loom kernels
+for what the encoder needs: norms, rotate-half RoPE, GEGLU and the attention scores
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/206&quot;&gt;#206&lt;/a&gt;,
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/208&quot;&gt;#208&lt;/a&gt;).&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Scorer&lt;/th&gt;
+&lt;th&gt;Accuracy&lt;/th&gt;
+&lt;th&gt;Per decision&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;C++ on the CPU&lt;/td&gt;
+&lt;td&gt;95.5%&lt;/td&gt;
+&lt;td&gt;538 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ggmlc on Vulkan&lt;/td&gt;
+&lt;td&gt;95.5%&lt;/td&gt;
+&lt;td&gt;24 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;ggmlc on HRX&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;95.5%&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;15-16 ms&lt;/strong&gt; (25 ms at 128 tokens)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Through &lt;code&gt;1bit serve --laya&lt;/code&gt; that is about 28 ms per request at the median. Routing no longer costs
+a noticeable first-turn delay.&lt;/p&gt;
+&lt;h2 id=&quot;4-bit-activations-reach-the-moe-experts&quot;&gt;4-bit activations reach the MoE experts&lt;a class=&quot;anchor&quot; href=&quot;#4-bit-activations-reach-the-moe-experts&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The Hadamard route rotates a model&#x27;s weights so 4-bit activations lose less. It now covers the
+expert matmuls too (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/199&quot;&gt;#199&lt;/a&gt;,
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/201&quot;&gt;#201&lt;/a&gt;). Qwen3-Coder-30B-A3B, ROCm, rotated Q4_0:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Route&lt;/th&gt;
+&lt;th&gt;Prompt (pp512)&lt;/th&gt;
+&lt;th&gt;Decode&lt;/th&gt;
+&lt;th&gt;KLD&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;exact 8-bit activations&lt;/td&gt;
+&lt;td&gt;1,218&lt;/td&gt;
+&lt;td&gt;79.0&lt;/td&gt;
+&lt;td&gt;0.048&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;4-bit activations, attention and experts&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;2,156&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;79.2&lt;/td&gt;
+&lt;td&gt;0.081&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Prompt speed only matters when prompts are long, so &lt;code&gt;tools/e2e_bench.py&lt;/code&gt; measures what a user
+waits for: time to first token plus decode, as effective tokens per second
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/202&quot;&gt;#202&lt;/a&gt;). &lt;code&gt;1bit serve --long-model&lt;/code&gt; sends
+conversations with 2K or more prompt tokens to the rotated file and shorter ones to the default
+device. On Qwen3-Coder-30B-A3B, 256 tokens out:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Prompt tokens&lt;/th&gt;
+&lt;th&gt;Vulkan alone&lt;/th&gt;
+&lt;th&gt;&lt;code&gt;--long-model&lt;/code&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;512&lt;/td&gt;
+&lt;td&gt;70.7&lt;/td&gt;
+&lt;td&gt;71.3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2,048&lt;/td&gt;
+&lt;td&gt;52.1&lt;/td&gt;
+&lt;td&gt;53.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;8,192&lt;/td&gt;
+&lt;td&gt;20.3&lt;/td&gt;
+&lt;td&gt;25.5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;16,384&lt;/td&gt;
+&lt;td&gt;8.6&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;13.1&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Running rotated files in 1,024-token micro-batches added another 6-10% to prompt speed for free
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/205&quot;&gt;#205&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;ggufs-on-the-npu-correct-first&quot;&gt;GGUFs on the NPU: correct first&lt;a class=&quot;anchor&quot; href=&quot;#ggufs-on-the-npu-correct-first&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;1bit serve -m &amp;lt;gguf&amp;gt; --device npu&lt;/code&gt; repacks a GGUF for the NPU and runs it on the per-op forward
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/209&quot;&gt;#209&lt;/a&gt;). Six architectures answer &quot; Paris&quot;:
+MiniCPM5-1B, Qwen2.5-7B, Qwen3-Coder-30B-A3B, Qwen3.6-35B-A3B (GDN + MoE), MiniCPM4-8B (LongRoPE
+and its embedding and residual scales) and GLM-4.7-Flash (MLA). Getting there meant
+matching llama.cpp&#x27;s conventions exactly: rotary pairing, MiniCPM&#x27;s scales, and the layout of
+GLM&#x27;s MLA weights. It is not fast yet: 0.006-0.17 tok/s, because the host sequences every
+operation. The next step is the fused path, which the NPU work already has for Qwen3.6-35B-A3B
+(16.3-16.5 tok/s decode through the private add-on).&lt;/p&gt;
+&lt;h2 id=&quot;dwarfstar-reads-1bp-packages&quot;&gt;DwarfStar reads 1BP packages&lt;a class=&quot;anchor&quot; href=&quot;#dwarfstar-reads-1bp-packages&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;DwarfStar now comes from our fork, which reads 1BP packages: a GGUF&#x27;s tensors and metadata,
+aligned for streaming (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/196&quot;&gt;#196&lt;/a&gt;).
+&lt;code&gt;gguf_to_1bp.py&lt;/code&gt; converts a local GGUF or one on Hugging Face through range requests, and
+&lt;code&gt;1bit serve&lt;/code&gt; recognises a &lt;code&gt;.1bp&lt;/code&gt; by its first bytes. DeepSeek V4 Flash Q2, converted straight from
+Hugging Face, gives the same answers and token counts as its GGUF.&lt;/p&gt;
+&lt;h2 id=&quot;hrx-so-far&quot;&gt;HRX so far&lt;a class=&quot;anchor&quot; href=&quot;#hrx-so-far&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The gates in RFC #213 are measured, not assumed. On ZAYA1-8B, Vulkan decodes at 93 tok/s and
+HRX at 47.9. On long prompts, HRX already prefills faster than Vulkan: handing an 8K prompt&#x27;s
+prefill to HRX cuts a Qwen2.5-7B request by 26%. The decode-split race that made HRX unreliable
+is fixed (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/123&quot;&gt;#123&lt;/a&gt;), and its multi-pass output
+step got 15-22% faster on long contexts (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/180&quot;&gt;#180&lt;/a&gt;).
+Each gate that closes gets its own post.&lt;/p&gt;
+&lt;div class=&quot;footnote&quot;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&quot;fn:geramyl&quot;&gt;
+&lt;p&gt;The review came from &lt;a href=&quot;https://github.com/Geramy&quot;&gt;geramyL&lt;/a&gt;, a moderator on Lemonade&#x27;s Discord. Thank you.&amp;#160;&lt;a class=&quot;footnote-backref&quot; href=&quot;#fnref:geramyl&quot; title=&quot;Jump back to footnote 1 in the text&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</content></entry><entry><title>Qwen3.8-27B at 45.7 tok/s: DFlash2 in 1bit serve, and 4-bit activations with a Hadamard rotation</title><link href="https://1bit.gg/blog-qwen38-27b-dflash2-and-hadamard.html"/><id>https://1bit.gg/blog-qwen38-27b-dflash2-and-hadamard.html</id><published>2026-09-28T00:00:00Z</published><updated>2026-09-28T00:00:00Z</updated><summary>The DFlash2 drafter decodes Qwen3.8-27B at 45.7 tok/s on code through 1bit serve --dflash, 44% faster than MTP.</summary><category term="qwen"/><category term="speculative-decoding"/><category term="quantization"/><category term="rocm"/><category term="vulkan"/><content type="html">&lt;p&gt;Qwen3.8-27B is a dense 27B model, and on Strix Halo its decode speed is set by memory
+bandwidth: every token reads the whole 15 GB file, so plain decode sits near 11-12 tok/s.
+Prompt processing is set by the GPU&#x27;s matrix units instead. This week we pushed on both.
+Every number below was measured on Strix Halo (Ryzen AI Max+ 395, Radeon 8060S), with the
+method in the linked docs.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; the DFlash2 one-server ROCm route and the H32 format are gone from the engine; &lt;code&gt;--dflash&lt;/code&gt; stays, on HRX, and Qwen3.8-27B with MTP now decodes at 36.0 / 26.8 / 29.9 tok/s (engine #487). See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; on HRX, the DFlash2 drafter decodes Qwen3.8-27B (UD-Q4_K_XL) at 56.6 tok/s on code prompts, against 36.0 tok/s with MTP. See &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;decode-dflash2-drafts-a-whole-block&quot;&gt;Decode: DFlash2 drafts a whole block&lt;a class=&quot;anchor&quot; href=&quot;#decode-dflash2-drafts-a-whole-block&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Speculative decoding breaks the bandwidth limit by guessing several tokens and checking them
+all in one pass of the big model. &lt;code&gt;1bit serve --mtp&lt;/code&gt; already does this with the model&#x27;s own
+MTP head. &lt;a href=&quot;https://huggingface.co/z-lab/Qwen3.8-27B-DFlash2&quot;&gt;DFlash2&lt;/a&gt;, from z-lab and Inco,
+is a separate 2B draft model trained for Qwen3.8-27B. It emits a whole block of 8 tokens in
+one pass, reading the big model&#x27;s hidden states, and keeps the top 16 candidates at each
+position so it can pick a coherent path through them. Upstream llama.cpp added it as
+&lt;code&gt;draft-dflash&lt;/code&gt;, and the Vulkan build the engine pins already carries it.&lt;/p&gt;
+&lt;p&gt;The new &lt;code&gt;1bit serve --dflash &amp;lt;draft.gguf&amp;gt;&lt;/code&gt; wires it in. One detail mattered more than any
+other: llama-server&#x27;s default draft length is 3, and DFlash only pays when it drafts full
+blocks. At length 3 it matched MTP; at full blocks it pulled well ahead. So &lt;code&gt;--dflash&lt;/code&gt; now
+drafts full blocks unless you say otherwise.&lt;/p&gt;
+&lt;p&gt;Qwen3.8-27B Q4_0 through &lt;code&gt;1bit serve --device vulkan&lt;/code&gt;, decode tok/s on three chat prompts
+(code / prose / short), back to back:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Drafter&lt;/th&gt;
+&lt;th&gt;tok/s&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;none&lt;/td&gt;
+&lt;td&gt;11.1 / 11.8 / 12.4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--mtp&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;31.7 / 25.8 / &lt;strong&gt;28.2&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--dflash&lt;/code&gt; (DFlash2, Q8_0)&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;45.7 / 28.3&lt;/strong&gt; / 17.8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;That is 4.1x on code, and 44% over MTP. On prose DFlash2 edges ahead. On the short prompt,
+a translation that ends after about 16 tokens, MTP still wins: there are too few tokens to
+fill blocks. The drafter runs faster in Q8_0 than in BF16 (42.5 against 38.9 tok/s on code).
+A drafted token is kept only when the model itself agrees, so the output is the model&#x27;s own.
+Converting the drafter needs only the target&#x27;s config and tokenizer, not its weights
+(&lt;a href=&quot;serve.html#dflash-draft-models-dflash&quot;&gt;1bit serve&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;prompt-processing-4-bit-activations-rotated-first&quot;&gt;Prompt processing: 4-bit activations, rotated first&lt;a class=&quot;anchor&quot; href=&quot;#prompt-processing-4-bit-activations-rotated-first&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;On the exact int8 path, prompt processing for this model tops out near 400 tok/s. The GPU
+is not power-limited: it runs at about 158 W and 2.7 GHz through the whole prompt, and the
+matmul kernel reaches about half of the int8 matrix rate. The matrix units run int4 × int4 at
+twice the int8 rate, though, and ROCmFPX&#x27;s W4A4 kernel uses exactly that instruction.&lt;/p&gt;
+&lt;p&gt;We pointed that kernel at Unsloth&#x27;s plain Q4_0 file. A Q4_0 weight is already a 4-bit value
+with an offset of 8, and flipping its top bit gives the same value in two&#x27;s complement. So
+the weights stay exactly what Unsloth shipped, and only the activations are rounded to 4 bits.
+That is fast (461-488 tok/s) but lossy: mean KLD against the full model rose from 0.029 to
+0.084. Leaving any single group of tensors at int8 did not fix it, because the error comes from
+all of them.&lt;/p&gt;
+&lt;p&gt;A Hadamard rotation fixes much of it. A few large activation values in a block of 32 force a
+coarse 4-bit scale on the other 31. Rotating each block by a 32-point Walsh-Hadamard transform
+spreads that energy evenly before rounding. We rotate the weights the same way once, offline,
+so the product is unchanged: on the exact int8 path the rotated file matches the plain one
+(KLD 0.031 against 0.029). The rotation itself runs inside the activation quantizer, as three
+lane shuffles and two in-register butterfly steps.&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Qwen3.8-27B Q4_0 on ROCm&lt;/th&gt;
+&lt;th&gt;pp512&lt;/th&gt;
+&lt;th&gt;Mean KLD&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;exact int8&lt;/td&gt;
+&lt;td&gt;~400&lt;/td&gt;
+&lt;td&gt;0.029&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;W4A4&lt;/td&gt;
+&lt;td&gt;461-488&lt;/td&gt;
+&lt;td&gt;0.084&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;W4A4, Hadamard-rotated&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;503&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;0.055&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The rotation removes a third of the 4-bit error. Perplexity ends up 1.2% above the exact
+path, and the error is still nearly double. So this is measured, not shipped: the patches are
+not in the engine&#x27;s pin yet (the lean-build notes of the archived repository).&lt;/p&gt;
+&lt;h2 id=&quot;whats-next&quot;&gt;What&#x27;s next&lt;a class=&quot;anchor&quot; href=&quot;#whats-next&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;DFlash2 is in &lt;code&gt;1bit serve&lt;/code&gt; today. For prompts, the next steps are a better exact int8 matmul
+for this GPU (about 15% would reach the W4A4 numbers without the error), and rotations
+larger than 32, which spread outliers further. Packages ship on Sunday with the weekly
+release.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update, later on 2026-09-28:&lt;/strong&gt; the Hadamard route has shipped. &lt;code&gt;tools/hadamard_q4_0.py&lt;/code&gt; makes the
+rotated file, &lt;code&gt;1bit serve&lt;/code&gt; recognises it and runs it on the lean ROCm build by itself, and the
+Qwen3.8-27B file is published as
+&lt;a href=&quot;https://huggingface.co/1bit-MONSTER/Qwen3.8-27B-Q4_0-H32-GGUF&quot;&gt;1bit-MONSTER/Qwen3.8-27B-Q4_0-H32-GGUF&lt;/a&gt;:
+pp512 509, KLD 0.055, and 440-470 tok/s on a 1,838-token prompt through &lt;code&gt;serve&lt;/code&gt;
+(the lean-build notes of the archived repository).&lt;/p&gt;</content></entry><entry><title>Laya routing: ask the model what it knows</title><link href="https://1bit.gg/blog-laya-routes-by-request-class.html"/><id>https://1bit.gg/blog-laya-routes-by-request-class.html</id><published>2026-09-28T00:00:00Z</published><updated>2026-09-28T00:00:00Z</updated><summary>Asked for a device, Laya picked ZINC every time; asked what kind of request it is, it is right 95.5% of the time, and 1bit serve --laya routes by class.</summary><category term="laya"/><category term="routing"/><category term="serve"/><content type="html">&lt;p&gt;The engine can run the same model on several devices of one machine: Vulkan and HRX on the
+Radeon, ROCm, ZINC, and the NPU for its own model format. Someone has to pick one for each
+request. Step 4 of the port gave that job to
+&lt;a href=&quot;https://github.com/NandhaKishorM/laya&quot;&gt;Laya&lt;/a&gt;, a small decision model that answers typed
+questions about a piece of text in one forward pass, with a calibrated confidence. This week we
+wired it into &lt;code&gt;1bit serve&lt;/code&gt;, and the first thing we learned was which question to ask it.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; Vulkan, ROCm and ZINC are no longer routes of the engine (engine #306); the route policy sends every class to HRX. See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;asking-for-a-device&quot;&gt;Asking for a device&lt;a class=&quot;anchor&quot; href=&quot;#asking-for-a-device&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The first version asked Laya directly: &quot;which device should run this request?&quot;, with the
+device names as the answers. On eight varied requests (code, a greeting, a translation, a
+contract summary, an explanation, arithmetic, a refactor, a haiku), it picked the same device
+every time:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Candidates&lt;/th&gt;
+&lt;th&gt;Picks&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;vulkan,hrx,zinc&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;zinc&lt;/code&gt; 8 of 8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;npu,hrx,vulkan,zinc&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;npu&lt;/code&gt; 4, &lt;code&gt;zinc&lt;/code&gt; 4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;That is not a flaw in Laya. It knows a great deal about text and nothing about this machine,
+so it had no basis for the answer. We wrote an RFC to change the question, and it was accepted.&lt;/p&gt;
+&lt;h2 id=&quot;asking-about-the-request&quot;&gt;Asking about the request&lt;a class=&quot;anchor&quot; href=&quot;#asking-about-the-request&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Now Laya answers a question it can answer: what kind of request is this? Code, prose (an
+explanation, story or plan), a short answer, or work on a long pasted document. A separate
+policy file, filled only from measured results, maps each class to a device.&lt;/p&gt;
+&lt;p&gt;Long documents turned out to be a question of size more than meaning. Laya often read a long
+pasted log or contract as code, and those were also its slowest decisions, because they fill its
+whole 512-token window. So any request of 1,024 characters or more is a long document without
+asking the model, and Laya chooses among the other three.&lt;/p&gt;
+&lt;p&gt;We measured it on 200 hand-labelled requests, 50 per class:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Setup&lt;/th&gt;
+&lt;th&gt;Accuracy&lt;/th&gt;
+&lt;th&gt;code&lt;/th&gt;
+&lt;th&gt;prose&lt;/th&gt;
+&lt;th&gt;short&lt;/th&gt;
+&lt;th&gt;long doc&lt;/th&gt;
+&lt;th&gt;per decision&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;typed-decisions checkpoint, size gate&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;95.5%&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;100%&lt;/td&gt;
+&lt;td&gt;82%&lt;/td&gt;
+&lt;td&gt;100%&lt;/td&gt;
+&lt;td&gt;100%&lt;/td&gt;
+&lt;td&gt;588 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;root checkpoint, size gate&lt;/td&gt;
+&lt;td&gt;92.0%&lt;/td&gt;
+&lt;td&gt;94%&lt;/td&gt;
+&lt;td&gt;74%&lt;/td&gt;
+&lt;td&gt;100%&lt;/td&gt;
+&lt;td&gt;100%&lt;/td&gt;
+&lt;td&gt;401 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;typed-decisions, four-way question&lt;/td&gt;
+&lt;td&gt;80.5%&lt;/td&gt;
+&lt;td&gt;100%&lt;/td&gt;
+&lt;td&gt;62%&lt;/td&gt;
+&lt;td&gt;90%&lt;/td&gt;
+&lt;td&gt;70%&lt;/td&gt;
+&lt;td&gt;1,739 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;root, four-way question&lt;/td&gt;
+&lt;td&gt;64.0%&lt;/td&gt;
+&lt;td&gt;98%&lt;/td&gt;
+&lt;td&gt;30%&lt;/td&gt;
+&lt;td&gt;96%&lt;/td&gt;
+&lt;td&gt;32%&lt;/td&gt;
+&lt;td&gt;1,379 ms&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The size gate took accuracy from 80.5% to 95.5% and cut the decision time by two thirds. Prose
+is still the class Laya misses most, reading some of it as a short answer. The confidence is
+useful: the least confident quarter of the answers is right 84% of the time, the rest 98-100%.
+Below a confidence of 0.16 a request takes the default device. A test now fails if accuracy
+drops under 90%.&lt;/p&gt;
+&lt;h2 id=&quot;what-the-policy-says-today&quot;&gt;What the policy says today&lt;a class=&quot;anchor&quot; href=&quot;#what-the-policy-says-today&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Every class goes to Vulkan. That is a measured result, not a placeholder. Vulkan decodes
+fastest on Strix Halo for every model file we have measured. The one per-class difference we
+found is the drafter for speculative decoding. On Qwen3.8-27B, short replies decode faster with
+the MTP head, and code much faster with DFlash2:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Class&lt;/th&gt;
+&lt;th&gt;DFlash2&lt;/th&gt;
+&lt;th&gt;MTP&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;code&lt;/td&gt;
+&lt;td&gt;45.7 tok/s&lt;/td&gt;
+&lt;td&gt;31.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;prose&lt;/td&gt;
+&lt;td&gt;28.3&lt;/td&gt;
+&lt;td&gt;25.8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;short&lt;/td&gt;
+&lt;td&gt;17.8&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;28.2&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;But llama-server fixes the drafter when it starts. We checked whether a request can change it
+or switch it off, and it cannot: &lt;code&gt;speculative.type&lt;/code&gt;, &lt;code&gt;speculative.n_max&lt;/code&gt; and
+&lt;code&gt;speculative.p_min&lt;/code&gt; in a request leave the number of drafted tokens unchanged. Sending short
+replies to MTP would take a second server holding a second copy of the 27B model, about 16 GB,
+to save about 0.3 s on a 16-token reply. The policy moves a class only when it has a net gain,
+so that row stays on Vulkan for now.&lt;/p&gt;
+&lt;h2 id=&quot;what-it-costs&quot;&gt;What it costs&lt;a class=&quot;anchor&quot; href=&quot;#what-it-costs&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Laya decides once per conversation, from its opening messages, and later turns reuse the
+answer. Measured through &lt;code&gt;1bit serve --device auto&lt;/code&gt;, Qwen3.8-27B with DFlash2:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;1-token reply, first turn&lt;/th&gt;
+&lt;th&gt;later turn&lt;/th&gt;
+&lt;th&gt;decode code / prose / short&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;without Laya&lt;/td&gt;
+&lt;td&gt;498-518 ms&lt;/td&gt;
+&lt;td&gt;713-849 ms&lt;/td&gt;
+&lt;td&gt;50.5-50.7 / 26.7-26.9 / 19.0-19.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;with &lt;code&gt;--laya&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;1,008-1,048 ms&lt;/td&gt;
+&lt;td&gt;703-767 ms&lt;/td&gt;
+&lt;td&gt;50.6 / 26.7 / 18.9-19.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The first turn pays about half a second. After that, nothing changes. Routing is therefore
+opt-in: &lt;code&gt;--device auto&lt;/code&gt; still means Vulkan unless you pass &lt;code&gt;--laya&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;try-it&quot;&gt;Try it&lt;a class=&quot;anchor&quot; href=&quot;#try-it&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;scripts/fetch-laya.sh                                    # the pinned checkpoint
+1bit serve -m model.gguf --device auto --laya
+1bit route --laya-model ~/.local/share/1bit/laya --classify --state &amp;quot;Write a Rust function that sums a slice.&amp;quot;
+# code 0.44 vulkan
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Every reply carries an &lt;code&gt;X-1bit-Route&lt;/code&gt; header with the class, the confidence and the device, and
+the server logs each decision. That traffic is what the next policy rows will come from, and
+the details are in &lt;a href=&quot;laya.html&quot;&gt;Laya router&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>509 tokens a second of prompt: the Hadamard route ships</title><link href="https://1bit.gg/blog-hadamard-q4-0-ships.html"/><id>https://1bit.gg/blog-hadamard-q4-0-ships.html</id><published>2026-09-28T00:00:00Z</published><updated>2026-09-28T00:00:00Z</updated><summary>Hadamard-rotated Q4_0 with 4-bit activations reads Qwen3.8-27B prompts at 509 tok/s (from ~400) at KLD 0.055, and 1bit serve runs it by itself.</summary><category term="rocm"/><category term="quantization"/><category term="qwen"/><category term="kernels"/><content type="html">&lt;p&gt;Earlier today we measured a way to make Qwen3.8-27B read prompts faster on Strix Halo: 4-bit
+activations on the GPU&#x27;s matrix units, with a Hadamard rotation to keep them accurate. It is no
+longer an experiment. The engine now has a tool that makes the rotated file, &lt;code&gt;1bit serve&lt;/code&gt;
+recognises the file and runs it on the right build by itself, and the Qwen3.8-27B file is on
+Hugging Face as
+&lt;a href=&quot;https://huggingface.co/1bit-MONSTER/Qwen3.8-27B-Q4_0-H32-GGUF&quot;&gt;1bit-MONSTER/Qwen3.8-27B-Q4_0-H32-GGUF&lt;/a&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; the Hadamard Q4_0 (H32) format and the lean ROCm route are dropped, and &lt;code&gt;1bit serve&lt;/code&gt; refuses H32 files; use the model&#x27;s UD-Q4_K_XL on HRX. See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;why-prompts-are-a-matrix-unit-problem&quot;&gt;Why prompts are a matrix-unit problem&lt;a class=&quot;anchor&quot; href=&quot;#why-prompts-are-a-matrix-unit-problem&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Decoding reads the whole model once per token, so memory bandwidth sets its speed. Reading a
+prompt is different: hundreds of tokens go through each weight at once, and the matrix units set
+the pace. On the Radeon 8060S those units multiply 8-bit integers at one rate and 4-bit integers
+at twice that rate. The usual path turns activations into 8-bit numbers. On this model it reads
+prompts at about 400 tokens a second.&lt;/p&gt;
+&lt;p&gt;A Q4_0 file already stores its weights as 4-bit numbers. A code &lt;code&gt;q&lt;/code&gt; means &lt;code&gt;q - 8&lt;/code&gt;, and flipping
+its top bit gives exactly that value in two&#x27;s complement. So the 4-bit kernel can read Unsloth&#x27;s
+Q4_0 weights bit for bit, and only the activations have to go down to 4 bits. That runs at 461-488
+tokens a second, but it costs accuracy: KLD against the full model rises from 0.029 to 0.084.&lt;/p&gt;
+&lt;h2 id=&quot;the-rotation&quot;&gt;The rotation&lt;a class=&quot;anchor&quot; href=&quot;#the-rotation&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Activations are rounded in blocks of 32 values that share one scale. A few large values in a
+block force a coarse scale on the other 31, and most of the 4-bit error comes from there. A
+32-point Walsh-Hadamard transform spreads each block&#x27;s energy evenly before rounding, so the
+scale fits all 32 values better.&lt;/p&gt;
+&lt;p&gt;The same transform is applied to the weights once, when the file is made. Because the transform
+is orthogonal, rotating both sides leaves every dot product unchanged: &lt;code&gt;x . w = (Hx) . (Hw)&lt;/code&gt;. The
+check is the exact 8-bit path: the rotated file gives KLD 0.031 there, against 0.029 for the same
+model unrotated. On the GPU the rotation runs inside the step that quantizes activations: two
+butterfly steps within each thread and three lane shuffles.&lt;/p&gt;
+&lt;h2 id=&quot;the-numbers&quot;&gt;The numbers&lt;a class=&quot;anchor&quot; href=&quot;#the-numbers&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Qwen3.8-27B on Strix Halo, KLD against BF16 over wikitext-2, prompt speed from llama-bench (512
+tokens):&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;Prompt, tok/s&lt;/th&gt;
+&lt;th&gt;Perplexity&lt;/th&gt;
+&lt;th&gt;KLD&lt;/th&gt;
+&lt;th&gt;Same top token&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Q4_0, 8-bit activations&lt;/td&gt;
+&lt;td&gt;~400&lt;/td&gt;
+&lt;td&gt;6.021&lt;/td&gt;
+&lt;td&gt;0.029&lt;/td&gt;
+&lt;td&gt;91.9%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Q4_0, 4-bit activations&lt;/td&gt;
+&lt;td&gt;461-488&lt;/td&gt;
+&lt;td&gt;6.241&lt;/td&gt;
+&lt;td&gt;0.084&lt;/td&gt;
+&lt;td&gt;87.4%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Q4_0-H32, rotated, 4-bit activations&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;509&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;6.096&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;0.055&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;89.3%&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The rotation removes a third of the 4-bit error. Against the 8-bit path, the rotated file reads
+prompts 28% faster for 1.2% more perplexity. Through &lt;code&gt;1bit serve&lt;/code&gt;, a 1,838-token prompt runs at
+440-470 tokens a second.&lt;/p&gt;
+&lt;h2 id=&quot;making-the-file-is-part-of-the-engine&quot;&gt;Making the file is part of the engine&lt;a class=&quot;anchor&quot; href=&quot;#making-the-file-is-part-of-the-engine&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A rotated file only works when the runtime rotates the activations too. Run it anywhere else and
+it produces garbage. So the engine treats the file and the route as one thing.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;tools/hadamard_q4_0.py&lt;/code&gt; rotates the attention, FFN and delta-net projections of a Q8_0 or BF16
+  source, adjusts the imatrix to match, and quantizes. It then stamps the file and checks that
+  every Q4_0 tensor in it is a rotated one; a file that fails is deleted. Qwen3.8-27B took about
+  20 minutes.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;1bit serve&lt;/code&gt; reads the stamp. With no device flag it runs the file on the lean ROCm build with
+  the rotation and the 4-bit path turned on. It refuses the file on any other device.&lt;/li&gt;
+&lt;li&gt;A test covers the routing without a GPU, so CI checks it on every change.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;tools/hadamard_q4_0.py Qwen3.8-27B-Q8_0.gguf Qwen3.8-27B-Q4_0-H32.gguf --imatrix imatrix.gguf
+1bit serve -m Qwen3.8-27B-Q4_0-H32.gguf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&quot;two-more-kernels-on-the-way&quot;&gt;Two more kernels on the way&lt;a class=&quot;anchor&quot; href=&quot;#two-more-kernels-on-the-way&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Qwen3.8&#x27;s linear-attention layers had two slow steps on ROCm, and the same update fixes both. A
+new prefill kernel keeps each state column in registers and stages each token&#x27;s inputs in shared
+memory. A tiled transpose replaces the strided copy that fed their convolution. Both match the CPU
+reference in the backend tests, and every model with these layers gets them on ROCm.&lt;/p&gt;
+&lt;h2 id=&quot;what-it-is-for&quot;&gt;What it is for&lt;a class=&quot;anchor&quot; href=&quot;#what-it-is-for&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;This route reads prompts. It decodes at about 11 tokens a second, so long answers belong
+elsewhere: the Vulkan route with the DFlash2 drafter decodes code at 45.7 tokens a second on the
+same model. Use the rotated file where prompts are long and answers short, like summaries, code
+review over whole files, or retrieval with large contexts. The details are in
+the lean-build notes of the archived repository.&lt;/p&gt;</content></entry><entry><title>Milestone: the HRX decode race is solved</title><link href="https://1bit.gg/blog-hrx-decode-race-solved.html"/><id>https://1bit.gg/blog-hrx-decode-race-solved.html</id><published>2026-09-27T00:00:00Z</published><updated>2026-09-27T00:00:00Z</updated><summary>One barrier that fenced only shared memory caused HRX&#x27;s NaNs and GPU faults; the fix took Qwen3-Coder-30B from 1 of 8 correct runs to 8 of 8.</summary><category term="hrx"/><category term="milestone"/><category term="kernels"/><content type="html">&lt;p&gt;Yesterday&#x27;s post ended with a workaround. HRX&#x27;s split flash-attention decode kernel gave
+different answers to identical requests, and on Qwen3-Coder-30B it sometimes produced NaNs that
+faulted the GPU (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/123&quot;&gt;#123&lt;/a&gt;,
+&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/issues/140&quot;&gt;#140&lt;/a&gt;). So &lt;code&gt;1bit serve --device hrx&lt;/code&gt; stopped
+using it. Today we found the cause and fixed it, and the kernel is back on by default. It is
+correct again, and faster than the path we used without it.&lt;/p&gt;
+&lt;h2 id=&quot;what-it-was&quot;&gt;What it was&lt;a class=&quot;anchor&quot; href=&quot;#what-it-was&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The decode-split kernel attends over the KV cache in blocks, and a final workgroup combines the
+blocks. That workgroup writes the attention output to global memory. Other waves then read it
+back to quantize it (&lt;code&gt;next_q8&lt;/code&gt;) for the next projection. Between the write and the read sat a
+workgroup barrier that fences shared memory (LDS) only. It does not wait for global stores or
+invalidate the cache the readers use. So a reading wave could pick up the output slot&#x27;s
+&lt;em&gt;previous&lt;/em&gt; contents. The f32 output was right, the quantized copy was wrong, and when the stale
+bytes happened to decode as NaN the MoE router saw NaN logits.&lt;/p&gt;
+&lt;p&gt;The window is narrow on a quiet box (a few percent of requests diverged there) and wide when the
+GPU preempts the dispatch in the middle. Any process&#x27;s KFD queue eviction does that: page
+compaction, KSM, memory pressure. That is why the failure rate followed those system settings. For a while it looked like a page-migration bug, but migration was only
+the trigger. The fix fences both memory spaces at all five places the kernel does this:
+&lt;code&gt;barrier&amp;lt;global&amp;gt;&lt;/code&gt;, then &lt;code&gt;barrier&amp;lt;workgroup&amp;gt;&lt;/code&gt;
+(&lt;a href=&quot;hrx.html#moe-router-expert-id-fault-fix-engine123&quot;&gt;HRX&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;how-we-know&quot;&gt;How we know&lt;a class=&quot;anchor&quot; href=&quot;#how-we-know&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A separate process forced queue evictions while the engine served, to make the rare case common:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Qwen3-Coder-30B-A3B&lt;/strong&gt; (2113-token prompt): 1 of 8 correct before, 8 of 8 after, with no NaN.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Qwen3-0.6B&lt;/strong&gt;, greedy: 13-34 divergent answers per ~177 requests before, none in 354 after.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The last clue came from hashing every kernel&#x27;s output in serial execution. In every bad request,
+the first command whose output diverged was this kernel, with the f32 output identical and the
+quantized output different.&lt;/p&gt;
+&lt;h2 id=&quot;faster-with-it-on&quot;&gt;Faster with it on&lt;a class=&quot;anchor&quot; href=&quot;#faster-with-it-on&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Decode tok/s (Q4_K_M, llama-bench, interleaved on a shared box):&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;model&lt;/th&gt;
+&lt;th&gt;ctx 2100, split on&lt;/th&gt;
+&lt;th&gt;ctx 2100, split off&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-0.6B&lt;/td&gt;
+&lt;td&gt;140-158&lt;/td&gt;
+&lt;td&gt;118-122&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-Coder-30B-A3B&lt;/td&gt;
+&lt;td&gt;42-62&lt;/td&gt;
+&lt;td&gt;47-49&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ZAYA1-8B&lt;/td&gt;
+&lt;td&gt;38-42&lt;/td&gt;
+&lt;td&gt;34-36&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The kernel&#x27;s multi-pass output step was also vectorised
+(&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/180&quot;&gt;#180&lt;/a&gt;): on Qwen3-Coder-30B-A3B, +15% at
+depth 2100, +20% at 3000 and +22% at 4800 (median of 6 interleaved rounds), with bit-identical
+perplexity. &lt;code&gt;ONEBIT_HRX_DECODE_SPLIT=0&lt;/code&gt; turns the kernel off if you need to compare.&lt;/p&gt;
+&lt;h2 id=&quot;also-this-week&quot;&gt;Also this week&lt;a class=&quot;anchor&quot; href=&quot;#also-this-week&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Architecture gaps closed.&lt;/strong&gt; OPT, GPT-Neo, CodeGen and GPT-J, which upstream llama.cpp has no
+  model code for, and Zyphra&#x27;s whole family, from ZAYA1-74B to the vision models, all run from our
+  llama.cpp. The registry now maps 323 Hugging Face architectures, up from 265 at step 5
+  (&lt;a href=&quot;registry.html&quot;&gt;Model registry&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GGUF on the NPU&lt;/strong&gt;: a repacked GGUF serves on the NPU. Qwen2.5-7B, MiniCPM4-8B and
+  MiniCPM5-1B answer there
+  (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/179&quot;&gt;#179&lt;/a&gt;, &lt;a href=&quot;npu.html#from-a-gguf&quot;&gt;NPU engine&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Packages with the fix ship on Sunday with the weekly release.&lt;/p&gt;</content></entry><entry><title>Zyphra&#x27;s whole family, four older architectures, and experts from the drive</title><link href="https://1bit.gg/blog-zyphra-family-old-architectures-experts-from-the-drive.html"/><id>https://1bit.gg/blog-zyphra-family-old-architectures-experts-from-the-drive.html</id><published>2026-09-26T00:00:00Z</published><updated>2026-09-26T00:00:00Z</updated><summary>Zyphra&#x27;s whole family runs (ZAYA1-74B at 35.4 tok/s), four older architectures join, and MoE experts stream from the drive at 43-45 tok/s.</summary><category term="zyphra"/><category term="models"/><category term="moe"/><category term="hrx"/><category term="onnx"/><content type="html">&lt;p&gt;A lot landed this week. Zyphra&#x27;s model family now runs end to end, including its vision
+models. Four older architectures that upstream llama.cpp never shipped are in. &lt;code&gt;1bit serve&lt;/code&gt; can
+run a MoE model whose experts do not fit in memory. And the HRX decode path became deterministic.
+Every number below was measured on Strix Halo (Ryzen AI Max+ 395, Radeon 8060S), with the
+method in the linked docs.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; Vulkan is no longer a route of the engine (engine #306): Zamba, Zamba2 and BlackMamba wait for an HRX port, and &lt;code&gt;--moe-slots&lt;/code&gt; is not in the current build. See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; ZAYA1-8B (Q4_K_M) decodes at 157 tok/s on HRX. See &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;zyphra-all-of-it&quot;&gt;Zyphra, all of it&lt;a class=&quot;anchor&quot; href=&quot;#zyphra-all-of-it&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;ZAYA1-8B already ran on Vulkan, HRX and ROCm. The rest of the family followed:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ZAYA1-74B-preview&lt;/strong&gt;, with its sliding-window layers: Q4_K_M decodes at 35.4 tok/s on Vulkan.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ZAYA1-base and ZAYA1-reasoning-base&lt;/strong&gt;, in Zyphra&#x27;s older checkpoint layout. Our converter
+  reads that layout directly, and the tensors it writes are byte-identical to ZAYA1-8B&#x27;s.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ZAYA1-VL-8B&lt;/strong&gt;, the vision model. It applies a vision-only LoRA to image tokens and attends to
+  each image bidirectionally. Against Zyphra&#x27;s own FP32 code it agrees at 100 of 101
+  teacher-forced positions. F16 decodes at 38-51 tok/s. It reads &quot;HELLO 42&quot; off a synthetic
+  image, and it recognises the New York Times front page of the moon landing.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Zamba, Zamba2 and BlackMamba&lt;/strong&gt;, plus &lt;strong&gt;Zamba2-VL&lt;/strong&gt;. Zamba v1 and BlackMamba match the
+  reference at 96/96 positions. A new Vulkan scan for Mamba-1 layers took Mamba-370M from 25.8
+  to 173.5 tok/s; those layers used to run on the CPU.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Adding the vision model left ZAYA1-8B&#x27;s text path unchanged. Its wikitext perplexity is
+identical on Vulkan (21.5731, and 21.6213 with four sequences per batch) and HRX (21.5518), and
+it still agrees with transformers at 95/96. Serve the vision models with &lt;code&gt;1bit serve --mmproj&lt;/code&gt;
+(the Vulkan notes of the archived repository).&lt;/p&gt;
+&lt;h2 id=&quot;four-older-architectures&quot;&gt;Four older architectures&lt;a class=&quot;anchor&quot; href=&quot;#four-older-architectures&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;OPT, GPT-Neo, CodeGen and GPT-J now run from our llama.cpp. We checked each port against
+transformers FP32 before it merged. CodeGen started at 0/96: its fused projection stores query,
+value and key in that order, not query, key, value. After the fix all four agree at every
+checked position (the Vulkan notes of the archived repository).
+With them, the model registry maps 323 Hugging Face architectures to a backend. &quot;Mapped&quot; means
+a backend&#x27;s code accepts the architecture; the census reports separately how many have been
+checked (&lt;a href=&quot;registry.html&quot;&gt;Model registry&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;moe-experts-from-the-drive&quot;&gt;MoE experts from the drive&lt;a class=&quot;anchor&quot; href=&quot;#moe-experts-from-the-drive&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;1bit serve --moe-slots N&lt;/code&gt; keeps a MoE model&#x27;s routed experts in the file on disk. It holds N of
+them in GPU memory and streams in the rest as the router asks for them. Perplexity is exactly
+that of the all-GPU model. On Qwen3-Coder-30B-A3B, with 75% of the experts resident and the
+prefetch moved off the decode path, it decodes at 43-45 tok/s (39 through &lt;code&gt;serve&lt;/code&gt;). With 25%
+resident it still decodes at 8-10. The resident model is faster (79-91 tok/s), so streaming
+is for models that do not fit
+(&lt;a href=&quot;moe-streaming.html#streaming-in-the-inference-path&quot;&gt;MoE streaming&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;hrx-decode-now-deterministic&quot;&gt;HRX decode, now deterministic&lt;a class=&quot;anchor&quot; href=&quot;#hrx-decode-now-deterministic&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Repeating the same request exposed a problem in HRX&#x27;s split flash-attention decode kernel: it
+gave different answers to identical requests, and on Qwen3-Coder-30B it faulted the GPU in two
+of three runs. &lt;code&gt;1bit serve --device hrx&lt;/code&gt; now decodes without it by default. That path is
+deterministic, and on most models faster: Qwen3-0.6B goes from 169 to 322 tok/s, and ZAYA1-8B
+from 23.5 to 25.5. Coder-30B runs 5 of 5 clean at 66-71 tok/s.
+&lt;code&gt;ONEBIT_HRX_DECODE_SPLIT=1&lt;/code&gt; turns the kernel back on for testing a fix
+(&lt;a href=&quot;hrx.html&quot;&gt;HRX&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&quot;also&quot;&gt;Also&lt;a class=&quot;anchor&quot; href=&quot;#also&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ONNX on the GPU on Linux&lt;/strong&gt;: ONNX Runtime&#x27;s WebGPU provider, over Vulkan. Qwen3-4B int4
+  decodes at 52.9 tok/s on the Radeon, against 26.8 on the CPU (&lt;a href=&quot;onnx.html&quot;&gt;ONNX Runtime&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GPU matrix units&lt;/strong&gt;: a short reference on the Radeon&#x27;s matrix instructions. int8 runs at the
+  f16 rate; only int4 × int4 doubles it (&lt;a href=&quot;hrx.html#the-gpus-matrix-units-wmma&quot;&gt;HRX&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Issues and security&lt;/strong&gt;:&lt;ul&gt;
+&lt;li&gt;issue forms, and RFCs for larger changes in Discussions;&lt;/li&gt;
+&lt;li&gt;a CI check that stops a pin from moving backwards;&lt;/li&gt;
+&lt;li&gt;CodeQL&#x27;s extended suite, with no open alerts.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Packages for all of this ship on Sunday with the weekly release.&lt;/p&gt;</content></entry><entry><title>The NPU drafts, the GPU checks</title><link href="https://1bit.gg/blog-the-npu-drafts-the-gpu-checks.html"/><id>https://1bit.gg/blog-the-npu-drafts-the-gpu-checks.html</id><published>2026-09-25T00:00:00Z</published><updated>2026-09-25T00:00:00Z</updated><summary>A small model on the NPU drafts, the GPU checks: Qwen3-32B goes from 10.7 to 23.4 tok/s, 2.19x.</summary><category term="npu"/><category term="speculative-decoding"/><content type="html">&lt;p&gt;Speculative decoding makes a large model faster by letting a small one guess ahead: the small model proposes a few tokens, the large model checks them all in one pass, and every guess it agrees with is a token it did not have to produce one at a time. Usually both models run on the GPU. On Strix Halo there is a second processor sitting idle during chat: the XDNA 2 NPU. So we gave it the small model.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; Vulkan is no longer a route of the engine (engine #306). The NPU and the GPU now combine through the hybrid route, the prompt on the NPU engine and the tokens on HRX (&lt;a href=&quot;hybrid.html&quot;&gt;Hybrid&lt;/a&gt;); the NPU route decodes Qwen3-0.6B at 88.6 tok/s in the release gate (&lt;a href=&quot;npu.html&quot;&gt;NPU engine&lt;/a&gt;).&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;how-it-works&quot;&gt;How it works&lt;a class=&quot;anchor&quot; href=&quot;#how-it-works&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The NPU runs Qwen3-0.6B through the engine. The GPU runs the target, a Qwen3 model from 14B to 32B, through llama.cpp on Vulkan. Each round:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The NPU proposes k tokens, one after another.&lt;/li&gt;
+&lt;li&gt;The GPU scores all k in a single batch and predicts the token after each.&lt;/li&gt;
+&lt;li&gt;The longest run of proposals the GPU agrees with is kept, plus the GPU&#x27;s own next token.&lt;/li&gt;
+&lt;li&gt;Both key/value caches roll back to that point, and the next round starts.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Both models decode greedily, so the result should equal the GPU decoding alone, token for token. That is the correctness check we ran every time.&lt;/p&gt;
+&lt;p&gt;One constraint: the two models must share a tokenizer. Qwen3-0.6B can draft for the Qwen3 family (151,936 tokens), including Qwen3-14B and Qwen3-32B; the newer Qwen3.5, 3.6 and 3.8 models use a different vocabulary.&lt;/p&gt;
+&lt;h2 id=&quot;measured&quot;&gt;Measured&lt;a class=&quot;anchor&quot; href=&quot;#measured&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Unsloth&#x27;s UD-Q4_K_XL files on Strix Halo, a coding prompt, 192 tokens (136 for the 14B, which finished its answer):&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Target&lt;/th&gt;
+&lt;th&gt;k&lt;/th&gt;
+&lt;th&gt;GPU alone&lt;/th&gt;
+&lt;th&gt;NPU drafts, GPU checks&lt;/th&gt;
+&lt;th&gt;Speed-up&lt;/th&gt;
+&lt;th&gt;Drafts accepted&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-32B&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;11.0 tok/s&lt;/td&gt;
+&lt;td&gt;17.9 tok/s&lt;/td&gt;
+&lt;td&gt;1.63x&lt;/td&gt;
+&lt;td&gt;72%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-32B&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;10.2&lt;/td&gt;
+&lt;td&gt;21.3&lt;/td&gt;
+&lt;td&gt;2.09x&lt;/td&gt;
+&lt;td&gt;59%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;Qwen3-32B&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;6&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;10.7&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;23.4&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;2.19x&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;56%&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-32B&lt;/td&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;10.7&lt;/td&gt;
+&lt;td&gt;12.9&lt;/td&gt;
+&lt;td&gt;1.20x&lt;/td&gt;
+&lt;td&gt;53%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-14B&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;24.1&lt;/td&gt;
+&lt;td&gt;31.6&lt;/td&gt;
+&lt;td&gt;1.31x&lt;/td&gt;
+&lt;td&gt;71%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;The larger the target, the more it pays.&lt;/strong&gt; Qwen3-32B more than doubles; the faster 14B gains 31%.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;k = 8 is past the knee.&lt;/strong&gt; Checking nine tokens at once costs the GPU far more than checking seven.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;The output matched GPU-only decoding in six of eight runs.&lt;/strong&gt; The other two differed at a single token, where the model&#x27;s top two choices were nearly tied and the GPU&#x27;s batched arithmetic broke the tie the other way.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;against-drafting-on-the-gpu&quot;&gt;Against drafting on the GPU&lt;a class=&quot;anchor&quot; href=&quot;#against-drafting-on-the-gpu&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The same 0.6B drafter can also run on the GPU next to the target, which llama.cpp does built in. We measured that too, same prompt and files:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Target&lt;/th&gt;
+&lt;th&gt;GPU alone&lt;/th&gt;
+&lt;th&gt;0.6B drafts on the GPU&lt;/th&gt;
+&lt;th&gt;0.6B drafts on the NPU&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-32B&lt;/td&gt;
+&lt;td&gt;10.4 tok/s&lt;/td&gt;
+&lt;td&gt;24.9 tok/s&lt;/td&gt;
+&lt;td&gt;23.4 tok/s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-14B&lt;/td&gt;
+&lt;td&gt;22.5&lt;/td&gt;
+&lt;td&gt;43.5&lt;/td&gt;
+&lt;td&gt;31.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Drafting on the GPU is still a little faster: a 0.6B model costs the GPU very little, and in this first version the NPU and the GPU take turns. What the NPU gives is the drafting done on silicon that was otherwise idle, with the GPU never running the small model at all. Making each NPU draft step cheaper is the next piece of work.&lt;/p&gt;</content></entry><entry><title>Speculative decoding: where it pays, and where it does not</title><link href="https://1bit.gg/blog-speculative-decoding-where-it-pays.html"/><id>https://1bit.gg/blog-speculative-decoding-where-it-pays.html</id><published>2026-09-24T00:00:00Z</published><updated>2026-09-24T00:00:00Z</updated><summary>MTP takes Qwen3.8-27B to 42.0 tok/s on code; on Qwen3-Coder-30B-A3B, already at 88 tok/s, every draft model we tried was slower.</summary><category term="speculative decoding"/><category term="mtp"/><category term="qwen3.8"/><content type="html">&lt;p&gt;Speculative decoding lets a cheap drafter guess the next few tokens and the model check them all in one pass. When the guesses are right, several tokens come out of one pass instead of one. We measured it on the two most popular Unsloth models on Strix Halo, and the answer depends entirely on the model.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; these MTP numbers were taken on the removed Vulkan build; on HRX, Qwen3.8-27B with MTP now decodes at 36.0 / 26.8 / 29.9 tok/s (engine #487). See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; on HRX, Qwen3.8-27B (UD-Q4_K_XL) decodes at 36.0 tok/s with MTP on code prompts and 56.6 tok/s with the DFlash2 drafter. See &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;dense-qwen38-27b-up-to-34x&quot;&gt;Dense Qwen3.8-27B: up to 3.4x&lt;a class=&quot;anchor&quot; href=&quot;#dense-qwen38-27b-up-to-34x&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Qwen3.8-27B ships its own multi-token-prediction (MTP) head, a small extra layer trained to draft. &lt;code&gt;1bit serve --mtp&lt;/code&gt; switches it on. Decode speed on three chat prompts (code, prose, short), UD-Q4_K_XL on Vulkan:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Setting&lt;/th&gt;
+&lt;th&gt;Code&lt;/th&gt;
+&lt;th&gt;Prose&lt;/th&gt;
+&lt;th&gt;Short&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;No drafting&lt;/td&gt;
+&lt;td&gt;12.2&lt;/td&gt;
+&lt;td&gt;12.3&lt;/td&gt;
+&lt;td&gt;12.3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--mtp&lt;/code&gt; (draft 3, the default)&lt;/td&gt;
+&lt;td&gt;35.9&lt;/td&gt;
+&lt;td&gt;28.2&lt;/td&gt;
+&lt;td&gt;28.8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--mtp --mtp-max 6 --mtp-p-min 0.5&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;42.0&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;27.3&lt;/td&gt;
+&lt;td&gt;25.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--mtp --mtp-max 8&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;21-25&lt;/td&gt;
+&lt;td&gt;13-20&lt;/td&gt;
+&lt;td&gt;10-20&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The default is the all-rounder: 2.3-2.9x on every prompt. Code is predictable enough to keep long drafts (93% of drafted tokens accepted), so draft length 6 with a confidence threshold of 0.5 reaches 3.4x there. Prose is not (56-76% accepted), and at length 8 the rejected drafts cost more than the accepted ones save. Adding free n-gram drafting on top of MTP gained nothing.&lt;/p&gt;
+&lt;p&gt;Accuracy does not change: a drafted token is kept only when the model would have produced it anyway.&lt;/p&gt;
+&lt;h2 id=&quot;qwen3-coder-30b-a3b-never&quot;&gt;Qwen3-Coder-30B-A3B: never&lt;a class=&quot;anchor&quot; href=&quot;#qwen3-coder-30b-a3b-never&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Qwen3-Coder-30B-A3B is a mixture of experts with 3B parameters active per token. It already decodes at 88 tok/s on Vulkan, and it has no MTP head, so we tried separate draft models (Qwen3 0.6B, 1.7B and 4B, 36 combinations of draft length and threshold on Vulkan and ROCm) and three n-gram methods:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Method&lt;/th&gt;
+&lt;th&gt;tok/s on code&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;No drafting&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;88&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;n-gram drafting&lt;/td&gt;
+&lt;td&gt;89 (a tie)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-0.6B draft, length 4&lt;/td&gt;
+&lt;td&gt;84, with 82-87% of drafts accepted&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-1.7B draft&lt;/td&gt;
+&lt;td&gt;41-66&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-4B draft&lt;/td&gt;
+&lt;td&gt;20-44&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Even a draft model that is right five times out of six loses: checking its guesses costs almost as much as generating them, when the model only reads 3B parameters per token.&lt;/p&gt;
+&lt;h2 id=&quot;the-rule&quot;&gt;The rule&lt;a class=&quot;anchor&quot; href=&quot;#the-rule&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Speculative decoding pays when the model is expensive per token and brings its own drafter: dense models with an MTP head. It does not pay on small-active mixtures of experts. And it is a single-user lever: a server with MTP loaded batches about a third less well, so under load the engine keeps MTP and batching apart (see &lt;a href=&quot;serve.html&quot;&gt;1bit serve&lt;/a&gt;).&lt;/p&gt;</content></entry><entry><title>Smaller files: Unsloth, ROCmFPX and a ternary 27B</title><link href="https://1bit.gg/blog-smaller-files-unsloth-rocmfpx-ternary.html"/><id>https://1bit.gg/blog-smaller-files-unsloth-rocmfpx-ternary.html</id><published>2026-09-24T00:00:00Z</published><updated>2026-09-24T00:00:00Z</updated><summary>What smaller files cost: Unsloth UD-Q4_K_XL stays at KLD 0.008 (95.3% same top token); ROCmFPX formats trade more; ternary is effectively lossless vs F16.</summary><category term="quantization"/><category term="ternary"/><category term="rocmfpx"/><category term="unsloth"/><content type="html">&lt;p&gt;A smaller model file decodes faster, because decode is limited by how many bytes the GPU reads per token. The question is what each format costs in accuracy. We measured three families of small files on Strix Halo against their full-precision originals: KL divergence (how far the model&#x27;s predictions move) and how often the top predicted token stays the same.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; the lean ROCm route these ROCmFPX files ran on is gone from the engine (engine #306); the GGUF measurements stand as measured. See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; ternary files now decode on HRX: PrismML Ternary-Bonsai-2-27B in PQ2_0 (6.7 GiB) at 43.3 tok/s with MTP, and Microsoft BitNet b1.58 2B-4T in TQ2_0 (1.11 GiB) at 123.4 tok/s. See &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;qwen38-27b-unsloth-against-rocmfpx&quot;&gt;Qwen3.8-27B: Unsloth against ROCmFPX&lt;a class=&quot;anchor&quot; href=&quot;#qwen38-27b-unsloth-against-rocmfpx&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Every file below is quantized from the same BF16 checkpoint, the ROCmFPX ones with Unsloth&#x27;s own importance matrix so the comparison is fair.&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;File&lt;/th&gt;
+&lt;th&gt;Size&lt;/th&gt;
+&lt;th&gt;KL divergence&lt;/th&gt;
+&lt;th&gt;Same top token&lt;/th&gt;
+&lt;th&gt;Decode (Vulkan)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;UD-Q4_K_XL (Unsloth, the default)&lt;/td&gt;
+&lt;td&gt;16.4 GiB&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;0.008&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;95.3%&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;11.9 tok/s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;UD-IQ4_XS (Unsloth)&lt;/td&gt;
+&lt;td&gt;13.3 GiB&lt;/td&gt;
+&lt;td&gt;0.019&lt;/td&gt;
+&lt;td&gt;93.3%&lt;/td&gt;
+&lt;td&gt;15.0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;UD-Q3_K_XL (Unsloth)&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;12.2 GiB&lt;/td&gt;
+&lt;td&gt;0.028&lt;/td&gt;
+&lt;td&gt;92.1%&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;15.8&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ROCmI4 (ROCmFPX)&lt;/td&gt;
+&lt;td&gt;13.9 GiB&lt;/td&gt;
+&lt;td&gt;0.036&lt;/td&gt;
+&lt;td&gt;91.3%&lt;/td&gt;
+&lt;td&gt;13.5 (ROCm)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ROCmFP4 (ROCmFPX)&lt;/td&gt;
+&lt;td&gt;13.8 GiB&lt;/td&gt;
+&lt;td&gt;0.045&lt;/td&gt;
+&lt;td&gt;89.6%&lt;/td&gt;
+&lt;td&gt;14.1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ROCmFP2 (ROCmFPX)&lt;/td&gt;
+&lt;td&gt;8.6 GiB&lt;/td&gt;
+&lt;td&gt;0.341&lt;/td&gt;
+&lt;td&gt;75.5%&lt;/td&gt;
+&lt;td&gt;21.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Unsloth&#x27;s own UD-Q3_K_XL is smaller, faster and closer to the model than either 4-bit ROCmFPX format. ROCmFPX keeps two jobs in the engine&#x27;s lean option (docs): ROCmI4 for the fastest prompt processing we measured (455 tok/s with its W4A4 path on ROCm), and ROCmFP2 when memory is the limit.&lt;/p&gt;
+&lt;h2 id=&quot;a-model-trained-ternary&quot;&gt;A model trained ternary&lt;a class=&quot;anchor&quot; href=&quot;#a-model-trained-ternary&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;PrismML&#x27;s Ternary-Bonsai-2-27B is trained with weights of -1, 0 or +1, not squeezed into them afterwards. Its files are 5.5 GiB (PTQ1_0, 1.75 bits per weight) and 6.7 GiB (PQ2_0), against 50 GiB in F16. Measured against its own F16:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;File&lt;/th&gt;
+&lt;th&gt;Where&lt;/th&gt;
+&lt;th&gt;KL divergence&lt;/th&gt;
+&lt;th&gt;Same top token&lt;/th&gt;
+&lt;th&gt;Decode&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;PQ2_0&lt;/td&gt;
+&lt;td&gt;CPU&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;0.00014&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;99.6%&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;PTQ1_0&lt;/td&gt;
+&lt;td&gt;ROCm&lt;/td&gt;
+&lt;td&gt;0.065&lt;/td&gt;
+&lt;td&gt;91.3%&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;27.3 tok/s&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;The ternary format itself is effectively lossless: on CPU, PQ2_0 matches F16 to within 0.00014. At 27 tok/s the 27B decodes 2.3x faster than the 4-bit file above, with no drafting. What is not there yet is the GPU path: PrismML&#x27;s llama.cpp fork has no Vulkan kernels for these formats, its ROCm PTQ1_0 kernel loses some accuracy, and its ROCm PQ2_0 kernel is broken. A 27B at full quality in 7 GB is one kernel fix away.&lt;/p&gt;
+&lt;h2 id=&quot;one-trap-on-the-way&quot;&gt;One trap on the way&lt;a class=&quot;anchor&quot; href=&quot;#one-trap-on-the-way&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;hipBLAS returns wrong matrix products on this GPU (gfx1151; ROCm/rocm-libraries#11530). It never touched our 4-bit files, which use llama.cpp&#x27;s own kernels, but it silently corrupted every F16 measurement until we moved those to the CPU and to Vulkan. The engine&#x27;s ROCm build now forces llama.cpp&#x27;s own kernels everywhere; that also measured slightly more accurate (KL 0.0064 against 0.0094) at the same speed.&lt;/p&gt;</content></entry><entry><title>One GPU, many users</title><link href="https://1bit.gg/blog-one-gpu-many-users.html"/><id>https://1bit.gg/blog-one-gpu-many-users.html</id><published>2026-09-24T00:00:00Z</published><updated>2026-09-24T00:00:00Z</updated><summary>Qwen3.8-27B from 1 to 24 simultaneous requests: Vulkan peaks at 50.9 tok/s with 8, ROCm reaches 68.0 with 16, and serve now grows with the load.</summary><category term="serving"/><category term="batching"/><category term="vulkan"/><category term="rocm"/><content type="html">&lt;p&gt;A chat with one person and a server for many want different things from the same GPU. We measured Qwen3.8-27B (UD-Q4_K_XL) on Strix Halo from 1 to 24 simultaneous requests, and the engine now grows with the load.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; the Vulkan and ROCm builds and &lt;code&gt;--adaptive&lt;/code&gt; are gone from the engine (engine #306); &lt;code&gt;--parallel&lt;/code&gt; runs on HRX. See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;batching-is-the-multi-user-lever&quot;&gt;Batching is the multi-user lever&lt;a class=&quot;anchor&quot; href=&quot;#batching-is-the-multi-user-lever&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Decode reads every weight once per step. With one request, one token comes out of that read; with eight batched together, eight do. &lt;code&gt;1bit serve --parallel N&lt;/code&gt; gives the model N slots that decode together:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Requests&lt;/th&gt;
+&lt;th&gt;Vulkan&lt;/th&gt;
+&lt;th&gt;ROCm&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;11.8&lt;/td&gt;
+&lt;td&gt;11.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;36.9&lt;/td&gt;
+&lt;td&gt;30.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;50.9&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;35.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;16&lt;/td&gt;
+&lt;td&gt;42.9&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;68.0&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Total tok/s. Vulkan is the better batcher up to 8 requests and then falls back; ROCm keeps climbing to 16, where it serves 5.8x one stream. On the smaller-active Qwen3-Coder-30B-A3B the same pattern holds at a higher level: 228 tok/s on Vulkan at 8 requests, 319 on ROCm at 16.&lt;/p&gt;
+&lt;p&gt;Two backends on one GPU also help a little on their own: Vulkan and ROCm decoding at the same time made 14.3 tok/s together against 12.2 for either alone (+18%), two Vulkan processes only +4%. They are one GPU on one memory bus, so it is a small gain, not a doubling.&lt;/p&gt;
+&lt;h2 id=&quot;mtp-and-batching-do-not-mix&quot;&gt;MTP and batching do not mix&lt;a class=&quot;anchor&quot; href=&quot;#mtp-and-batching-do-not-mix&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Multi-token prediction gives one user 2.3-3.4x (&lt;a href=&quot;blog-speculative-decoding-where-it-pays.html&quot;&gt;the previous post&lt;/a&gt;). Under load it costs: with the MTP head loaded, Vulkan at 4 requests made 24.9 tok/s against 36.9 without it, and turning drafting off per request (draft length 0) did not win it back. Having MTP loaded changes how the server batches.&lt;/p&gt;
+&lt;h2 id=&quot;growing-with-the-load&quot;&gt;Growing with the load&lt;a class=&quot;anchor&quot; href=&quot;#growing-with-the-load&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So &lt;code&gt;1bit serve --adaptive&lt;/code&gt; runs two backends side by side, the model loaded on each, and routes every request by how busy they are:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Requests&lt;/th&gt;
+&lt;th&gt;1&lt;/th&gt;
+&lt;th&gt;2&lt;/th&gt;
+&lt;th&gt;4&lt;/th&gt;
+&lt;th&gt;8&lt;/th&gt;
+&lt;th&gt;12&lt;/th&gt;
+&lt;th&gt;16&lt;/th&gt;
+&lt;th&gt;24&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;--adaptive --adaptive-at 8&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;12.0&lt;/td&gt;
+&lt;td&gt;21.9&lt;/td&gt;
+&lt;td&gt;36.3&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;49.9&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;43.5&lt;/td&gt;
+&lt;td&gt;44.7&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;63.5&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Vulkan takes the first eight requests, batched; ROCm takes the overflow. It matches the best single setup up to 8 and keeps going past it: 63.5 tok/s at 24, where Vulkan alone falls back. Between 12 and 16 the two backends compete for the one GPU and it dips below ROCm alone; that is the next thing to tune.&lt;/p&gt;
+&lt;p&gt;The first version of the router had a bug worth recording: a burst of requests all checked &quot;is Vulkan free?&quot; before any of them had claimed it, and all piled onto one slot. Choosing a backend and reserving its slot is now one locked step.&lt;/p&gt;
+&lt;h2 id=&quot;which-to-use&quot;&gt;Which to use&lt;a class=&quot;anchor&quot; href=&quot;#which-to-use&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;One person at a time:&lt;/strong&gt; &lt;code&gt;1bit serve --mtp&lt;/code&gt; (35-42 tok/s on Qwen3.8-27B).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Many people:&lt;/strong&gt; &lt;code&gt;1bit serve --adaptive --adaptive-at 8&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;A fixed crowd of 16 or more:&lt;/strong&gt; &lt;code&gt;--device rocm --parallel 16&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Details and the full tables are in &lt;a href=&quot;serve.html&quot;&gt;1bit serve&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>1bit.MONSTER is now 1bit engine</title><link href="https://1bit.gg/blog-new-direction-from-1bit-monster.html"/><id>https://1bit.gg/blog-new-direction-from-1bit-monster.html</id><published>2026-09-24T00:00:00Z</published><updated>2026-09-24T00:00:00Z</updated><summary>The inference engine from 1bit.MONSTER is now its own Apache-2.0 project, 1bit engine, running as a backend inside Lemonade.</summary><category term="announcement"/><category term="engine"/><content type="html">&lt;p&gt;1bit.MONSTER grew fast: an inference engine, a model zoo, benchmarks, a store, a voice assistant and a lot of experiments, all in one repository with all of its history. The engine that came out of it is now its own project, &lt;strong&gt;1bit engine&lt;/strong&gt;, and this site is its home.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; Vulkan, ROCm and ZINC are no longer routes of the engine (engine #306); it is HRX with our own HIP kernels plus the NPU engine, inside Lemonade, pinned to Lemonade&#x27;s weekly release. See &lt;a href=&quot;overview.html&quot;&gt;What the engine is&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;what-changed&quot;&gt;What changed&lt;a class=&quot;anchor&quot; href=&quot;#what-changed&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;A clean repository.&lt;/strong&gt; The engine lives in &lt;a href=&quot;https://github.com/1bit-MONSTER/engine&quot;&gt;1bit-MONSTER/engine&lt;/a&gt;. It holds verified code only, without the development history. Each piece is ported over once it passes its end-to-end test on Strix Halo, and the &lt;a href=&quot;PORTING.html&quot;&gt;porting map&lt;/a&gt; shows what has moved and what is next.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Apache-2.0.&lt;/strong&gt; The old repository was GPL-3.0. The engine is Apache-2.0, with a copyright and license notice on every file, enforced in CI, and every third-party project it builds on credited in its NOTICE.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Inside Lemonade, not around it.&lt;/strong&gt; The old engine vendored its own copy of Lemonade. Now &lt;a href=&quot;lemonade.html&quot;&gt;Lemonade&lt;/a&gt; is the server you talk to (its catalog, downloads, router and UI), and it runs the engine as one of its backends, through &lt;code&gt;1bit serve&lt;/code&gt;, the same way it runs &lt;code&gt;llama-server&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Upstream, pinned and kept current.&lt;/strong&gt; The XDNA driver, AMD&#x27;s HRX pair, llama.cpp for Vulkan, ZINC, the Linux kernel, Hugging Face tokenizers and the Laya router are each pinned to upstream, and the pins are bumped automatically, so new models and fixes arrive soon after upstream ships them.&lt;/p&gt;
+&lt;h2 id=&quot;what-it-runs-on&quot;&gt;What it runs on&lt;a class=&quot;anchor&quot; href=&quot;#what-it-runs-on&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;One &lt;code&gt;1bit serve&lt;/code&gt; drives:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the &lt;a href=&quot;npu.html&quot;&gt;XDNA 2 NPU&lt;/a&gt;;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;hrx.html&quot;&gt;HRX and Vulkan&lt;/a&gt; on the Radeon iGPU, one llama.cpp build with both;&lt;/li&gt;
+&lt;li&gt;ZINC, which also reaches NVIDIA GPUs through CUDA;&lt;/li&gt;
+&lt;li&gt;MLX on Apple Silicon.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Measured numbers live on the &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/wiki&quot;&gt;wiki&lt;/a&gt;. &lt;a href=&quot;blog-first-week-milestones.html&quot;&gt;The first week of 1bit engine&lt;/a&gt; lists what the first three days produced.&lt;/p&gt;
+&lt;h2 id=&quot;the-old-site&quot;&gt;The old site&lt;a class=&quot;anchor&quot; href=&quot;#the-old-site&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The 1bit.MONSTER site and its posts stay online in the &lt;a href=&quot;https://1bit-monster.github.io/1bit-MONSTER/&quot;&gt;1bit.MONSTER archive&lt;/a&gt;, and old links land on a page that points at their archived copy. The blog page here lists the old posts worth keeping. 1bit JARVIS, the voice assistant, is not part of the engine for now; it will come back later as its own piece.&lt;/p&gt;</content></entry><entry><title>Prefill on HRX, decode on Vulkan, one KV cache</title><link href="https://1bit.gg/blog-hrx-prefill-vulkan-decode.html"/><id>https://1bit.gg/blog-hrx-prefill-vulkan-decode.html</id><published>2026-09-24T00:00:00Z</published><updated>2026-09-24T00:00:00Z</updated><summary>HRX prefills, Vulkan decodes, one KV cache and no copies: an 8,192-token request on Qwen2.5-7B finishes 26% sooner.</summary><category term="hrx"/><category term="vulkan"/><category term="zero-copy"/><content type="html">&lt;p&gt;On Strix Halo&#x27;s Radeon iGPU, AMD&#x27;s HRX runtime prefills a prompt faster than Vulkan, and Vulkan decodes faster than HRX. &lt;code&gt;1bit serve --device vulkan --prefill-device hrx&lt;/code&gt; now uses both on the same request, and the key-value cache never gets copied between them.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; Vulkan is no longer a route of the engine (engine #306), and &lt;code&gt;--prefill-device&lt;/code&gt; is refused; HRX runs the whole request. See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;the-idea&quot;&gt;The idea&lt;a class=&quot;anchor&quot; href=&quot;#the-idea&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;A request has two phases. &lt;strong&gt;Prefill&lt;/strong&gt; reads the whole prompt at once and is compute-bound; &lt;strong&gt;decode&lt;/strong&gt; makes one token at a time and is bound by memory bandwidth. Our one llama.cpp build carries both GPU backends, &lt;code&gt;HRX0&lt;/code&gt; and &lt;code&gt;Vulkan0&lt;/code&gt;, so the engine loads the model on each, runs the prompt prefix on HRX, and hands the rest of the request to Vulkan.&lt;/p&gt;
+&lt;p&gt;The hand-off is the hard part. Prefill&#x27;s output is the KV cache: every layer&#x27;s keys and values for every prompt token. Copying it from one backend to the other would cost the time the split saves.&lt;/p&gt;
+&lt;h2 id=&quot;zero-copies&quot;&gt;Zero copies&lt;a class=&quot;anchor&quot; href=&quot;#zero-copies&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;So both contexts use &lt;strong&gt;one&lt;/strong&gt; KV cache:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HRX allocates it in its own device memory and exports it as a &lt;strong&gt;dma-buf&lt;/strong&gt; (through HSA).&lt;/li&gt;
+&lt;li&gt;Vulkan imports the same memory with &lt;code&gt;VK_EXT_external_memory_dma_buf&lt;/code&gt; and reads it in place, at 110.6 GB/s against 113.2 GB/s for its own allocations.&lt;/li&gt;
+&lt;li&gt;The only thing that moves between them is the cache&#x27;s bookkeeping: which cells hold which positions of which sequence.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We tried sharing host memory first. It worked, but it cost Vulkan half its decode speed; device memory through a dma-buf does not.&lt;/p&gt;
+&lt;p&gt;Both sides compute the cache&#x27;s layout independently, so they must agree on it exactly: tensors on 4 KiB boundaries, split into chunks of at most 1 GiB (Vulkan reads garbage from a single buffer past about 4 GiB), and a hash of the layout checked on both sides. HRX&#x27;s prefill is fastest in whole batches, so only whole ubatches of the prompt go to HRX, and short prompts skip the split: below 1024 tokens (&lt;code&gt;--prefill-min-tokens&lt;/code&gt;) it does not pay.&lt;/p&gt;
+&lt;h2 id=&quot;measured&quot;&gt;Measured&lt;a class=&quot;anchor&quot; href=&quot;#measured&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;llama-server on Strix Halo, prefill and whole request:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Model&lt;/th&gt;
+&lt;th&gt;Prompt&lt;/th&gt;
+&lt;th&gt;Vulkan alone&lt;/th&gt;
+&lt;th&gt;HRX prefill + Vulkan&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen2.5-7B Q4_K_M&lt;/td&gt;
+&lt;td&gt;2048&lt;/td&gt;
+&lt;td&gt;1541 / 4314 ms&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;1078&lt;/strong&gt; / 3890 ms (-10%)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen2.5-7B Q4_K_M&lt;/td&gt;
+&lt;td&gt;8192&lt;/td&gt;
+&lt;td&gt;7347 / 10376 ms&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;4646&lt;/strong&gt; / 7668 ms (&lt;strong&gt;-26%&lt;/strong&gt;)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-0.6B Q4_K_M&lt;/td&gt;
+&lt;td&gt;8192&lt;/td&gt;
+&lt;td&gt;1289 / 2267 ms&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;1089&lt;/strong&gt; / 2032 ms (-10%)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;Decoding on the shared cache runs within 3% of Vulkan with its own cache. The output is the same model: against Vulkan alone, teacher-forced over 64 tokens, the mean KL divergence is 0.0002-0.0006 nats and the top token agrees on 64-65 of 65 positions. For scale, Q4_K_M quantization itself is 0.063 against BF16.&lt;/p&gt;
+&lt;h2 id=&quot;where-it-lives&quot;&gt;Where it lives&lt;a class=&quot;anchor&quot; href=&quot;#where-it-lives&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The patches are in our llama.cpp fork, on top of AMD&#x27;s tested HRX commit, and are rebased onto every new AMD pair automatically: dma-buf export in ggml-hrx, dma-buf import in ggml-vulkan, the cache sharing in llama, and the prefill hand-off in llama-server. The weights are loaded twice, once per device, so it suits machines with memory to spare; Strix Halo&#x27;s unified memory is one. The details are in the &lt;a href=&quot;hrx.html&quot;&gt;HRX docs&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>HRX answers long prompts correctly, and where Unsloth quants pay</title><link href="https://1bit.gg/blog-hrx-long-prompts-and-ud-sweet-spots.html"/><id>https://1bit.gg/blog-hrx-long-prompts-and-ud-sweet-spots.html</id><published>2026-09-24T00:00:00Z</published><updated>2026-09-24T00:00:00Z</updated><summary>HRX decoding was wrong once the KV cache passed 256 tokens, now fixed; and which Unsloth file to get: UD-Q4_K_XL lean, UD-Q5_K_XL accurate.</summary><category term="hrx"/><category term="quantization"/><category term="unsloth"/><content type="html">&lt;p&gt;Two results from the end of the day: a bug fixed in HRX decoding, and one table that answers &quot;which Unsloth file should I download?&quot; for five popular models.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; the sub-4-bit files no longer run partly on the CPU: every ggml weight type runs on HRX, including NVFP4, Q2_0, MXFP4 and the ternary TQ, PTQ and PQ formats, and Vulkan is no longer a route of the engine (engine #306). See &lt;a href=&quot;hrx.html&quot;&gt;HRX on the Radeon 8060S iGPU&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;hrx-decoding-past-256-tokens&quot;&gt;HRX: decoding past 256 tokens&lt;a class=&quot;anchor&quot; href=&quot;#hrx-decoding-past-256-tokens&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;1bit serve --device hrx&lt;/code&gt; gave garbled answers to prompts of about 400 to 1,700 tokens, while short prompts and very long ones read fine. Prompt processing was right at every length; what went wrong was decoding one token at a time once the KV cache held more than 256 tokens.&lt;/p&gt;
+&lt;p&gt;HRX&#x27;s decode attention splits the cache into 64-token blocks and then combines the per-block results. Up to 256 tokens it combines them one way; past that it switches to a cooperative path in which four groups of threads each take two query rows. That path only checked that a row&#x27;s query head exists, not that the row belongs to the key/value head doing the work. Qwen3-0.6B has two query heads per key/value head, so the spare groups combined stale rows and wrote them over their neighbours&#x27; output. The fix adds that one bound, in both copies of the kernel.&lt;/p&gt;
+&lt;p&gt;After the fix, fed the same tokens as Vulkan, HRX&#x27;s predictions differ by 1-3% at every length we tried (248 to 2,040 tokens), and chat answers match Vulkan&#x27;s from 404 to 2,844 tokens. The details are in the &lt;a href=&quot;hrx.html&quot;&gt;HRX docs&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The same day, the sub-4-bit Unsloth files started working on HRX: our pinned HRX build has an IQ3_XXS matmul, and HRX and Vulkan now give the same perplexity within 0.3% on UD-Q2_K_XL and UD-IQ2_M. They decode slowly there (13-17 tok/s, where Vulkan does about 390 on Qwen3-0.6B) because parts of those files still run on the CPU, so Vulkan remains the device for them.&lt;/p&gt;
+&lt;h2 id=&quot;which-unsloth-file-to-download&quot;&gt;Which Unsloth file to download&lt;a class=&quot;anchor&quot; href=&quot;#which-unsloth-file-to-download&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;For each model we measured every Unsloth Dynamic quant from 2 to 5 bits against a reference (BF16 when it fits, else Q8_0): KL divergence over 40 x 512 tokens of wikitext-2, and decode speed on Vulkan on Strix Halo. Two picks come out of it on every model:&lt;/p&gt;
+&lt;div class=&quot;table&quot;&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Model&lt;/th&gt;
+&lt;th&gt;Lean pick&lt;/th&gt;
+&lt;th&gt;KL&lt;/th&gt;
+&lt;th&gt;Decode&lt;/th&gt;
+&lt;th&gt;Accurate pick&lt;/th&gt;
+&lt;th&gt;KL&lt;/th&gt;
+&lt;th&gt;Decode&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3.5-4B&lt;/td&gt;
+&lt;td&gt;UD-Q4_K_XL, 2.7 GiB&lt;/td&gt;
+&lt;td&gt;0.018&lt;/td&gt;
+&lt;td&gt;60.0 tok/s&lt;/td&gt;
+&lt;td&gt;UD-Q5_K_XL, 3.0 GiB&lt;/td&gt;
+&lt;td&gt;0.0099&lt;/td&gt;
+&lt;td&gt;55.4 tok/s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3.5-9B&lt;/td&gt;
+&lt;td&gt;UD-Q4_K_XL, 5.6 GiB&lt;/td&gt;
+&lt;td&gt;0.016&lt;/td&gt;
+&lt;td&gt;36.0&lt;/td&gt;
+&lt;td&gt;UD-Q5_K_XL, 6.3 GiB&lt;/td&gt;
+&lt;td&gt;0.0092&lt;/td&gt;
+&lt;td&gt;32.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3-Coder-30B-A3B&lt;/td&gt;
+&lt;td&gt;UD-Q4_K_XL, 16.5 GiB&lt;/td&gt;
+&lt;td&gt;0.027&lt;/td&gt;
+&lt;td&gt;84.7&lt;/td&gt;
+&lt;td&gt;UD-Q5_K_XL, 20.2 GiB&lt;/td&gt;
+&lt;td&gt;0.012&lt;/td&gt;
+&lt;td&gt;76.4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3.6-27B&lt;/td&gt;
+&lt;td&gt;UD-Q4_K_XL, 16.4 GiB&lt;/td&gt;
+&lt;td&gt;0.018&lt;/td&gt;
+&lt;td&gt;12.0&lt;/td&gt;
+&lt;td&gt;UD-Q5_K_XL, 18.7 GiB&lt;/td&gt;
+&lt;td&gt;0.0081&lt;/td&gt;
+&lt;td&gt;10.0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Qwen3.6-35B-A3B&lt;/td&gt;
+&lt;td&gt;UD-Q4_K_XL, 20.8 GiB&lt;/td&gt;
+&lt;td&gt;0.014&lt;/td&gt;
+&lt;td&gt;61.0&lt;/td&gt;
+&lt;td&gt;UD-Q5_K_XL, 24.8 GiB&lt;/td&gt;
+&lt;td&gt;0.0091&lt;/td&gt;
+&lt;td&gt;53.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;UD-Q4_K_XL is the lean pick everywhere:&lt;/strong&gt; the smallest file that stays within a KL of 0.03.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;UD-Q5_K_XL is the accurate pick:&lt;/strong&gt; under 0.01 on four of the five models, for 8-17% slower decode. Qwen3-Coder-30B-A3B is the exception: 0.012 is as close as any Unsloth file gets it.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Skip the 2-bit files at these sizes:&lt;/strong&gt; KL 0.11-0.23, with the top prediction changing on 13-21% of tokens.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;One popular model is missing: gemma-4-12b-it does not run correctly on the llama.cpp build we measured with, so there was nothing fair to compare. (MiniMax-H3 was on our download list too, by mistake: it generates video, it is not a text model.) Every row, with prompt speeds and ROCm, is on the &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/wiki/Quantization&quot;&gt;Quantization page&lt;/a&gt; of the wiki.&lt;/p&gt;</content></entry><entry><title>The first week of 1bit engine</title><link href="https://1bit.gg/blog-first-week-milestones.html"/><id>https://1bit.gg/blog-first-week-milestones.html</id><published>2026-09-24T00:00:00Z</published><updated>2026-09-24T00:00:00Z</updated><summary>Three days in: the engine runs on the NPU, HRX, Vulkan and ZINC inside Lemonade, each step verified on Strix Halo.</summary><category term="milestones"/><category term="npu"/><category term="hrx"/><category term="vulkan"/><category term="zinc"/><content type="html">&lt;p&gt;The clean repository started on 2026-09-22. In its first three days, the engine came up on every device it targets, inside Lemonade, with each step verified on real hardware before it merged. These are the milestones, with the numbers and where they come from.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Since 21 October 2026:&lt;/strong&gt; Vulkan and ZINC are no longer routes of the engine (engine #306); it is HRX with our HIP kernels plus the NPU engine, inside Lemonade. See &lt;a href=&quot;blog-every-node-on-hrx.html&quot;&gt;Every node on the GPU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update (2026-10-30):&lt;/strong&gt; the NPU route now decodes Qwen3-0.6B at 88.6 tok/s in the release gate, and the Linux kernel pin moved to v7.3-rc4 with the IOMMU PerfOpt backports. Current numbers: &lt;a href=&quot;models.html&quot;&gt;Models measured&lt;/a&gt;; the routes: &lt;a href=&quot;npu.html&quot;&gt;NPU engine&lt;/a&gt;, &lt;a href=&quot;hrx.html&quot;&gt;HRX&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;the-npu&quot;&gt;The NPU&lt;a class=&quot;anchor&quot; href=&quot;#the-npu&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The XDNA 2 NPU runs Qwen3-0.6B end to end through the engine, served inside Lemonade (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/8&quot;&gt;#8&lt;/a&gt;, &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/9&quot;&gt;#9&lt;/a&gt;). The XDNA driver is pinned to upstream (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/12&quot;&gt;#12&lt;/a&gt;). The &lt;a href=&quot;npu.html&quot;&gt;NPU status page&lt;/a&gt; tracks where it stands.&lt;/p&gt;
+&lt;h2 id=&quot;hrx-and-vulkan-in-one-build-then-both-at-once&quot;&gt;HRX and Vulkan in one build, then both at once&lt;a class=&quot;anchor&quot; href=&quot;#hrx-and-vulkan-in-one-build-then-both-at-once&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The Radeon iGPU has two devices in one llama.cpp build: &lt;code&gt;HRX0&lt;/code&gt; on AMD&#x27;s HRX runtime and &lt;code&gt;Vulkan0&lt;/code&gt;. HRX follows AMD&#x27;s live ggml-hrx, pinned to the pair AMD tests and bumped daily (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/11&quot;&gt;#11&lt;/a&gt;); Vulkan has its own pin on upstream llama.cpp&#x27;s latest release (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/28&quot;&gt;#28&lt;/a&gt;).&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;HRX went from 3-5x slower than Vulkan to close behind it.&lt;/strong&gt; Its prefill is now 1.3-1.7x Vulkan&#x27;s, and its decode within 10% on 4-bit files.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Our patches make HRX correct on more models&lt;/strong&gt; (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/29&quot;&gt;#29&lt;/a&gt;): an IQ3_XXS kernel, and op claims that only take the nodes HRX can actually run. &lt;code&gt;test-backend-ops&lt;/code&gt; on HRX0 went from about 1150 failures to &lt;strong&gt;791 passing, 0 failing&lt;/strong&gt;, and Unsloth&#x27;s sub-4-bit files, which failed on HRX, now come within 1% of Vulkan&#x27;s perplexity.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Prefill on HRX, decode on Vulkan, with zero copies&lt;/strong&gt; (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/30&quot;&gt;#30&lt;/a&gt;): a whole 8192-token request on Qwen2.5-7B finishes &lt;strong&gt;26% sooner&lt;/strong&gt;. &lt;a href=&quot;blog-hrx-prefill-vulkan-decode.html&quot;&gt;How it works&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;beyond-amd&quot;&gt;Beyond AMD&lt;a class=&quot;anchor&quot; href=&quot;#beyond-amd&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;NVIDIA, through ZINC&#x27;s CUDA backend&lt;/strong&gt; (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/14&quot;&gt;#14&lt;/a&gt;): Qwen3.5-9B at &lt;strong&gt;167-173 tok/s&lt;/strong&gt; on an RTX 5090, and 295 tok/s through ZINC&#x27;s Vulkan backend on Strix Halo.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Apple Silicon&lt;/strong&gt;, through Lemonade&#x27;s &lt;code&gt;mlx&lt;/code&gt; recipe and lemon-mlx-engine, verified on an M4 (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/10&quot;&gt;#10&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;underneath&quot;&gt;Underneath&lt;a class=&quot;anchor&quot; href=&quot;#underneath&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Tokenizers:&lt;/strong&gt; Hugging Face &lt;code&gt;tokenizers&lt;/code&gt; v0.23.2 behind our C ABI reads any model&#x27;s &lt;code&gt;tokenizer.json&lt;/code&gt;, byte-exact on 18 models (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/19&quot;&gt;#19&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Quantization:&lt;/strong&gt; on the GPU, Unsloth&#x27;s Dynamic UD-Q4_K_XL beats Q4_K_M: 17% lower KL divergence for 2% more size. On the NPU, a ternary model converts to 4-bit exactly, and XDNA 2 multiplies int8 by int4 natively (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/wiki/Quantization&quot;&gt;wiki&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;The Linux kernel&lt;/strong&gt; is pinned to upstream v7.3-rc4 with &lt;code&gt;amdxdna&lt;/code&gt; in-tree (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/17&quot;&gt;#17&lt;/a&gt;), and the &lt;strong&gt;Laya router&lt;/strong&gt;&#x27;s source and checkpoints are pinned and hash-verified (&lt;a href=&quot;https://github.com/1bit-MONSTER/engine/pull/18&quot;&gt;#18&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;next&quot;&gt;Next&lt;a class=&quot;anchor&quot; href=&quot;#next&quot; title=&quot;Permanent link&quot;&gt;#&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Step 4 is the Laya router, which decides where each request runs. After it: every Hugging Face architecture, kept current by a daily census. The &lt;a href=&quot;PORTING.html&quot;&gt;porting map&lt;/a&gt; tracks it, and the &lt;a href=&quot;https://github.com/1bit-MONSTER/engine/wiki&quot;&gt;wiki&lt;/a&gt; keeps every measured number with how it was taken.&lt;/p&gt;</content></entry></feed>

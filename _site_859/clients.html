@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect a client · 1bit engine</title>
+<meta name="description" content="1bit OS runs Lemonade Server, and Lemonade is what a client talks to. On the appliance it listens on 0.0.0.0:13305 — every interface…">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Connect a client · 1bit engine">
+<meta property="og:description" content="1bit OS runs Lemonade Server, and Lemonade is what a client talks to. On the appliance it listens on 0.0.0.0:13305 — every interface…">
+<link rel="canonical" href="https://1bit.gg/clients.html">
+<meta property="og:url" content="https://1bit.gg/clients.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Connect a client · 1bit engine">
+<meta name="twitter:description" content="1bit OS runs Lemonade Server, and Lemonade is what a client talks to. On the appliance it listens on 0.0.0.0:13305 — every interface…">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-11-03">
+<meta property="article:modified_time" content="2026-11-03">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/clients.html#article", "headline": "Connect a client", "description": "1bit OS runs Lemonade Server, and Lemonade is what a client talks to. On the appliance it listens on 0.0.0.0:13305 — every interface…", "url": "https://1bit.gg/clients.html", "mainEntityOfPage": "https://1bit.gg/clients.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-03", "dateModified": "2026-11-03", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="clients.html" aria-current="page">Connect a client</a></li>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="install.html">Install 1bit OS</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the Puppy Linux appliance</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="connect-a-client">Connect a client<a class="anchor" href="#connect-a-client" title="Permanent link">#</a></h1>
+<p>1bit OS runs <a href="https://github.com/lemonade-sdk/lemonade">Lemonade Server</a>, and Lemonade is what a client
+talks to. On the appliance it listens on <strong><code>0.0.0.0:13305</code></strong> — every interface, not just loopback — with
+an OpenAI-compatible API under <strong><code>/api/v1</code></strong> (and <code>/v1</code>), a WebSocket on <strong>9000</strong>, and its web app at the
+root. Every request needs the API key as a Bearer token:</p>
+<pre><code>Authorization: Bearer &lt;key&gt;
+</code></pre>
+<p>The key is the only gate. Anything on the same network that has it can use the box.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>client</th>
+<th>how it connects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#2-curl"><code>curl</code></a></td>
+<td>the URL plus the header above</td>
+</tr>
+<tr>
+<td><a href="#3-the-lemonade-web-app-in-a-browser">the Lemonade web app</a></td>
+<td><code>http://&lt;box&gt;:13305</code> in a browser</td>
+</tr>
+<tr>
+<td><a href="#4-lemonade-mobile-on-a-phone">Lemonade Mobile</a></td>
+<td>the server URL and the key, in the app's settings</td>
+</tr>
+<tr>
+<td><a href="#5-openai-sdks-and-openai-compatible-apps">OpenAI SDKs and OpenAI-compatible apps</a></td>
+<td>base URL <code>http://&lt;box&gt;:13305/api/v1</code> + the key</td>
+</tr>
+<tr>
+<td><a href="#6-the-lemonade-cli-from-another-machine">the <code>lemonade</code> CLI</a></td>
+<td><code>--host</code>, <code>--port</code>, <code>--api-key</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="1-find-the-box-and-its-key">1. Find the box, and its key<a class="anchor" href="#1-find-the-box-and-its-key" title="Permanent link">#</a></h2>
+<p><strong>The address.</strong> On the box's console or over SSH:</p>
+<pre><code class="language-sh">hostname -I                 # e.g. 192.168.1.42
+hostname                    # 1bit-os - the name the image sets in /etc/hostname
+</code></pre>
+<p><strong>The name is <code>1bit-os</code>, not an address.</strong> Puppy only invents a per-machine <code>puppypc&lt;digits&gt;</code> while
+<code>/etc/hostname</code> still holds its stock word, and the shipped image sets <code>1bit-os</code> instead (measured: on the
+cycle-13 image it still booted as <code>puppypc19108</code>, which is why older notes name it that way). Read the
+address off the box rather than guessing <code>1bit.local</code> — mDNS is not claimed. If you cannot get to a
+console, the router's client list shows the box
+(the MAC of the wired or wireless interface), and the box announces the server on the LAN itself —
+<code>lemond</code> logs <code>Net Broadcast</code> on each RFC1918 interface, and <code>lemonade scan</code> (run anywhere on the same
+network with the CLI installed) lists the beacons it hears.</p>
+<p><strong>The key.</strong> It is one line in Lemonade's environment file on the <code>1BIT-DATA</code> partition:</p>
+<pre><code class="language-sh">sudo sed -n 's/^LEMONADE_API_KEY=//p' /data/lemonade/lemond.conf
+</code></pre>
+<p><code>/etc/1bit/lemond.conf</code> is a symlink to that same file, so either path reads the same key. It is
+<code>0600 root</code>, minted by <code>prepare-stick --mint</code> when the stick is written, and written on first boot if the
+file is empty. There is no <code>lemonade</code> CLI command that prints it — the file is the interface.</p>
+<h2 id="2-curl">2. <code>curl</code><a class="anchor" href="#2-curl" title="Permanent link">#</a></h2>
+<p>List the models, with the key:</p>
+<pre><code class="language-sh">BOX=192.168.1.42
+KEY=$(ssh root@$BOX &quot;sed -n 's/^LEMONADE_API_KEY=//p' /data/lemonade/lemond.conf&quot;)   # or copy it by hand
+
+curl -s -H &quot;Authorization: Bearer $KEY&quot; http://$BOX:13305/api/v1/models
+</code></pre>
+<p>One chat completion, and the one-line check that it worked:</p>
+<pre><code class="language-sh">curl -s -H &quot;Authorization: Bearer $KEY&quot; -H 'Content-Type: application/json' \
+  -d '{&quot;model&quot;:&quot;Qwen3-0.6B-NPU-1bit&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;Say OK.&quot;}],&quot;max_tokens&quot;:16,&quot;temperature&quot;:0,&quot;chat_template_kwargs&quot;:{&quot;enable_thinking&quot;:false}}' \
+  http://$BOX:13305/api/v1/chat/completions
+</code></pre>
+<p><code>http=200</code> and a <code>choices[0].message.content</code> in the body is the whole check. Without the key the same
+request answers <strong>401</strong>; with a wrong key, also 401.</p>
+<p>The <code>chat_template_kwargs</code> bit is for the thinking models in the catalogue: without it Qwen3 answers in
+<code>reasoning_content</code> and <code>content</code> stays empty, which is correct but reads like a failure in a one-line
+test. Drop it if you want the reasoning, and read <code>reasoning_content</code> instead.</p>
+<p><strong>Which model id.</strong> <code>GET /api/v1/models</code> is the list to use — it is Lemonade's catalogue plus whatever is
+on the stick's <code>1BIT-DATA:models/</code>, registered by the boot. On the shipped appliance that includes the
+HRX rows (<code>Qwen3-0.6B-1bit</code>, <code>Qwen3-4B-1bit</code>, <code>Qwen3.8-27B-1bit</code>, <code>gpt-oss-20b-mxfp4-1bit</code>, …) and the
+NPU rows (<code>Qwen3-0.6B-NPU-1bit</code>, <code>Qwen3-1.7B-NPU-1bit</code>, <code>Qwen3-4B-NPU-1bit</code>,
+<code>Qwen3.6-35B-A3B-NPU-1bit</code>). The engine's own model list is in <code>/etc/1bit/onebit-models.txt</code> on the box.
+Those rows are <strong>filtered by the hardware</strong>: on a machine with neither the GPU nor the NPU (a VM, say)
+the onebit rows do not appear, and <code>GET /api/v1/models?show_all=true</code> lists the whole catalogue instead.
+<code>Qwen3-0.6B-NPU-1bit</code> is the one the board boots test with: "1BIT OK." at 93.2 / 95.3 tok/s through
+Lemonade (2026-11-02 board run).</p>
+<h2 id="3-the-lemonade-web-app-in-a-browser">3. The Lemonade web app in a browser<a class="anchor" href="#3-the-lemonade-web-app-in-a-browser" title="Permanent link">#</a></h2>
+<p>Open <code>http://&lt;box&gt;:13305</code> from any machine on the LAN. Lemonade's web app is served there — chat, the
+model catalogue, downloads, settings and logs. The page itself loads without a key (it is static), and
+every request it makes needs one, so the first time it asks for the API key; paste the key from
+<a href="#1-find-the-box-and-its-key">1</a>.</p>
+<h2 id="4-lemonade-mobile-on-a-phone">4. Lemonade Mobile on a phone<a class="anchor" href="#4-lemonade-mobile-on-a-phone" title="Permanent link">#</a></h2>
+<p>Lemonade's phone client is <strong>Lemonade Mobile</strong>, by Geramy Loveless, and it is the front door to the same
+server: no cloud account and no Lemonade service in the path, just the box you configured.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>iPhone / iPad</td>
+<td><a href="https://apps.apple.com/app/id6757372210">App Store 6757372210</a>, "Lemonade Mobile" (Lemonade Chat), iOS/iPadOS 13 or later</td>
+</tr>
+<tr>
+<td>Android</td>
+<td><a href="https://play.google.com/store/apps/details?id=com.lemonade.mobile.chat.ai">Lemonade Mobile Omni</a> on Google Play (<code>com.lemonade.mobile.chat.ai</code>), the same app family from the same developer</td>
+</tr>
+</tbody>
+</table></div>
+<p>In the app: <strong>Settings → Manage servers → add a server</strong>, then</p>
+<ul>
+<li><strong>URL</strong>: <code>http://&lt;box&gt;:13305</code> (the scheme and the port are part of it; no trailing <code>/api/v1</code>)</li>
+<li><strong>API key</strong>: the key from <a href="#1-find-the-box-and-its-key">1</a></li>
+</ul>
+<p>The app manages several servers, so a second box (or the same model on another machine) is a second
+entry. The App Store listing calls the API key optional — that is for a Lemonade running with no key. <strong>On
+1bit OS it is required</strong>: without it the app gets 401 from every request.</p>
+<h2 id="5-openai-sdks-and-openai-compatible-apps">5. OpenAI SDKs and OpenAI-compatible apps<a class="anchor" href="#5-openai-sdks-and-openai-compatible-apps" title="Permanent link">#</a></h2>
+<p>Any OpenAI client works; the two values are the base URL and the key. Python, against the <code>openai</code>
+package:</p>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(base_url=&quot;http://192.168.1.42:13305/api/v1&quot;, api_key=&quot;&lt;the key&gt;&quot;)
+
+print([m.id for m in client.models.list()])
+r = client.chat.completions.create(model=&quot;Qwen3-0.6B-NPU-1bit&quot;,
+                                   messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Say OK.&quot;}],
+                                   max_tokens=16, temperature=0,
+                                   extra_body={&quot;chat_template_kwargs&quot;: {&quot;enable_thinking&quot;: False}})
+print(r.choices[0].message.content)
+</code></pre>
+<p>Without <code>extra_body</code> a thinking model puts its answer in <code>reasoning_content</code> and leaves <code>content</code> empty,
+the same as the <code>curl</code> example above.</p>
+<p>The same two values fill in any app that speaks the OpenAI API and lets you set a base URL — Open WebUI,
+Continue, a chat front-end, an agent framework. Give it <code>http://&lt;box&gt;:13305/api/v1</code> (or <code>…/v1</code>; Lemonade
+answers both) and the key. Lemonade's own docs keep a list of clients it is tested with at
+<a href="https://lemonade-server.ai">lemonade-server.ai</a>.</p>
+<h2 id="6-the-lemonade-cli-from-another-machine">6. The <code>lemonade</code> CLI from another machine<a class="anchor" href="#6-the-lemonade-cli-from-another-machine" title="Permanent link">#</a></h2>
+<p>Where Lemonade's CLI is installed (it ships with Lemonade Server), point it at the box:</p>
+<pre><code class="language-sh">lemonade --host 192.168.1.42 --port 13305 --api-key &quot;$KEY&quot; status
+lemonade --host 192.168.1.42 --port 13305 --api-key &quot;$KEY&quot; list
+lemonade --host 192.168.1.42 --port 13305 --api-key &quot;$KEY&quot; load Qwen3-0.6B-NPU-1bit
+</code></pre>
+<p>The same three values have environment variables, which is how a script sets them once:
+<code>LEMONADE_HOST</code>, <code>LEMONADE_PORT</code>, <code>LEMONADE_API_KEY</code>. <code>lemonade scan</code> finds servers on the LAN that
+announce themselves (the beacon <code>lemond</code> sends — the same one the mobile app can use).</p>
+<p>On the box itself the CLI needs no <code>--host</code>: <code>lemonade status</code> uses <code>127.0.0.1:13305</code>, and it still needs
+<code>--api-key</code> (or <code>LEMONADE_API_KEY</code> in the environment) because the server requires it on every route.</p>
+<h2 id="7-security-the-key-is-the-whole-gate">7. Security: the key is the whole gate<a class="anchor" href="#7-security-the-key-is-the-whole-gate" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the gate</td>
+<td><code>LEMONADE_API_KEY</code> on every <code>/api/*</code>, <code>/v0/*</code> and <code>/v1/*</code> request, as a Bearer token. No key, no service</td>
+</tr>
+<tr>
+<td>network</td>
+<td>the appliance opens <strong>13305</strong> (Lemonade) and <strong>22</strong> (SSH) in its firewall, and allows the RFC1918 ranges through <code>/etc/hosts.allow</code>; everything else inbound is dropped. It is a LAN service</td>
+</tr>
+<tr>
+<td>never</td>
+<td>forward 13305 from your router to the internet. If you need it from outside, use a VPN, or an HTTPS reverse proxy in front of it — Lemonade's own <a href="https://lemonade-server.ai/docs/guide/faq/">FAQ</a> says the same</td>
+</tr>
+<tr>
+<td>SSH</td>
+<td>keys only: <code>/data/ssh/authorized_keys</code> on the stick is copied to <code>/root/.ssh/authorized_keys</code> at boot. <code>prepare-stick --ssh-pubkey</code> writes it</td>
+</tr>
+<tr>
+<td>rotate the key</td>
+<td>write the new one and restart the service: <code>sudo sh -c 'printf "LEMONADE_API_KEY=%s\n" "$(head -c 24 /dev/urandom \| od -An -tx1 \| tr -d " \\n")" &gt; /data/lemonade/lemond.conf' &amp;&amp; sudo /etc/init.d/10lemonade restart</code>. Every client's key has to be updated with it. Re-running <code>prepare-stick --mint</code> on a reflashed stick does the same thing offline</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sources">Sources<a class="anchor" href="#sources" title="Permanent link">#</a></h2>
+<ul>
+<li>the App Store listing, <a href="https://apps.apple.com/app/id6757372210">apps.apple.com/app/id6757372210</a> — name,
+  developer, iOS requirement, "Settings → Manage servers"</li>
+<li><a href="https://play.google.com/store/apps/details?id=com.lemonade.mobile.chat.ai">Lemonade Mobile Omni on Google Play</a></li>
+<li>Lemonade's <a href="https://lemonade-server.ai/docs/guide/faq/">FAQ</a> (remote access) and
+  <a href="https://lemonade-server.ai/docs/guide/cli/">CLI reference</a> (<code>--host</code>, <code>--port</code>, <code>--api-key</code>,
+  <code>--discovery</code>, and their <code>LEMONADE_*</code> variables)</li>
+</ul>
+<h2 id="what-was-verified-for-this-page">What was verified for this page<a class="anchor" href="#what-was-verified-for-this-page" title="Permanent link">#</a></h2>
+<p>Against the cycle-13 appliance image booted in QEMU (<code>sha256 dcc619ff…</code>, kernel
+<code>7.3.0-rc4-1bit-perfopt+</code>, Secure Boot on):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>claim</th>
+<th>measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lemonade listens on every interface</td>
+<td><code>netstat</code>: <code>lemond</code> on <code>0.0.0.0:13305</code>, WebSocket <code>9000</code>, <code>sshd</code> on <code>0.0.0.0:22</code></td>
+</tr>
+<tr>
+<td><code>/api/v1</code> and <code>/v1</code> are the API</td>
+<td><code>GET /api/v1/models</code> and <code>GET /v1/models</code> both answer</td>
+</tr>
+<tr>
+<td>the key is required, and only the key</td>
+<td>with a key minted: no key and a wrong key → <strong>401</strong>, the right key → <strong>200</strong> (both paths)</td>
+</tr>
+<tr>
+<td>the key's file</td>
+<td><code>readlink -f /etc/1bit/lemond.conf</code> → <code>/data/lemonade/lemond.conf</code>, <code>0600 root</code>; a key written there plus <code>/etc/init.d/10lemonade restart</code> takes effect on the next request</td>
+</tr>
+<tr>
+<td>the web app</td>
+<td><code>GET http://&lt;box&gt;:13305/</code> → 200, <code>text/html</code>, <code>&lt;title&gt;Lemonade App&lt;/title&gt;</code>, with and without a key (it is static; its own API calls are what 401)</td>
+</tr>
+<tr>
+<td>the <code>curl</code> chat example</td>
+<td><code>POST /api/v1/chat/completions</code> with <code>chat_template_kwargs.enable_thinking=false</code>: <strong>200</strong>, <code>content: "Sure! 😊"</code>, <code>finish_reason: stop</code></td>
+</tr>
+<tr>
+<td>the OpenAI SDK example</td>
+<td>run from another machine against the forwarded port with <code>base_url=…/api/v1</code> and <code>api_key</code>: <code>models.list()</code> → <code>['rlk-cpu']</code>, <code>chat.completions.create()</code> → 200 with <code>content: 'Sure! 😊'</code> once <code>enable_thinking</code> is off</td>
+</tr>
+<tr>
+<td>the CLI flags</td>
+<td><code>lemonade --help</code> on the box: <code>--host HOST</code>, <code>--port PORT</code>, <code>--api-key KEY</code>, <code>--discovery/--no-discovery</code>, <code>LEMONADE_HOST/PORT/API_KEY</code>; <code>lemonade --host 10.0.2.2 --port 21305 --api-key &lt;key&gt; status</code> answered</td>
+</tr>
+<tr>
+<td>the discovery beacon</td>
+<td><code>lemonade scan</code> on the box: <code>Discovered: puppypc19045 at http://127.0.0.1:13305/api/v1/</code>; <code>lemond</code> logs <code>Net Broadcast</code> on each RFC1918 interface</td>
+</tr>
+<tr>
+<td>the firewall</td>
+<td><code>iptables -S INPUT</code>: <code>-P INPUT DROP</code> with <code>ACCEPT</code> for <code>--dport 22</code> and <code>--dport 13305</code>; <code>/etc/hosts.allow</code> carries the RFC1918 <code>1bit-lan</code> line</td>
+</tr>
+<tr>
+<td>Lemonade Mobile</td>
+<td><strong>not run on a phone here</strong> — verified as: the two store listings exist with the names above, the app's own "Getting started" text gives the same URL + API-key flow, and the HTTP API it talks to is the one measured above</td>
+</tr>
+</tbody>
+</table></div>
+<p>The QEMU VM has no GPU and no NPU, so its <code>GET /api/v1/models</code> lists none of the appliance's onebit rows
+(they are filtered by hardware) and a onebit model cannot be loaded there. The chat examples above were
+therefore exercised on a GGUF registered through the same <code>user_models.json</code> mechanism with the <code>llamacpp</code>
+recipe — the answer came from llama.cpp on the VM's CPU at 1.7-2.3 tok/s, not from the engine. What the
+board run adds, and this page does not re-measure, is the onebit route itself: <code>Qwen3-0.6B-NPU-1bit</code>
+through Lemonade on the Ryzen AI MAX+ 395.</p>
+<p>Not verified on this page: a phone against a real box on a real LAN (the app needs a device), and mDNS —
+avahi-daemon runs on the box, but this page does not claim <code>&lt;name&gt;.local</code> resolves, so read the address
+with <code>hostname -I</code> or the router instead.</p>
+<nav class="pager"><a class="prev" href="PORTING.html"><span>Previous</span>Porting map</a><a class="next" href="determinism.html"><span>Next</span>Determinism and cross-route log-prob agreement</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/clients.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

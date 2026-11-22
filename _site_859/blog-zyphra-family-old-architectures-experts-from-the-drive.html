@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zyphra family, older archs, experts from disk · 1bit engine</title>
+<meta name="description" content="Zyphra&#x27;s whole family runs (ZAYA1-74B at 35.4 tok/s), four older architectures join, and MoE experts stream from the drive at 43-45 tok/s.">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Zyphra family, older archs, experts from disk · 1bit engine">
+<meta property="og:description" content="Zyphra&#x27;s whole family runs (ZAYA1-74B at 35.4 tok/s), four older architectures join, and MoE experts stream from the drive at 43-45 tok/s.">
+<link rel="canonical" href="https://1bit.gg/blog-zyphra-family-old-architectures-experts-from-the-drive.html">
+<meta property="og:url" content="https://1bit.gg/blog-zyphra-family-old-architectures-experts-from-the-drive.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Zyphra&#x27;s whole family, four older architectures, and experts from the drive">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Zyphra family, older archs, experts from disk · 1bit engine">
+<meta name="twitter:description" content="Zyphra&#x27;s whole family runs (ZAYA1-74B at 35.4 tok/s), four older architectures join, and MoE experts stream from the drive at 43-45 tok/s.">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="Zyphra&#x27;s whole family, four older architectures, and experts from the drive">
+<meta property="article:tag" content="zyphra">
+<meta property="article:tag" content="models">
+<meta property="article:tag" content="moe">
+<meta property="article:tag" content="hrx">
+<meta property="article:tag" content="onnx">
+<meta property="article:published_time" content="2026-09-26">
+<meta property="article:modified_time" content="2026-11-03">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "BlogPosting", "@id": "https://1bit.gg/blog-zyphra-family-old-architectures-experts-from-the-drive.html#article", "headline": "Zyphra's whole family, four older architectures, and experts from the drive", "description": "Zyphra's whole family runs (ZAYA1-74B at 35.4 tok/s), four older architectures join, and MoE experts stream from the drive at 43-45 tok/s.", "url": "https://1bit.gg/blog-zyphra-family-old-architectures-experts-from-the-drive.html", "mainEntityOfPage": "https://1bit.gg/blog-zyphra-family-old-architectures-experts-from-the-drive.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-26", "dateModified": "2026-11-03", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "keywords": "zyphra, models, moe, hrx, onnx"}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="post">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html">Docs</a>
+      <a href="blog.html" aria-current="page">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<article class="art"><div class="container">
+<a class="back" href="blog.html">← all posts</a>
+<div class="art-meta"><time datetime="2026-09-26">2026-09-26</time><span class="tag">zyphra</span><span class="tag">models</span><span class="tag">moe</span><span class="tag">hrx</span><span class="tag">onnx</span></div>
+<h1>Zyphra&#x27;s whole family, four older architectures, and experts from the drive</h1>
+<p class="lead">A lot landed this week. Zyphra's model family now runs end to end, including its vision
+models. Four older architectures that upstream llama.cpp never shipped are in. <code>1bit serve</code> can
+run a MoE model whose experts do not fit in memory. And the HRX decode path became deterministic.
+Every number below was measured on Strix Halo (Ryzen AI Max+ 395, Radeon 8060S), with the
+method in the linked docs.</p>
+<div class="prose">
+<blockquote>
+<p><strong>Since 21 October 2026:</strong> Vulkan is no longer a route of the engine (engine #306): Zamba, Zamba2 and BlackMamba wait for an HRX port, and <code>--moe-slots</code> is not in the current build. See <a href="blog-every-node-on-hrx.html">Every node on the GPU</a>.</p>
+<p><strong>Update (2026-10-30):</strong> ZAYA1-8B (Q4_K_M) decodes at 157 tok/s on HRX. See <a href="models.html">Models measured</a>.</p>
+</blockquote>
+<h2 id="zyphra-all-of-it">Zyphra, all of it<a class="anchor" href="#zyphra-all-of-it" title="Permanent link">#</a></h2>
+<p>ZAYA1-8B already ran on Vulkan, HRX and ROCm. The rest of the family followed:</p>
+<ul>
+<li><strong>ZAYA1-74B-preview</strong>, with its sliding-window layers: Q4_K_M decodes at 35.4 tok/s on Vulkan.</li>
+<li><strong>ZAYA1-base and ZAYA1-reasoning-base</strong>, in Zyphra's older checkpoint layout. Our converter
+  reads that layout directly, and the tensors it writes are byte-identical to ZAYA1-8B's.</li>
+<li><strong>ZAYA1-VL-8B</strong>, the vision model. It applies a vision-only LoRA to image tokens and attends to
+  each image bidirectionally. Against Zyphra's own FP32 code it agrees at 100 of 101
+  teacher-forced positions. F16 decodes at 38-51 tok/s. It reads "HELLO 42" off a synthetic
+  image, and it recognises the New York Times front page of the moon landing.</li>
+<li><strong>Zamba, Zamba2 and BlackMamba</strong>, plus <strong>Zamba2-VL</strong>. Zamba v1 and BlackMamba match the
+  reference at 96/96 positions. A new Vulkan scan for Mamba-1 layers took Mamba-370M from 25.8
+  to 173.5 tok/s; those layers used to run on the CPU.</li>
+</ul>
+<p>Adding the vision model left ZAYA1-8B's text path unchanged. Its wikitext perplexity is
+identical on Vulkan (21.5731, and 21.6213 with four sequences per batch) and HRX (21.5518), and
+it still agrees with transformers at 95/96. Serve the vision models with <code>1bit serve --mmproj</code>
+(the Vulkan notes of the archived repository).</p>
+<h2 id="four-older-architectures">Four older architectures<a class="anchor" href="#four-older-architectures" title="Permanent link">#</a></h2>
+<p>OPT, GPT-Neo, CodeGen and GPT-J now run from our llama.cpp. We checked each port against
+transformers FP32 before it merged. CodeGen started at 0/96: its fused projection stores query,
+value and key in that order, not query, key, value. After the fix all four agree at every
+checked position (the Vulkan notes of the archived repository).
+With them, the model registry maps 323 Hugging Face architectures to a backend. "Mapped" means
+a backend's code accepts the architecture; the census reports separately how many have been
+checked (<a href="registry.html">Model registry</a>).</p>
+<h2 id="moe-experts-from-the-drive">MoE experts from the drive<a class="anchor" href="#moe-experts-from-the-drive" title="Permanent link">#</a></h2>
+<p><code>1bit serve --moe-slots N</code> keeps a MoE model's routed experts in the file on disk. It holds N of
+them in GPU memory and streams in the rest as the router asks for them. Perplexity is exactly
+that of the all-GPU model. On Qwen3-Coder-30B-A3B, with 75% of the experts resident and the
+prefetch moved off the decode path, it decodes at 43-45 tok/s (39 through <code>serve</code>). With 25%
+resident it still decodes at 8-10. The resident model is faster (79-91 tok/s), so streaming
+is for models that do not fit
+(<a href="moe-streaming.html#streaming-in-the-inference-path">MoE streaming</a>).</p>
+<h2 id="hrx-decode-now-deterministic">HRX decode, now deterministic<a class="anchor" href="#hrx-decode-now-deterministic" title="Permanent link">#</a></h2>
+<p>Repeating the same request exposed a problem in HRX's split flash-attention decode kernel: it
+gave different answers to identical requests, and on Qwen3-Coder-30B it faulted the GPU in two
+of three runs. <code>1bit serve --device hrx</code> now decodes without it by default. That path is
+deterministic, and on most models faster: Qwen3-0.6B goes from 169 to 322 tok/s, and ZAYA1-8B
+from 23.5 to 25.5. Coder-30B runs 5 of 5 clean at 66-71 tok/s.
+<code>ONEBIT_HRX_DECODE_SPLIT=1</code> turns the kernel back on for testing a fix
+(<a href="hrx.html">HRX</a>).</p>
+<h2 id="also">Also<a class="anchor" href="#also" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>ONNX on the GPU on Linux</strong>: ONNX Runtime's WebGPU provider, over Vulkan. Qwen3-4B int4
+  decodes at 52.9 tok/s on the Radeon, against 26.8 on the CPU (<a href="onnx.html">ONNX Runtime</a>).</li>
+<li><strong>GPU matrix units</strong>: a short reference on the Radeon's matrix instructions. int8 runs at the
+  f16 rate; only int4 × int4 doubles it (<a href="hrx.html#the-gpus-matrix-units-wmma">HRX</a>).</li>
+<li><strong>Issues and security</strong>:<ul>
+<li>issue forms, and RFCs for larger changes in Discussions;</li>
+<li>a CI check that stops a pin from moving backwards;</li>
+<li>CodeQL's extended suite, with no open alerts.</li>
+</ul>
+</li>
+</ul>
+<p>Packages for all of this ship on Sunday with the weekly release.</p>
+</div>
+<nav class="pager"><a class="prev" href="blog-hrx-decode-race-solved.html"><span>Newer</span>Milestone: the HRX decode race is solved</a><a class="next" href="blog-the-npu-drafts-the-gpu-checks.html"><span>Older</span>The NPU drafts, the GPU checks</a></nav>
+</div></article>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="HRX, AMD&#x27;s HIP Runtime Extended, with our own HIP kernels on the Radeon 8060S iGPU: pinned sources, quant coverage, MTP and DFlash2, ternary Bonsai, BitNet.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-09-22">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/hrx.html#article", "headline": "HRX on the Radeon iGPU", "description": "HRX, AMD's HIP Runtime Extended, with our own HIP kernels on the Radeon 8060S iGPU: pinned sources, quant coverage, MTP and DFlash2, ternary Bonsai, BitNet.", "url": "https://1bit.gg/hrx.html", "mainEntityOfPage": "https://1bit.gg/hrx.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-22", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/hrx.html#article", "headline": "HRX on the Radeon iGPU", "description": "HRX, AMD's HIP Runtime Extended, with our own HIP kernels on the Radeon 8060S iGPU: pinned sources, quant coverage, MTP and DFlash2, ternary Bonsai, BitNet.", "url": "https://1bit.gg/hrx.html", "mainEntityOfPage": "https://1bit.gg/hrx.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -93,6 +92,12 @@
 <li><a href="kernel.html">Linux kernel</a></li>
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
 </ul>
 </nav></details>
 <article class="docs-page prose">
@@ -729,7 +734,7 @@ time:</p>
 </table></div>
 <p>The expert GEMMs are a third of the pass and already the fastest thing per token: the m64 tile is
 in play, so a wider MMQ tile is not the lever, and those kernels belong to the private add-on
-(<code>third_party/ds4</code>'s <code>ROCM_MMQ_Y</code> is a different route and does not appear in this bundle). The two
+(the removed DwarfStar tree's <code>ROCM_MMQ_Y</code> was a different route and never appeared in this bundle). The two
 levers that do appear are both decode-shaped code running on a prefill. <code>hrx_dp_mm_q8_0_*</code> is ~16%
 of it while its grid stays 4x10x1 and 4x40x1 workgroups — 40 and 160 workgroups on a 40-CU part —
 however many tokens the chunk carries. <code>ggml_mul_mat_f32_f32_wmma</code> is 8% of a 4.25 bpw model's
@@ -1090,20 +1095,39 @@ program is rebuilt.</p>
   change includes a regression test that varies stale masked rows and requires bit-identical
   outputs.</p>
 <h3 id="cwsr-save-area-placement-engine315">CWSR save-area placement (engine#315)<a class="anchor" href="#cwsr-save-area-placement-engine315" title="Permanent link">#</a></h3>
+<h3 id="the-trio-belongs-to-every-hrx-process-not-just-to-serves-backends-engine715">The trio belongs to every HRX process, not just to serve's backends (engine#715)<a class="anchor" href="#the-trio-belongs-to-every-hrx-process-not-just-to-serves-backends-engine715" title="Permanent link">#</a></h3>
+<p><code>serve</code> puts the save-area variables in its backends' environment <em>and in its own</em> (<code>app/hrx_cwsr.h</code>,
+<code>apply_cwsr_env_to_self</code>), so a child that execs with the inherited environment — a helper started by
+<code>run_program</code>, the Laya daemon — inherits them too, and a spawn site added later cannot forget them.</p>
+<p>Everything else that initialises HRX on a box whose libhsa is the TheRock nightly needs them as well, because the
+fault they prevent happens inside ROCr/the HAL before any of our code runs: <code>test-backend-ops</code>, <code>llama-bench</code>,
+<code>llama-cli</code>, and any harness that starts <code>llama-server</code> itself. For scripts there is one definition to source:</p>
+<pre><code class="language-sh">. scripts/hrx-env.sh --check     # sets the trio, refuses to continue without it
+. scripts/hrx-env.sh             # sets it, no check
+</code></pre>
+<p>and the recipe itself, for anything that cannot source a file:</p>
+<pre><code class="language-sh">HSA_USE_SVM=0 HSA_USERPTR_FOR_PAGED_MEM=0 HRX_ALLOW_NO_SVM=1
+</code></pre>
+<p><code>HRX_SVM=1</code> and <code>--hrx-cwsr-placement=off</code> remain the opt-outs, but they are no longer silent: on an <code>hrx</code>/<code>auto</code> route
+<code>serve</code> refuses to start when <em>you</em> opted out and the trio is absent, and prints the recipe above — the mode those flags
+select is the one that page-faults on the first graph replay on this box. The refusal keys on the opt-out, deliberately
+not on "the trio happens to be empty": a build whose hrx-system has no <code>HRX_ALLOW_NO_SVM</code> gate also has an empty trio,
+and it cannot start HRX0 at all. <code>ONEBIT_HRX_NO_TRIO_OK=1</code> is the acknowledgement for a box whose
+ROCr does not need the placement. <code>--device cpu</code> and <code>--device npu</code> are never affected.</p>
 <p>The shipped configuration for engine#315 is amdgpu with CWSR <strong>off</strong> (<code>amdgpu.cwsr_enable=0</code> on the
-kernel command line and in <code>/etc/modprobe.d</code>). Nothing below changes that, and it stays the default.
-The replacement below was accepted by a soak on a CWSR-on boot (2026-10-18/19: 37 in-band arms, 9 h 03 min,
-0 faults, every graded arm's save area two GTT BOs and no SVM lookup; KNOWN-ISSUES.md, engine#315), so
-a box that runs CWSR on - for another workload, or by its owner's choice - gets the safe placement
-automatically.</p>
-<p>On a box that runs CWSR <strong>on</strong>, <code>1bit serve</code> moves each HRX queue's CWSR context save area out of
-pageable memory. By default libhsakmt allocates the save area as an SVM range. With
-<code>HSA_USE_SVM=0</code> and <code>HSA_USERPTR_FOR_PAGED_MEM=0</code> it allocates a KFD GTT buffer object instead.
-ROCr then reports no SVM, which HRX refuses unless <code>HRX_ALLOW_NO_SVM=1</code> is set; that gate is our
-hrx-system commit (<code>util/no_svm_gate.c</code>). serve adds the three variables to the environment of
-every HRX backend it starts (the chat server, the RAG servers, the Laya scorer), so they are in
-place before ROCr initialises in that process, and prints one line:</p>
-<pre><code>1bit serve: HRX: CWSR is on; CWSR save area placed in GTT (engine#315)
+kernel command line and in <code>/etc/modprobe.d</code>). Nothing below changes that. The replacement below was
+accepted by a soak on a CWSR-on boot (2026-10-18/19: 37 in-band arms, 9 h 03 min, 0 faults, every graded
+arm's save area two GTT BOs and no SVM lookup; KNOWN-ISSUES.md, engine#315), and since <strong>2026-10-31 it is
+the default for every HRX backend, CWSR on or off</strong> - see the A/B below, where the pageable placement
+faulted on the first graph replay of a CWSR-<strong>off</strong> box.</p>
+<p>On such a box, <code>1bit serve</code> moves each HRX queue's CWSR context save area out of pageable memory. By
+default libhsakmt allocates the save area as an SVM range. With <code>HSA_USE_SVM=0</code> and
+<code>HSA_USERPTR_FOR_PAGED_MEM=0</code> it allocates a KFD GTT buffer object instead. ROCr then reports no SVM,
+which HRX refuses unless <code>HRX_ALLOW_NO_SVM=1</code> is set; that gate is our hrx-system commit
+(<code>util/no_svm_gate.c</code>). serve adds the three variables to the environment of every HRX backend it starts
+(the chat server, the RAG servers, the Laya scorer), so they are in place before ROCr initialises in that
+process, and prints one line:</p>
+<pre><code>1bit serve: HRX: CWSR save area placed in GTT by default (engine#315; amdgpu cwsr_enable=0; --hrx-cwsr-placement=off or HRX_SVM=1 opts out)
 </code></pre>
 <p><code>--hrx-cwsr-placement</code> picks the mode:</p>
 <div class="table"><table>
@@ -1116,11 +1140,11 @@ place before ROCr initialises in that process, and prints one line:</p>
 <tbody>
 <tr>
 <td><code>auto</code> (default)</td>
-<td>adds the three variables only when <code>/sys/module/amdgpu/parameters/cwsr_enable</code> reads <code>1</code> and you set none of them. With CWSR off it adds nothing and logs <code>HRX: CWSR is off; CWSR save-area placement unchanged (engine#315)</code></td>
+<td>adds the three variables, whatever <code>cwsr_enable</code> says. A value you set yourself still wins. <code>HRX_SVM=1</code> in the environment turns it off again (<code>HRX: HRX_SVM=1; CWSR save-area placement left to ROCr (engine#315)</code>)</td>
 </tr>
 <tr>
 <td><code>on</code></td>
-<td>adds them whatever <code>cwsr_enable</code> says. A value you set yourself still wins</td>
+<td>the same, but refuses to start in a build without the gate</td>
 </tr>
 <tr>
 <td><code>off</code></td>
@@ -1130,8 +1154,102 @@ place before ROCr initialises in that process, and prints one line:</p>
 </table></div>
 <p>A build whose hrx-system has no <code>HRX_ALLOW_NO_SVM</code> gate (CMake prints
 <code>HRX_ALLOW_NO_SVM gate in hrx-system: 0</code>) adds nothing in <code>auto</code> and refuses <code>on</code>, because
-<code>HSA_USE_SVM=0</code> would leave HRX with no device. <code>llama-server</code>, <code>llama-bench</code> or other HRX tools
-you start yourself get the variables only if you set them.</p>
+<code>HSA_USE_SVM=0</code> would leave HRX with no device. <code>llama-server</code>, <code>llama-bench</code>, <code>test-backend-ops</code> or other
+HRX tools you start yourself get the variables only if you set them - <code>scripts/hw-gate.sh</code> exports them for
+its own direct runs for that reason.</p>
+<h4 id="why-it-is-the-default-the-2026-10-31-ab-kernel-730-rc4-1bit-perfopt">Why it is the default: the 2026-10-31 A/B (kernel <code>7.3.0-rc4-1bit-perfopt+</code>)<a class="anchor" href="#why-it-is-the-default-the-2026-10-31-ab-kernel-730-rc4-1bit-perfopt" title="Permanent link">#</a></h4>
+<p>After that kernel was rebuilt, <strong>every</strong> HRX process on strixhalo page-faulted on its first graph replay,
+the release tarball included: <code>wait for HRX graph replay commands failed: … ABORTED; AMDGPU memory access
+fault at device address 0x…</code>, and in <code>dmesg</code> <code>[gfxhub] page fault … client CPF</code>, <code>PERMISSION_FAULTS 0x8</code>,
+<code>WALKER_ERROR 0</code>, <code>MAPPING_ERROR 0</code>. Three HSA runtimes exist on the box; same binary (<code>llama-server</code> from
+<code>1bit/hrx-vulkan-patched</code> + #161), same Qwen3-0.6B file, same argv, one <code>gpu-hold</code> claim, 32 tokens per arm:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>HSA runtime (sha256)</th>
+<th>SVM mode</th>
+<th>result</th>
+<th style="text-align: right;">new gfxhub faults</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>release-bundled <code>f6ef689d…</code></td>
+<td><code>HSA_USE_SVM</code> unset, <code>HSA_USERPTR_FOR_PAGED_MEM=0</code></td>
+<td><strong>no HRX0 at all</strong>: <code>--device: invalid device: HRX0</code></td>
+<td style="text-align: right;">0 (nothing ran)</td>
+</tr>
+<tr>
+<td>release-bundled <code>f6ef689d…</code></td>
+<td><code>HSA_USE_SVM=0 HSA_USERPTR_FOR_PAGED_MEM=0 HRX_ALLOW_NO_SVM=1</code></td>
+<td><strong>no HRX0 at all</strong>, same error</td>
+<td style="text-align: right;">0 (nothing ran)</td>
+</tr>
+<tr>
+<td>TheRock nightly <code>21a66824…</code> (10.3.0a20261031)</td>
+<td><code>HSA_USE_SVM</code> unset, <code>HSA_USERPTR_FOR_PAGED_MEM=0</code></td>
+<td>server up, first completion <strong>HTTP 500</strong>, 31 fault lines</td>
+<td style="text-align: right;"><strong>+1</strong></td>
+</tr>
+<tr>
+<td>TheRock nightly <code>21a66824…</code></td>
+<td><code>HSA_USE_SVM=0 HSA_USERPTR_FOR_PAGED_MEM=0 HRX_ALLOW_NO_SVM=1</code></td>
+<td><strong>HTTP 200, 260.1 tok/s</strong></td>
+<td style="text-align: right;"><strong>0</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>So on a dev build the release-bundled libhsa cannot register HRX0 at all, and the nightly libhsa the engine
+picks page-faults in the mode above.</p>
+<p><strong>Which variable is responsible is narrower than "SVM":</strong> a four-corner table on the same 0.6B file (same binary,
+cache limit 128) shows the fault needs the two knobs <em>together</em> — libhsakmt takes the SVM save-area path only when
+pageable userptr is also disabled:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th><code>HSA_USE_SVM</code></th>
+<th><code>HSA_USERPTR_FOR_PAGED_MEM</code></th>
+<th>result</th>
+<th style="text-align: right;">new faults</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unset (1)</td>
+<td><strong>0</strong></td>
+<td>first completion fails</td>
+<td style="text-align: right;"><strong>+1</strong></td>
+</tr>
+<tr>
+<td>unset (1)</td>
+<td>unset (1) — libhsakmt's real default</td>
+<td><strong>ok</strong></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>unset (1)</td>
+<td><strong>ok</strong></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>0 (this placement)</td>
+<td><strong>ok</strong></td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table></div>
+<p>So the faulting mode is <em>SVM with pageable userptr disabled</em> — what the fleet's shell harness had been setting
+(<code>HSA_USERPTR_FOR_PAGED_MEM=0</code>, inherited from <code>612-hrx.sh</code>) — not libhsakmt's default. That makes this placement one
+of three working modes rather than the only one. It is still the mode <code>serve</code> can choose safely on a box whose
+defaults are not known to be clean, because it is the one the #315 soak covered; the true-defaults mode was clean on
+the 0.6B file and its 76 GiB measurement was still pending when this landed.</p>
+<p>Corroborating evidence from the same session: plain HIP through the same runtime is clean
+(<code>hipMalloc -&gt; H2D -&gt; memset -&gt; kernel -&gt; D2H -&gt; pinned H2D</code>, <code>HIP_PATH_OK</code>, 0 faults), <code>rocminfo</code> reports
+<code>XNACK enabled: NO</code> and <code>Coherent Host Access: FALSE</code> for <code>gfx1151</code>, and <code>test-backend-ops -o TOP_K -b HRX0</code> passes
+484/484 with the placement in place and 0 fault lines. The box's <code>cwsr_enable</code> was <code>0</code> throughout, which is why
+<code>auto</code> no longer keys off it.</p>
 <p>Measured on strixhalo (performance mode, 120 W cap), engine <code>fce3a68</code> build with the gate:</p>
 <ul>
 <li>CWSR-on boot, GLM-4.7-Flash Q4_K_M at the #315 composition (4 neighbour servers, 16 GiB ballast,
@@ -1347,13 +1465,26 @@ The rates come from AMD's
 through the kernel compiler, which places them in these layouts. The fragment sizes match the
 table: 16 f16 inputs and 4 f32 results per lane in wave64.</p>
 <h2 id="build">Build<a class="anchor" href="#build" title="Permanent link">#</a></h2>
-<pre><code class="language-bash">git submodule update --init --depth 1 third_party/hrx-system third_party/llama.cpp
-cmake -B build -G Ninja -DONEBIT_HRX=ON          # needs TheRock at /opt/rocm-therock (ONEBIT_HRX_TOOLCHAIN)
+<pre><code class="language-bash">scripts/fetch-rocm-sdk.sh                      # the pinned toolchain, into third_party/toolchain/
+git submodule update --init --depth 1 third_party/hrx-system third_party/llama.cpp
+cmake -B build -G Ninja -DONEBIT_HRX=ON          # -DONEBIT_HRX_TOOLCHAIN=&lt;dir&gt; overrides the toolchain
 cmake --build build --target onebit
 </code></pre>
 <ul>
-<li><strong>One external project.</strong> llama.cpp's ggml-hrx builds hrx-system itself
-  (<code>HRX_SOURCE_DIR</code>) with TheRock's <code>amdclang</code>.</li>
+<li>
+<p><strong>The toolchain.</strong> The build compiles with TheRock's ROCm SDK at one pinned version and one GPU
+  target, <code>config/hrx-toolchain.config</code> (engine#713): <code>scripts/fetch-rocm-sdk.sh</code> installs
+  <code>rocm[libraries,devel,device-gfx1151]</code> at that version from the nightly wheel index into
+  <code>third_party/toolchain/rocm-sdk-&lt;version&gt;-&lt;gfx&gt;</code>, and <code>cmake/hrx.cmake</code> defaults to that copy, so
+  a fresh box needs only this repository. <code>-DONEBIT_HRX_TOOLCHAIN</code> / <code>ROCM_PATH</code> still override it,
+  and an existing <code>/opt/rocm-therock</code> is used when the tree copy is absent. The device library
+  (the <code>amdgcn</code> bitcode) is read from the toolchain itself, so no <code>HIP_DEVICE_LIB_PATH</code>,
+  <code>ROCM_PATH</code> or <code>HIP_PATH</code> is needed in the environment.</p>
+</li>
+<li>
+<p><strong>One external project.</strong> llama.cpp's ggml-hrx builds hrx-system itself
+  (<code>HRX_SOURCE_DIR</code>) with TheRock's <code>amdclang</code>.</p>
+</li>
 <li><strong>HRX0 and the CPU only.</strong> <code>GGML_VULKAN</code>, <code>GGML_HIP</code> and <code>GGML_CUDA</code> are off. The targets are
   <code>llama-server</code> and <code>llama-bench</code>. With
   <code>-DONEBIT_SERVE_TEST_GGUF=&lt;gguf&gt;</code>, ctest runs <code>serve_e2e_hrx</code> and <code>serve_e2e_cpu</code>.
@@ -1367,7 +1498,7 @@ cmake --build build --target onebit
   gfx1151, so HRX then registers no device. CMake finds TheRock's
   <code>libhsa-runtime64.so.1</code> (<code>ONEBIT_HRX_LIBHSA</code>), and <code>1bit serve</code> passes it to
   llama-server as <code>IREE_HAL_AMDGPU_LIBHSA_PATH</code>, unless it is already set. Without a
-  build path it searches <code>/opt/rocm-therock</code>. To run
+  build path it searches the pinned toolchain, then <code>/opt/rocm-therock</code>. To run
   llama-server or llama-bench by hand, export that variable yourself.</li>
 </ul>
 <h3 id="private-hip-kernels">Private HIP kernels<a class="anchor" href="#private-hip-kernels" title="Permanent link">#</a></h3>

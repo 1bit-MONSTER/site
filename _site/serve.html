@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="1bit serve runs the engine behind one OpenAI-compatible API inside Lemonade: devices, model loading, strict GPU placement, --parallel, --mtp, --dflash, --laya.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-09-23">
-<meta property="article:modified_time" content="2026-10-28">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/serve.html#article", "headline": "1bit serve: the engine behind one OpenAI-compatible API", "description": "1bit serve runs the engine behind one OpenAI-compatible API inside Lemonade: devices, model loading, strict GPU placement, --parallel, --mtp, --dflash, --laya.", "url": "https://1bit.gg/serve.html", "mainEntityOfPage": "https://1bit.gg/serve.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-23", "dateModified": "2026-10-28", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/serve.html#article", "headline": "1bit serve: the engine behind one OpenAI-compatible API", "description": "1bit serve runs the engine behind one OpenAI-compatible API inside Lemonade: devices, model loading, strict GPU placement, --parallel, --mtp, --dflash, --laya.", "url": "https://1bit.gg/serve.html", "mainEntityOfPage": "https://1bit.gg/serve.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -94,6 +93,12 @@
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
 </ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
+</ul>
 </nav></details>
 <article class="docs-page prose">
 <h1 id="1bit-serve-the-engine-behind-one-openai-compatible-api"><code>1bit serve</code>: the engine behind one OpenAI-compatible API<a class="anchor" href="#1bit-serve-the-engine-behind-one-openai-compatible-api" title="Permanent link">#</a></h1>
@@ -104,8 +109,8 @@ On HRX the whole graph runs on the GPU or the model does not load: 43 of 43 conf
 2026-10-20 census had 0 nodes off HRX. <code>1bit serve</code> exposes nothing but an OpenAI-compatible API,
 so it also works on its own with any OpenAI client.</p>
 <pre><code class="language-sh">1bit serve -m &lt;model&gt; [--port 8000] [--host 127.0.0.1]
-           [--device auto|npu|hrx|hybrid|cpu|ds4] [--ctx-size N] [--alias NAME]
-           [--llama-server PATH] [--ds4 PATH] [--ssd-streaming] [--hrx-libhsa PATH]
+           [--device auto|npu|hrx|hybrid|cpu] [--ctx-size N] [--alias NAME]
+           [--llama-server PATH] [--hrx-libhsa PATH]
            [--prefill-provider PATH]      --device hybrid: NPU prefill, HRX decode (docs/hybrid.md)
            [--hrx-cwsr-placement=auto|on|off]
            [--mtp HEAD.gguf | --dflash DRAFT.gguf | --no-mtp] [--mtp-max N] [--mtp-p-min P] [--mmproj MMPROJ.gguf]
@@ -121,6 +126,13 @@ so it also works on its own with any OpenAI client.</p>
            [--strict-device | --no-strict-device] [--placement-report]
            [--print-backend | --print-backend-env]
 </code></pre>
+<blockquote>
+<p><strong><code>--device ds4</code> was removed</strong> (owner decision 2026-11-01, DwarfStar out of the tree 2026-11-02). It ran
+DwarfStar, whose ds4-server was antirez's CUDA kernels through a HIP shim plus hipBLAS, not our HIP kernels, and
+it was also the engine's only 1BP reader. <code>--device ds4</code>, <code>--ds4</code> and <code>--ssd-streaming</code> now fail with a message
+that says so; DeepSeek V4.x, GLM 5.x and Qwen3.8-Flash-Next run on <code>--device hrx</code>, and a <code>.1bp</code> package has no
+route (convert it to GGUF).</p>
+</blockquote>
 <p>One model per process:</p>
 <div class="table"><table>
 <thead>
@@ -178,7 +190,7 @@ so it also works on its own with any OpenAI client.</p>
 </table></div>
 <p>"llama-server devices" means <code>hrx</code> and <code>cpu</code>. These routes go to the llama-server
 behind the model, which is how Lemonade's llamacpp backend reaches them (the <code>onebit</code> recipe
-inherits it). On <code>npu</code> and <code>ds4</code> they answer 501.</p>
+inherits it). On <code>npu</code> they answer 501.</p>
 <p><code>1bit serve</code> has no authentication (SECURITY.md), so it refuses two kinds of request a web
 page could make with 403: on a loopback <code>--host</code>, any whose <code>Host</code> header is not a loopback
 name (<code>localhost</code>, <code>127.x.x.x</code>, <code>[::1]</code>), and on any host, a POST whose <code>Origin</code> is neither a
@@ -220,12 +232,40 @@ is the same DRAM, and MemAvailable on the CPU. A load is refused only when the n
 more than that. Two things grow after load, so they only warn:
 - the HRX graph-program cache (2-9 GiB as prompt shapes vary);
 - landing at or above 95 GiB of GTT, where engine #315's faults were seen.</p>
+<h3 id="the-gtt-ceiling-refused-not-faulted-engine-680">The GTT ceiling: refused, not faulted (engine #680)<a class="anchor" href="#the-gtt-ceiling-refused-not-faulted-engine-680" title="Permanent link">#</a></h3>
+<p>Free memory is not the only wall. On this box the device page-faulted and reset (a gfxhub fault
+plus a MODE2 reset) twice at <strong>GTT 106.5 GiB of 120</strong>, i.e. 13.5 GiB of headroom was not enough
+once the runtime's own allocations landed. So serve refuses a load whose <em>landing</em> would be above a
+ceiling, even when the free-memory test above would admit it:</p>
+<pre><code>ceiling = GTT total - reserve          reserve = 16 GiB (GGML_HRX_GTT_RESERVE_MB)   -&gt; 104 GiB of 120
+refuse  when GTT used now + the estimate &gt; ceiling
+</code></pre>
+<p>The same reserve knob is what ggml-hrx charges its own allocations against (fork PR #166), so the
+pre-launch refusal and the allocation-time backstop cannot disagree about where the wall is. A
+refused load prints the numbers and exits 3, exactly like the free-memory refusal:</p>
+<pre><code>1bit serve: Qwen3.8-27B-UD-Q4_K_XL does not fit: need 96.00 GiB (...) at ctx 262144, free 60.1 GiB
+  (GTT 60.1 of 120.0 GiB free, MemAvailable 57.7 GiB); GTT after this load would reach 116.0 GiB of
+  the 104.0 GiB ceiling (120.0 GiB total, 16.0 GiB reserve, GGML_HRX_GTT_RESERVE_MB), where engine
+  #680 faulted; free GTT or raise the reserve; free memory, lower --ctx-size, or pass --no-mem-check
+</code></pre>
+<p>Consequences worth knowing:
+- with a 120 GiB pool and the default reserve, <strong>at most 104 GiB of GTT is ever planned</strong>, so the</p>
+<blockquote>
+<p>= 95 GiB warning now only fires in the 95-104 GiB band (and the graph-program-cache warning only
+  when MemAvailable is the binding limit, which under the ceiling it usually is not);
+- a box already holding more than the ceiling of GTT (another serve, another agent) refuses even a
+  small load - that is the intended behaviour: the wall is the wall, and <code>GGML_HRX_GTT_RESERVE_MB</code>
+  or freeing the other process is the way out;
+- <code>--no-mem-check</code> (or <code>ONEBIT_MEM_CHECK=0</code>) still skips all of it, ceiling included.</p>
+</blockquote>
 <ul>
 <li><code>--no-mem-check</code> (or <code>ONEBIT_MEM_CHECK=0</code>) skips the check.</li>
 <li><code>--mem-check</code> prints the estimate and exits: 0 when it fits, 3 when it does not.</li>
 <li>A refused load exits with status 3 too.</li>
 </ul>
-<p>ctest <code>mem_admit</code> checks the KV and state sizes against HRX0 server logs:</p>
+<p>ctest <code>mem_admit</code> checks the KV and state sizes against HRX0 server logs, and the ceiling arithmetic
+(120 GiB total - 16 GiB reserve = 104 GiB; a load landing at 105 GiB is refused while 60 GiB is still
+free; a pool smaller than the reserve refuses at any size):</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -265,11 +305,11 @@ MiniCPM4-8B, at 2K-262K context.</p>
 <h2 id="when-a-backend-hangs">When a backend hangs<a class="anchor" href="#when-a-backend-hangs" title="Permanent link">#</a></h2>
 <p>A hung GPU dispatch (a wedged HRX queue, a #315 fault) stops llama-server's main loop, while its
 HTTP thread keeps answering <code>/health</code> with 200. So <code>1bit serve</code> checks two things itself, for the
-backends it runs as child processes (<code>hrx</code>, <code>cpu</code>, <code>ds4</code>; the in-process NPU route
+backends it runs as child processes (<code>hrx</code>, <code>cpu</code>; the in-process NPU route
 is not covered):</p>
 <ul>
 <li><strong><code>/health</code> follows the backend.</strong> Once the model is loaded, serve asks each backend's own
-  health route (<code>/health</code>, or <code>/v1/models</code> for DwarfStar) and answers 503 with the reason when
+  health route (<code>/health</code>, or <code>/v1/models</code> for a backend without <code>/slots</code>) and answers 503 with the reason when
   one has exited, does not answer within 1.5 s (Lemonade's probe gives up at 2 s), or the watchdog below has fired. Lemonade's
   BackendWatchdog probes this route.</li>
 <li><strong>A progress watchdog.</strong> Every chat, completion and Responses request serve forwards is
@@ -308,7 +348,7 @@ the restart policy; serve builds none):
   watchdog exit is what does, within <code>--watchdog</code> seconds plus Lemonade's 5 s poll.
 - <code>LEMONADE_BACKEND_WATCHDOG_*</code> tune Lemonade's side. <code>onebit_args</code> in a recipe passes
   <code>--watchdog</code> to serve.</p>
-<p>A backend with no <code>/slots</code> (DwarfStar, or a llama-server started with <code>--no-slots</code>)
+<p>A backend with no <code>/slots</code> (a llama-server started with <code>--no-slots</code>)
 shows progress only by sending bytes, so on those only streamed requests are judged: a long
 non-streamed answer and a hang look the same from outside. <code>tests/watchdog_serve.sh</code> (ctest
 <code>watchdog_serve</code>, CI included) checks all of this against <code>tests/fake_backend.py</code>, whose
@@ -319,7 +359,7 @@ non-streamed answer and a hang look the same from outside. <code>tests/watchdog_
 - CPU and memory use;
 - GTT plus VRAM, as <code>lemonade_vram_used_gb</code>.</p>
 <p>So <code>GET /metrics</code> on serve adds only what the engine sees and Lemonade cannot, in Prometheus
-text (format 0.0.4), on every device serve runs as a child process (<code>hrx</code>, <code>cpu</code>, <code>ds4</code>).
+text (format 0.0.4), on every device serve runs as a child process (<code>hrx</code>, <code>cpu</code>).
 The in-process NPU route has none yet. serve's own series come first. The backend's own
 <code>/metrics</code> follows when it answers one: llama-server is started with <code>--metrics</code>, so its
 <code>llamacpp:*</code> series follow.</p>
@@ -418,7 +458,7 @@ two processes (lemond, llama-server) instead of two hops and three.</p>
 </tr>
 <tr>
 <td>5</td>
-<td>the route needs serve in the request path: an NPU model directory, <code>--device npu</code>, <code>hybrid</code> or <code>ds4</code>, <code>--pm</code>, <code>--laya</code>, <code>--embed</code> or <code>--rerank</code></td>
+<td>the route needs serve in the request path: an NPU model directory, <code>--device npu</code>, <code>hybrid</code>, <code>--pm</code>, <code>--laya</code>, <code>--embed</code> or <code>--rerank</code></td>
 <td>runs <code>1bit serve</code> as before</td>
 </tr>
 </tbody>
@@ -601,11 +641,6 @@ without a GPU.</p>
 <td><code>hybrid</code></td>
 <td>the HRX llama-server decodes, one slot, from a KV cache a prefill provider computed for the prompt (the NPU engine, named by <code>--prefill-provider</code> / <code>ONEBIT_HYBRID_PREFILL</code>) and serve restored into the slot; without a provider, HRX prefills too (<a href="hybrid.html">Hybrid</a>)</td>
 </tr>
-<tr>
-<td>DwarfStar <code>.gguf</code> (DeepSeek V4 Flash, GLM 5.x, Qwen3.8-Flash-Next in its own layouts)</td>
-<td><code>ds4</code></td>
-<td>this build's DwarfStar <code>ds4-server</code> (HIP; <code>--ssd-streaming</code> streams routed experts; docs/dwarfstar.md)</td>
-</tr>
 </tbody>
 </table></div>
 <p>What <code>--device auto</code> does with a <code>.gguf</code> that HRX has no route for. Until RFC #213 stage 3 these
@@ -769,8 +804,8 @@ a conversation pays about 0.5 s for the decision.</p>
 PM4-emulation probe, and then HRX registers no device. <code>serve</code> sets
 <code>IREE_HAL_AMDGPU_LIBHSA_PATH</code> itself unless you did. It uses <code>--hrx-libhsa</code>,
 else the build's copy, else the first one under <code>/opt/rocm-therock</code>.</p>
-<p>The child binaries default to this build's (<code>-DONEBIT_HRX</code>, <code>-DONEBIT_DS4</code>),
-then <code>$ONEBIT_LLAMA_SERVER</code> / <code>$ONEBIT_DS4</code>, then <code>llama-server</code> / <code>ds4-server</code> on PATH.</p>
+<p>The child binaries default to this build's (<code>-DONEBIT_HRX</code>), then <code>$ONEBIT_LLAMA_SERVER</code>,
+then <code>llama-server</code> on PATH.</p>
 <p>Stopping <code>serve</code> (SIGTERM, SIGINT) sends each backend SIGTERM and waits
 <code>ONEBIT_BACKEND_STOP_GRACE_S</code> seconds (default 30) before SIGKILL, with a warning line
 first; a backend that already exited is reaped where <code>serve</code> noticed, so its stop
@@ -795,7 +830,7 @@ URL), which llama.cpp's mtmd encodes and places in the prompt. The mmproj comes 
 <code>convert_hf_to_gguf.py --mmproj</code> on the same checkpoint as the model. With it, llama-server runs
 with <code>-b 4096 -ub 4096</code>: an image is decoded as one ubatch, which models that attend to an image
 bidirectionally (ZAYA1-VL, Gemma 3) need. Zyphra's Zamba2-VL and ZAYA1-VL-8B were checked on the
-removed Vulkan build (<a href="https://github.com/1bit-MONSTER/engine/blob/0baf286/docs/vulkan.md">vulkan.md at 0baf286</a>). The NPU and DwarfStar routes take no <code>--mmproj</code>.</p>
+removed Vulkan build (<a href="https://github.com/1bit-MONSTER/engine/blob/0baf286/docs/vulkan.md">vulkan.md at 0baf286</a>). The NPU route takes no <code>--mmproj</code>.</p>
 <h2 id="greedy-requests-temperature-0">Greedy requests (<code>temperature 0</code>)<a class="anchor" href="#greedy-requests-temperature-0" title="Permanent link">#</a></h2>
 <p>A request with <code>temperature: 0</code> (or any negative temperature) leaves nothing to sample: serve forwards
 it with <code>top_k: 1</code>, so llama-server takes the argmax and skips the top-p / min-p passes over the whole

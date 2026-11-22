@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="The engine&#x27;s README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-09-22">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/overview.html#article", "headline": "1bit engine: local LLMs on the AMD Ryzen AI MAX+ 395", "description": "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.", "url": "https://1bit.gg/overview.html", "mainEntityOfPage": "https://1bit.gg/overview.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-22", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "about": {"@id": "https://1bit.gg/#software"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/overview.html#article", "headline": "1bit engine: local LLMs on the AMD Ryzen AI MAX+ 395", "description": "The engine's README: HRX with our HIP kernels on the Radeon 8060S iGPU, our NPU runtime on the XDNA 2 NPU, the hybrid route, and how it installs via Lemonade.", "url": "https://1bit.gg/overview.html", "mainEntityOfPage": "https://1bit.gg/overview.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}, "about": {"@id": "https://1bit.gg/#software"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -94,6 +93,12 @@
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
 </ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
+</ul>
 </nav></details>
 <article class="docs-page prose">
 <h1 id="1bit-engine-local-llms-on-the-amd-ryzen-ai-max-395">1bit engine: local LLMs on the AMD Ryzen AI MAX+ 395<a class="anchor" href="#1bit-engine-local-llms-on-the-amd-ryzen-ai-max-395" title="Permanent link">#</a></h1>
@@ -102,8 +107,8 @@
 <a href="https://github.com/1bit-MONSTER/engine/releases"><img alt="Releases" src="https://img.shields.io/badge/releases-GitHub-24292f" /></a>
 <a href="https://1bit.gg/"><img alt="Documentation: 1bit.gg" src="https://img.shields.io/badge/docs-1bit.gg-1779e1" /></a>
 <a href="https://discord.gg/fa5m4Vawpa"><img alt="Discord" src="https://img.shields.io/badge/chat-Discord-5865F2" /></a></p>
-<p>Boot a USB stick, and your Strix Halo machine serves local LLMs on its GPU and NPU through AMD's
-<a href="https://github.com/lemonade-sdk/lemonade">Lemonade Server</a>. That is the whole setup.</p>
+<p>Boot a USB stick, and your AMD Ryzen AI MAX+ 395 (Strix Halo) machine serves local LLMs on its GPU and NPU,
+on Linux, through AMD's <a href="https://github.com/lemonade-sdk/lemonade">Lemonade Server</a>. That is the whole setup.</p>
 <h2 id="get-started">Get started<a class="anchor" href="#get-started" title="Permanent link">#</a></h2>
 <ol>
 <li>Download <code>1bit-os-&lt;version&gt;.img.zst</code> from the <a href="https://github.com/1bit-MONSTER/engine/releases">releases page</a>.</li>
@@ -113,7 +118,7 @@
 </ol>
 <p>Already running Lemonade on Ubuntu? The <code>lemonade-onebit</code> package from the same releases page adds the engine as a Lemonade backend; nothing else changes (<a href="lemonade.html">Lemonade</a>).</p>
 <h2 id="what-it-is">What it is<a class="anchor" href="#what-it-is" title="Permanent link">#</a></h2>
-<p>The 1bit engine is Lemonade's <code>onebit</code> backend for the AMD Ryzen AI MAX+ 395 (Strix Halo). It runs the Radeon 8060S iGPU through HRX with our own HIP kernels, and the XDNA 2 NPU through our own NPU runtime, behind the OpenAI-compatible API Lemonade already gives you. Every model is checked on the hardware before it ships; the models and their measured numbers are one page: <a href="models.html">Models measured</a>.</p>
+<p>One binary to rule them all. The 1bit engine is model agnostic: any Hugging Face architecture, any GGUF quantization, Ryzen AI NPU packs and ONNX graphs, served by one Lemonade backend on the AMD Ryzen AI MAX+ 395 (Strix Halo). It runs the Radeon 8060S iGPU through HRX with our own HIP kernels, and the XDNA 2 NPU through our own NPU runtime, behind the OpenAI-compatible API Lemonade already gives you. Every model is checked on the hardware before it ships; the models and their measured numbers are one page: <a href="models.html">Models measured</a>.</p>
 <h2 id="milestones">Milestones<a class="anchor" href="#milestones" title="Permanent link">#</a></h2>
 <div class="table"><table>
 <thead>
@@ -147,12 +152,17 @@
 <td>2026-10-30</td>
 <td>The HRX pin carries the DeepSeek-V4.1 port; ONNX Runtime runs in-process with our own execution provider on the NPU; the NPU and the GPU are measured running at the same time (<a href="https://github.com/1bit-MONSTER/engine/pull/672">#672</a>, <a href="https://github.com/1bit-MONSTER/engine/pull/647">#647</a>, <a href="hybrid.html">Hybrid</a>)</td>
 </tr>
+<tr>
+<td>2026-11-01</td>
+<td><strong>v2026.44 is a draft</strong>: candidate 19 is gated in software (1959/1959 kernel ops, NPU 82.03 tok/s, <code>VMTEST</code> pass through install and installed-disk boot, <code>VMTEST-RELEASE</code> 10 pass / 9 skip / 0 fail) but has <strong>not</strong> been booted or installed on hardware; candidate 20 takes the full gate, hardware boot and install included, before it is published (<a href="releases.html">Releases</a>)</td>
+</tr>
 </tbody>
 </table></div>
 <p>The release goes out when every item on the release checklist is done (<a href="releases.html">Releases</a>); the weekly Lemonade pin moves with Lemonade's releases.</p>
 <h2 id="documentation">Documentation<a class="anchor" href="#documentation" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="https://1bit.gg/">1bit.gg</a>: the docs site, built from this repository's <code>docs/</code>.</li>
+<li><a href="https://1bit.gg/">1bit.gg</a>: the docs site, built from this repository's <code>docs/</code>; <a href="https://1bit.gg/blog.html">the blog</a> is the build log.</li>
+<li><a href="https://1bit.gg/hrx.html">HRX on the Radeon 8060S</a> and <a href="https://1bit.gg/npu.html">the NPU engine</a>: the two device routes, on the site.</li>
 <li><a href="architecture.html">How the engine is built</a>: how the engine is built, what runs where, the hardware gate, the kernel, the direction.</li>
 <li><a href="serve.html">1bit serve</a>: <code>1bit serve</code> and its options.</li>
 <li><a href="https://github.com/1bit-MONSTER/engine/wiki">Measured results</a>: every number with how it was taken.</li>
@@ -256,7 +266,7 @@ This engine is what following those breadcrumbs built.</p>
 <tr>
 <td>11</td>
 <td><a href="https://github.com/antirez/ds4">antirez/ds4</a> (DwarfStar)</td>
-<td>DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next on its own kernels (ROCm on Strix Halo, CUDA, Metal)</td>
+<td><strong>removed from the engine</strong> (owner 2026-11-01, out of the tree 2026-11-02): antirez's CUDA kernels through a HIP shim plus hipBLAS are not our HIP kernels, and <code>--device ds4</code> now says it is gone. The fork <a href="https://github.com/1bit-MONSTER/ds4">1bit-MONSTER/ds4</a> stays in the open as the reference for that work</td>
 <td>MIT</td>
 </tr>
 </tbody>

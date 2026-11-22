@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Determinism and cross-route log-prob agreement · 1bit engine</title>
+<meta name="description" content="Two routes serving the same weights are not the same computation. This page states exactly what 1bit serve can promise about repetition and about agreement…">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="Determinism and cross-route log-prob agreement · 1bit engine">
+<meta property="og:description" content="Two routes serving the same weights are not the same computation. This page states exactly what 1bit serve can promise about repetition and about agreement…">
+<link rel="canonical" href="https://1bit.gg/determinism.html">
+<meta property="og:url" content="https://1bit.gg/determinism.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Determinism and cross-route log-prob agreement · 1bit engine">
+<meta name="twitter:description" content="Two routes serving the same weights are not the same computation. This page states exactly what 1bit serve can promise about repetition and about agreement…">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/determinism.html#article", "headline": "Determinism and cross-route log-prob agreement", "description": "Two routes serving the same weights are not the same computation. This page states exactly what 1bit serve can promise about repetition and about agreement…", "url": "https://1bit.gg/determinism.html", "mainEntityOfPage": "https://1bit.gg/determinism.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="os-v3.html">1bit OS</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html" aria-current="page">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="determinism-and-cross-route-log-prob-agreement">Determinism and cross-route log-prob agreement<a class="anchor" href="#determinism-and-cross-route-log-prob-agreement" title="Permanent link">#</a></h1>
+<p>Two routes serving the same weights are not the same computation. This page states exactly what
+<code>1bit serve</code> can promise about repetition and about agreement between devices today, with the
+measured numbers behind each claim and the command to reproduce them. <code>tools/logprob_agree.py</code>
+produces every number below.</p>
+<h2 id="the-contract-we-can-promise-today">The contract we can promise today<a class="anchor" href="#the-contract-we-can-promise-today" title="Permanent link">#</a></h2>
+<ol>
+<li><strong>A repeated identical request is bit-identical on one route — while that request is served
+   alone.</strong> Send the same prompt, greedy, with <code>cache_prompt</code> false, and every generated token's
+   log-probability has the same float32 bits. Holds on <code>cpu</code> and <code>hrx</code>.</li>
+<li><strong>The same request served concurrently with others is not bit-identical, and this is the
+   default configuration</strong> (<code>--parallel 4</code>). The log-probabilities a client reads depend on how many
+   sequences happened to decode with it. <code>--parallel 1</code> restores reproducibility. This is engine
+   issue <a href="https://github.com/1bit-MONSTER/engine/issues/751">#751</a> and is the decode-batch sibling
+   of the prefill case already documented in the <code>--precise</code> section of <a href="serve.html">1bit serve</a>;
+   <code>--precise</code> does not address it, because it only forces a re-prefill.</li>
+<li><strong>Two routes are not bit-identical, and today are not close.</strong> Nothing pins a reduction order
+   across a CPU ggml matmul and an HRX kernel, so log-probabilities from different devices differ
+   in the third significant figure at the median and by up to ~0.4 nats at the tail. Greedy
+   continuations diverge on a substantial fraction of prompts.</li>
+<li><strong>All three routes are bitwise repeatable run-to-run</strong>, and the NPU can be <em>compared</em> to the other
+   two — but only with thinking on and tokens matched by text, and its distance from both carries a
+   weight requantisation on top of the arithmetic. Its numbers are therefore not the arithmetic-only
+   distance that <code>cpu</code> vs <code>hrx</code> is. Method and measurements below.</li>
+</ol>
+<p>Promises 3 and 4 are measurements, not bug reports: the routes genuinely compute different
+floating-point sums over different quantised weights. That is the same class of problem that
+motivated a fixed reduction order in dedicated deterministic-operator stacks, and it is why a
+meaningful bitwise gate can only be asserted <strong>within</strong> one route, at a fixed batch composition.</p>
+<h2 id="measured">Measured<a class="anchor" href="#measured" title="Permanent link">#</a></h2>
+<p>Qwen3-0.6B Q4_K_M, 8 prompts, 64 tokens each, greedy (<code>temperature 0</code>, <code>top_k 1</code>), fixed seed,
+<code>logprobs=true</code>, <code>top_logprobs=5</code>, <code>cache_prompt=false</code>, 5 repeats per prompt, thinking off except
+where a table says otherwise. Binary <code>lemonade-onebit-rc-2026-10-31c</code> (c18) for the thinking-off
+measurements; the thinking-on ones below ran on a build of <code>main</code> at <code>1b3def2</code>, which still emits NPU
+log-probabilities for think tokens.</p>
+<h3 id="repetition-per-route-requests-served-one-at-a-time">Repetition, per route (requests served one at a time)<a class="anchor" href="#repetition-per-route-requests-served-one-at-a-time" title="Permanent link">#</a></h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Route</th>
+<th>run-to-run</th>
+<th>max |Δlogp|</th>
+<th>tokens</th>
+<th>text stable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cpu</code></td>
+<td>bitwise-identical (5 repeats)</td>
+<td>0</td>
+<td>128</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>hrx</code></td>
+<td>bitwise-identical (5 repeats)</td>
+<td>0</td>
+<td>122</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>npu</code> (forward path)</td>
+<td>bitwise-identical (3 repeats × 16 tokens)</td>
+<td>0</td>
+<td>128</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>npu</code>, thinking on</td>
+<td>bitwise-identical (2 repeats × 24 tokens)</td>
+<td>0</td>
+<td>192</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>npu</code>, thinking on, 64 tokens</td>
+<td>bitwise-identical (2 repeats × 64 tokens)</td>
+<td>0</td>
+<td>512</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table></div>
+<p>All three routes are bitwise repeatable, at both thinking settings. That is the only property all three
+share.</p>
+<h3 id="agreement-cpu-vs-hrx">Agreement, <code>cpu</code> vs <code>hrx</code><a class="anchor" href="#agreement-cpu-vs-hrx" title="Permanent link">#</a></h3>
+<p>Over 122 aligned positions, 88 of which carry the same token id:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>metric</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token-id match rate</td>
+<td>0.721</td>
+</tr>
+<tr>
+<td>top-1 agreement rate</td>
+<td>0.721</td>
+</tr>
+<tr>
+<td>exact-bit match rate</td>
+<td>0.080</td>
+</tr>
+<tr>
+<td>max |Δlogp|</td>
+<td>3.98e-01</td>
+</tr>
+<tr>
+<td>mean |Δlogp|</td>
+<td>4.03e-02</td>
+</tr>
+<tr>
+<td>median |Δlogp|</td>
+<td>1.05e-03</td>
+</tr>
+<tr>
+<td>p90 |Δlogp|</td>
+<td>1.37e-01</td>
+</tr>
+</tbody>
+</table></div>
+<p>The disagreement is in the distribution, not in how a tie was broken: at the largest deltas the
+<em>same</em> token is top-1 on both routes while its log-probability differs — token 220 in prompt 1
+position 7 at <code>-0.2097</code> (cpu) vs <code>-0.6077</code> (hrx), with the whole top-5 reordered. The
+first-divergence top-2 margins were 0.33/0.11, 0.014/0.32, 0.041/0.26 and 0.29/0.008 (cpu/hrx) —
+mostly not near-ties.</p>
+<p>For scale against a published gate: a dedicated deterministic-operator stack (RL-Kernel) uses
+<code>max_abs_dlogp &lt;= 0.06</code> and a proposed <code>mean_abs_dlogp &lt;= 0.005</code>, measured for one kernel across
+tensor-parallel layouts on one GPU. Our cross-device max is 6.6× their max gate and our mean is 8×
+their proposed mean gate.</p>
+<h3 id="concurrency-changes-the-numbers-parallel-4-the-default">Concurrency changes the numbers (<code>--parallel 4</code>, the default)<a class="anchor" href="#concurrency-changes-the-numbers-parallel-4-the-default" title="Permanent link">#</a></h3>
+<p>Counts are token-id mismatches and log-prob bit mismatches on positions where the ids agree, out of
+48 generated tokens. Probe: <em>"Explain in one paragraph why the sky appears blue."</em></p>
+<p><code>cpu</code>, default <code>n_slots = 4</code>:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>comparison</th>
+<th>ids</th>
+<th>logprob bits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alone vs alone (sequential)</td>
+<td>0/48</td>
+<td>0/48</td>
+</tr>
+<tr>
+<td>alone vs after 3 other prompts ran sequentially</td>
+<td>0/48</td>
+<td>0/48</td>
+</tr>
+<tr>
+<td>alone vs concurrent with 3 <em>different</em> prompts</td>
+<td>21/48</td>
+<td>27/48</td>
+</tr>
+<tr>
+<td>4 identical prompts concurrent, copy0 vs copy1</td>
+<td>43/48</td>
+<td>5/48</td>
+</tr>
+</tbody>
+</table></div>
+<p>First divergence with 3 other prompts in flight is at <strong>token 0</strong> on the <em>same</em> token id:
+<code>-0.000222</code> alone vs <code>-0.000252</code> batched.</p>
+<p><code>cpu</code>, <code>--parallel 1</code>, the same concurrent test: <strong>0/48 and 0/48</strong> for every copy, against the
+alone run and against each other. The two servers agree with each other on the serial prompt, so
+batch width, not the build, is the variable.</p>
+<p><code>hrx</code>, default <code>n_slots = 4</code>: copy0 vs alone <code>4/48</code> ids but <strong>44/48</strong> log-prob bits, i.e. the
+reported numbers move even where the tokens do not.</p>
+<h3 id="what-the-hrx-width-gate-is-by-name">What the <code>hrx</code> width gate is, by name<a class="anchor" href="#what-the-hrx-width-gate-is-by-name" title="Permanent link">#</a></h3>
+<p><code>GGML_HRX_LOG_DISPATCH=1</code> prints each dispatch registration the first time it matches
+(<code>dispatch_registry/dispatch-registry.cpp</code>), so the set of registrations a serve logs is the set of
+kernels its graphs actually ran. Keying that log on the root node's shape as well — a throwaway local
+patch, not proposed for merge — separates the widths, because a <em>solo</em> request also prefills at width</p>
+<blockquote>
+<ol>
+<li>One <code>hrx</code> serve, Qwen3-0.6B, 48-token probe at <code>--parallel 4</code>, 26 registrations, and the decode
+step splits into two disjoint sets:</li>
+</ol>
+</blockquote>
+<div class="table"><table>
+<thead>
+<tr>
+<th>decode width</th>
+<th>registrations seen only at that width</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 (solo, and any sequential history)</td>
+<td><code>hip.qkv_rope</code>, <code>kquant.mul_mat.decode_f32</code>, <code>hip.dense_kquant_swiglu</code>, <code>hip.gemv_add_norm</code>, <code>common.mul_mat.f32_f32_decode</code></td>
+</tr>
+<tr>
+<td>2 (concurrent)</td>
+<td><code>hip.kquant_tokens.mm</code>, <code>hip.kquant_tokens.mm_add</code>, <code>hip.kquant_tokens.swiglu</code>, <code>common.rmsnorm_binary_f32</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Seventeen more registrations match at both widths, including the attention kernel
+(<code>common.flash_attention_decode_split_next_q8</code>): on <code>hrx</code>, unlike on <code>cpu</code>, attention is <em>not</em> where
+the width dependence comes from. What changes is the <strong>fusion boundaries</strong>. The residual add and
+RMSNorm are one kernel at width 1 (<code>hip.gemv_add_norm</code>) and two dispatches at width 2
+(<code>hip.kquant_tokens.mm_add</code> + <code>common.rmsnorm_binary_f32</code>); gate/up/SwiGLU is
+<code>hip.dense_kquant_swiglu</code> versus <code>hip.kquant_tokens.swiglu</code>; the K-quant matmul is the per-token
+decode family versus the <code>decode_tokens</code> family. So the width-2 graph is not the width-1 graph
+widened, it is a differently fused graph.</p>
+<p><strong>No single switch restores width invariance on <code>hrx</code>.</strong> Six <code>GGML_HRX_DISABLE_DISPATCH=</code> arms were
+run, each verified to have taken effect by the changed registration set: disabling the width-2
+token-matmul family, the width-2 separate norm, the width-1 fused add+norm, and all four width-1
+fusions together each still left the width-2 numbers displaced from the solo ones — max |Δlogp|
+0.045-0.132 nats in every arm, against 0.092 for the unmodified server. Forcing both widths onto a
+single kernel set is not expressible at all: <code>hip.dense_kquant_swiglu</code> has no fallback, and with it
+disabled <code>GGML_HRX_STRICT=1</code> refuses the graph (<code>ffn_gate-27</code> <code>MUL_MAT f32 ne=[3072,1,1,1]</code> not placed
+on HRX, 2 of 986 nodes off HRX). Disabling the width-1 fused add+norm alone moves the <em>solo</em> numbers
+by 0.121 nats — as much as the width switch itself — so these fused kernels each reassociate a sum
+rather than being interchangeable extras. Contrast <code>cpu</code>, where one flag (<code>-DGGML_CPU_REPACK=OFF</code>)
+removes the width dependence entirely: on <code>hrx</code> the reproducible configuration is <code>--parallel 1</code>, and
+there is no equivalent env switch.</p>
+<h3 id="npu-repeatable-and-comparable-with-two-adjustments">NPU: repeatable, and comparable with two adjustments<a class="anchor" href="#npu-repeatable-and-comparable-with-two-adjustments" title="Permanent link">#</a></h3>
+<p>The NPU route is <strong>bitwise repeatable</strong>: 8 prompts × 24 tokens × 2 repeats (192 tokens), <code>max |Δlogp| = 0</code>,
+0 non-float32 values, text stable — as well as the earlier 8 × 16 × 3 (128 tokens) run on the same build.
+It stays bitwise repeatable at the other routes' budget too: 8 prompts × <strong>64</strong> tokens × 2 repeats
+(512 tokens), <code>max |Δlogp| = 0</code>, 0 non-float32 values, text stable.</p>
+<p>The extra cost is time, not correctness. The per-op forward path measures ~0.5 s/token here, so the same
+8 × 64 × 2 matrix took <strong>586 s of device time in one NPU claim</strong> (against 34 s for <code>cpu</code> + <code>hrx</code> under one
+GPU claim). Five repeats — what the <code>cpu</code> and <code>hrx</code> columns use — would be ~25 min of the array, so the NPU
+column is 2 repeats at every budget.</p>
+<p>It <strong>can</strong> join the agreement comparison — the earlier version of this page said it could not — with two
+adjustments, both of which are flags on the tool rather than changes to the engine:</p>
+<ol>
+<li><strong>Every route runs with thinking on</strong> (<code>--thinking on</code>), which is how the tables below were measured.
+   That was a <em>requirement</em> until #864 fixed issue
+   <a href="https://github.com/1bit-MONSTER/engine/issues/832">#832</a>: the NPU forward path accepted
+   <code>chat_template_kwargs.enable_thinking=false</code> and dropped it, so its stream always opened <code>&lt;think&gt;</code> while
+   the llama-server routes honoured the kwarg, and two routes run with it set diverged at position 0 for
+   template reasons — which looks exactly like a numerical disagreement. With #864 the NPU path honours it
+   (<code>app/npu_chatml.h</code>), so <code>--thinking off</code> now works on every route; it has not been re-measured that
+   way, and the numbers below are the thinking-on ones.</li>
+<li><strong>Match tokens by text, not by id</strong> (<code>--match-by text</code>). The NPU reports <code>token</code> and <code>logprob</code> but no
+   <code>id</code>, in <code>logprobs.content</code> and in <code>top_logprobs</code> alike, so an id-keyed comparison between it and
+   <code>cpu</code>/<code>hrx</code> matches nothing at all.</li>
+</ol>
+<p><code>message.content</code> being empty on that path does not matter: the comparison reads <code>logprobs.content</code>, which
+is populated. And the log-probabilities have to come from a build whose NPU path emits them (see
+<a href="#routes-and-logprobs">Routes and logprobs</a>). One build detail matters here: <code>44d849d</code> onward emits
+entries for <strong>content</strong> tokens only, so a thinking reply's <code>logprobs.content</code> is empty there: measure
+with a build before <code>44d849d</code>, or with <code>--thinking off</code> on a build carrying #864 (the #832 fix).</p>
+<p>Qwen3-0.6B, 8 prompts, greedy, thinking <strong>on</strong>, 2 repeats (NPU) / 5 repeats (cpu, hrx).
+One control first: the <code>cpu</code> route was measured in <strong>two separate server runs</strong>, and the two agree
+<strong>exactly, over both budgets</strong> — 192/192 positions at 24 tokens and <strong>512/512 at 64 tokens</strong>, exact bits,
+<code>max |Δlogp| = 0</code> — so comparing routes across runs (necessary here: the GPU and NPU claims are held
+separately) does not manufacture or hide a difference.</p>
+<p><strong>At 64 tokens, the same budget the <code>cpu</code>/<code>hrx</code> table above uses:</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>pair</th>
+<th>token match</th>
+<th>top-1</th>
+<th>exact-bit match</th>
+<th>max |Δlogp|</th>
+<th>mean |Δlogp|</th>
+<th>prompts diverging</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cpu</code> vs <code>hrx</code></td>
+<td>0.766</td>
+<td>0.766</td>
+<td>0.031</td>
+<td>6.31e-01</td>
+<td>4.62e-02</td>
+<td>7 of 8</td>
+</tr>
+<tr>
+<td><code>cpu</code> vs <code>npu</code></td>
+<td>0.264</td>
+<td>0.264</td>
+<td>0.000</td>
+<td>6.71e-01</td>
+<td>5.51e-02</td>
+<td>8 of 8</td>
+</tr>
+<tr>
+<td><code>hrx</code> vs <code>npu</code></td>
+<td>0.266</td>
+<td>0.266</td>
+<td>0.000</td>
+<td>6.55e-01</td>
+<td>5.19e-02</td>
+<td>8 of 8</td>
+</tr>
+</tbody>
+</table></div>
+<p>(392 of the 512 positions carry the same token on <code>cpu</code>/<code>hrx</code>, 135 and 136 on the NPU pairs; deltas are
+over the common positions only.)</p>
+<p><strong>At 24 tokens</strong>, for the shape of the same three pairs over a shorter stream:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>pair</th>
+<th>token match</th>
+<th>top-1</th>
+<th>exact-bit match</th>
+<th>max |Δlogp|</th>
+<th>mean |Δlogp|</th>
+<th>prompts diverging</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cpu</code> vs <code>hrx</code></td>
+<td>0.958</td>
+<td>0.958</td>
+<td>0.060</td>
+<td>6.25e-01</td>
+<td>2.83e-02</td>
+<td>1 of 8</td>
+</tr>
+<tr>
+<td><code>cpu</code> vs <code>npu</code></td>
+<td>0.641</td>
+<td>0.641</td>
+<td>0.000</td>
+<td>6.71e-01</td>
+<td>4.66e-02</td>
+<td>7 of 8</td>
+</tr>
+<tr>
+<td><code>hrx</code> vs <code>npu</code></td>
+<td>0.641</td>
+<td>0.641</td>
+<td>0.000</td>
+<td>6.55e-01</td>
+<td>4.21e-02</td>
+<td>7 of 8</td>
+</tr>
+</tbody>
+</table></div>
+<p>(123 of the 192 positions carry the same token text on the NPU pairs, 184 on <code>cpu</code>/<code>hrx</code>.)</p>
+<p><strong>The NPU is roughly equidistant from both — and that distance is not arithmetic-only.</strong> It matches <code>cpu</code>
+and <code>hrx</code> at the same rate, with the same deltas (0.641 and 4.2-4.7e-02 mean at 24 tokens; 0.26 and
+5.2-5.5e-02 at 64), and it shares <strong>no exact bits with either</strong> (0.000, against 0.031-0.060 for
+<code>cpu</code>/<code>hrx</code>). Its <em>distance</em> from <code>cpu</code> relative to <code>hrx</code>'s narrows as the stream lengthens — <strong>1.6× at 24
+tokens, 1.2× at 64</strong> — because a longer stream diverges more, which raises the <code>cpu</code>/<code>hrx</code> delta as well as
+the NPU's; the ordering (NPU furthest, <code>cpu</code>/<code>hrx</code> closest) is stable at both budgets and the exact-bit
+split is not budget-dependent. A Q4NX weight
+is a q4_1 tile (bf16 scale and zero per 32 columns) requantised from Q4_K, so the NPU number contains a
+<strong>weight change plus</strong> kernel arithmetic and is <em>not</em> the same quantity as <code>cpu</code> vs <code>hrx</code>. Quote it as
+"NPU pack vs GGUF" or not at all.</p>
+<p>What can be promised today, then: repetition on all three routes, and a cross-route agreement number — not
+an agreement threshold. No pair is bitwise, and no pair is within RL-Kernel's <code>max_abs_dlogp &lt;= 0.06</code> gate.</p>
+<h2 id="routes-and-logprobs">Routes and logprobs<a class="anchor" href="#routes-and-logprobs" title="Permanent link">#</a></h2>
+<p><code>logprobs</code> / <code>top_logprobs</code> on <code>/v1/chat/completions</code> are available on the <code>hrx</code> and <code>cpu</code> routes
+(llama-server) and, on a build that has them, on the NPU forward path:</p>
+<ul>
+<li>A Q4NX <strong>model directory</strong> served with <code>--device npu</code> takes the in-process <code>unified</code> path
+  (<code>app/serve.cpp</code> <code>run_unified</code>), which does not build log-probabilities. The reply is correct but
+  carries no <code>logprobs</code> key even when asked. Issue
+  <a href="https://github.com/1bit-MONSTER/engine/issues/651">#651</a> is the NPU logprobs item; the
+  implementation is on the <code>forward-serve</code> path only, so <code>--device npu</code> with a directory is the
+  wrong route to measure on.</li>
+<li>The NPU log-probabilities live in <code>app/forward_serve.cpp</code> + <code>app/npu_sampling.h</code>. Reach that path
+  with <code>1bit forward-serve -m &lt;dir&gt;/model.q4nx --kernels &lt;dir&gt;</code>, which needs a directory of
+  <code>full_i8_*.elf</code> designs — a shipped dx kernel directory (<code>npu/kernels/&lt;H&gt;x&lt;IM&gt;x&lt;NH&gt;x&lt;NKV&gt;/</code> of
+  <code>layer*.elf</code>) does not contain them. A release binary older than that change has no NPU logprobs
+  anywhere (<code>strings &lt;bin&gt; | grep top_logprobs</code> is the check).</li>
+<li><code>chat_template_kwargs.enable_thinking=false</code> is honoured by every route, the NPU forward path
+  included since #864 (<code>app/npu_chatml.h</code>); before that it was accepted and dropped there, so an NPU
+  reply could open a <code>&lt;think&gt;</code> block where the others did not. Compare token streams only with the same
+  template behaviour, or the divergence you measure is the template.</li>
+</ul>
+<p>The weight caveat above is why the NPU's agreement numbers are reported with the pack named and not
+folded into the <code>cpu</code> vs <code>hrx</code> column: the measured tables are above.</p>
+<h2 id="how-to-re-run">How to re-run<a class="anchor" href="#how-to-re-run" title="Permanent link">#</a></h2>
+<p>Start the routes (one process each; the GPU and NPU ones take the box's fair claims):</p>
+<pre><code class="language-sh"># cpu — no device claim needed
+1bit serve -m ~/models/Qwen3-0.6B-Q4_K_M.gguf --device cpu --port 18110 --ctx-size 2048
+
+# hrx — under the GPU claim, with the no-SVM variables set
+HSA_USE_SVM=0 HSA_USERPTR_FOR_PAGED_MEM=0 HRX_ALLOW_NO_SVM=1 \
+  gpu-hold -l rlk -t 12 -- 1bit serve -m ~/models/Qwen3-0.6B-Q4_K_M.gguf --device hrx \
+    --port 18111 --ctx-size 2048
+
+# npu — under the NPU claim; the forward path is the only one with logprobs
+npu-hold -l rlk -t 18 -- 1bit forward-serve -m ~/models/npu/Qwen3-0.6B/model.q4nx \
+  --kernels &lt;full_i8 ELF dir&gt; -p 18112 --host 127.0.0.1
+</code></pre>
+<p>Then:</p>
+<pre><code class="language-sh">python3 tools/logprob_agree.py \
+    --route cpu=http://127.0.0.1:18110 \
+    --route hrx=http://127.0.0.1:18111 \
+    --repeat 5 --max-tokens 64 --json agree.json
+</code></pre>
+<p>With the NPU in the comparison, the same command with <code>--thinking on --match-by text</code>: the forward path
+reports no token ids, so tokens are matched by text, and <code>--thinking on</code> is what the numbers above were
+taken with (on a build carrying #864, <code>--thinking off</code> works there too). The NPU tries 2 repeats at the same 64-token budget — ~10 min in one claim, which is what its
+~0.5 s/token allows. If the GPU and NPU claims cannot be held at once, run the pairs separately and
+compare the two reports with the tool's own comparator:</p>
+<pre><code class="language-sh">python3 tools/logprob_agree.py --route cpu=… --route npu=… \
+    --thinking on --match-by text --repeat 2 --max-tokens 64 --json npu.json
+python3 tools/logprob_agree.py --route cpu=… --route hrx=… \
+    --thinking on --repeat 5 --max-tokens 64 --json hrx.json
+python3 - &lt;&lt;'PY'   # agreement across the two reports, by text
+import importlib.util, json
+s = importlib.util.spec_from_file_location(&quot;t&quot;, &quot;tools/logprob_agree.py&quot;)
+t = importlib.util.module_from_spec(s); s.loader.exec_module(t)
+load = lambda p, r: json.load(open(p))[&quot;routes&quot;][r]
+npu, hrx = load(&quot;npu.json&quot;, &quot;npu&quot;), load(&quot;hrx.json&quot;, &quot;hrx&quot;)
+print(t.agreement(npu[0][&quot;runs&quot;][0], hrx[0][&quot;runs&quot;][0], &quot;text&quot;))
+PY
+</code></pre>
+<p>Exit code 0 means every route was bitwise repeatable <em>and</em> every pair matched exactly; 1 means a
+route diverged on repeat, a route returned no log-probabilities, or a pair differs; 2 means a route
+was unreachable. <code>--selftest</code> checks the comparison logic without a server.</p>
+<p>To re-derive the <code>hrx</code> width gate rather than guess it, run the same serve with <code>GGML_HRX_LOG_DISPATCH=1</code>
+and issue a solo request in one process and a concurrent one in another; the registration sets differ by
+exactly the table above. <code>GGML_HRX_DISABLE_DISPATCH=&lt;substring&gt;</code> turns any one registration off, which is
+how each arm above was run.</p>
+<h2 id="two-things-that-will-waste-your-afternoon">Two things that will waste your afternoon<a class="anchor" href="#two-things-that-will-waste-your-afternoon" title="Permanent link">#</a></h2>
+<ul>
+<li><strong><code>/v1/health</code> is a readiness probe, not a liveness probe.</strong> While the model loads it answers
+  503; once loaded it answers 200; but an <em>idle</em> llama-server reports
+  <code>{"status":"stalled","seconds_since_progress":N}</code> with 503 and clears the moment a request
+  arrives. Waiting on <code>/v1/health</code> == 200 before the first request is correct. Using it to decide
+  "is this endpoint up" is not: a perfectly usable idle server fails that test.</li>
+<li><strong><code>/v1/models</code> answers before the model finishes loading</strong>, so it cannot be used for readiness
+  either. It is only a liveness probe. Use each for what it actually reports.</li>
+</ul>
+<h2 id="known-limits">Known limits<a class="anchor" href="#known-limits" title="Permanent link">#</a></h2>
+<ul>
+<li>The wire carries log-probabilities as JSON decimals, i.e. a float32 promoted to a double. The
+  tool compares the float32 bit patterns and counts any value that does not round-trip; in every
+  run recorded here that count was zero, so the cast is exact for these routes. A route that ever
+  emitted a float64 log-probability would not be compared bit-exactly by this tool.</li>
+<li><code>cache_prompt</code> false everywhere means no route is measured through the prompt-cache path. The
+  cache path can round differently; that is a separate axis and <code>tools/kat.py</code> covers it.</li>
+<li>One model, 0.6B, 8 prompts: enough to show the routes disagree and that repetition is exact, not
+  enough to estimate a tail. Treat the max as a lower bound on the worst case.</li>
+<li>The numbers are for one binary and one model quantisation. A change to a quantisation kernel
+  moves them; re-run rather than extrapolate.</li>
+<li>The concurrency numbers were measured on a 0.6B model on one host; they show the effect exists
+  and is not small, not how large it gets for other shapes.</li>
+<li>The NPU agreement rows are 2 repeats (the other routes' 5 would be ~25 min of the array) and, over a
+  <em>requantised</em> pack, they are not an arithmetic-only distance. The 64-token row removes the earlier
+  budget difference, so all three columns can be read at one token count.</li>
+<li>The NPU rows depend on the build. A binary at <code>44d849d</code> or later masks the think tokens, so on that
+  build the NPU row cannot be reproduced until
+  <a href="https://github.com/1bit-MONSTER/engine/issues/832">#832</a> is fixed; the numbers above come from a
+  <code>main@1b3def2</code> build, which still emits log-probabilities for the think tokens.</li>
+</ul>
+<nav class="pager"><a class="prev" href="PORTING.html"><span>Previous</span>Porting map</a><a class="next" href="hetero-prefill.html"><span>Next</span>HeteroMosaic&#x27;s split prefill, checked on our stack</a></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/determinism.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

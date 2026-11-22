@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-09-25">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/onnx.html#article", "headline": "ONNX Runtime in-process", "description": "1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.", "url": "https://1bit.gg/onnx.html", "mainEntityOfPage": "https://1bit.gg/onnx.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-09-25", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/onnx.html#article", "headline": "ONNX Runtime in-process", "description": "1bit serve --device onnx serves ONNX Runtime GenAI model directories (genai_config.json, model.onnx and the tokenizer) behind the same OpenAI-compatible API.", "url": "https://1bit.gg/onnx.html", "mainEntityOfPage": "https://1bit.gg/onnx.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html" aria-current="page">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -93,6 +92,12 @@
 <li><a href="kernel.html">Linux kernel</a></li>
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
 </ul>
 </nav></details>
 <article class="docs-page prose">
@@ -143,6 +148,10 @@ constants this repository uses are the ones its public headers declare.</p>
 whose layout is fixed by <code>ORT_API_VERSION</code>, so a host built for another version would call through
 the wrong offsets instead of failing. <code>1bit ort-info</code> prints both numbers, and the version the
 headers compile against is checked against the version the loaded library serves.</p>
+<p>Same version, our own build: <code>onnx/build_ort.sh</code> clones tag <code>v1.23.2</code>, patches the one <code>#include
+&lt;cstdint&gt;</code> GCC 15 needs in <code>core/common/semver.h</code>, and installs to <code>~/vendor/onnxruntime-1.23.2</code>, so
+<code>pkg-config</code> finds it by <code>PKG_CONFIG_PATH</code> alone — nothing in <code>onnx/</code> changes. The MIT notice covers
+that build too (see <code>NOTICE</code>).</p>
 <h2 id="building-it">Building it<a class="anchor" href="#building-it" title="Permanent link">#</a></h2>
 <pre><code class="language-bash">sudo apt install libonnxruntime-dev        # 1.23.2 on 26.04
 cmake -S . -B build -DONEBIT_ORT=ON
@@ -221,6 +230,16 @@ than something the EP infers:</p>
 </tr>
 </tbody>
 </table></div>
+<p>The fused A8W8 QDQ path has its own entry beside <code>gemm_f32</code>: with <code>ONEBIT_EP_NPU_ELFS="MxKxN=path,…"</code>
+(one ELF per shape, because a QDQ group is claimed per (K, N)) <code>gemm_q8</code> hands the graph's int8 activations
+and int8 weights to the kernel unchanged — no <code>packB</code>, no <code>amax/127</code>, since those bytes already carry the
+graph's scales — and reads int32 accumulators back into the <strong>same epilogue</strong> the host path runs, so a device
+result differs from the host one only if the accumulator does. A shape with no ELF falls back with
+<code>npu_qdq_fallback … why=no QDQ kernel for KxN</code>, and a run is only a device run if that line is absent for
+the shape you care about: <code>qdq rows=</code> is written by the shared epilogue either way. <strong>An entry the runtime
+cannot load costs that design and nothing else</strong>: <code>init_elf</code> returning false marks the shape unavailable
+(<code>no QDQ kernel for KxN: I8Ctx init_elf failed for &lt;path&gt; (MxKxN)</code>) while the other configured designs keep
+running, and only a configuration in which <em>every</em> design is refused disables the device as a whole.</p>
 <p><strong>The device lock.</strong> The NPU is shared, and the rule is that a plugin never evicts the owner's
 serve. The EP takes <code>/tmp/1bit-npu-device.lock</code> with <code>flock(2)</code> <strong>non-blocking</strong> and holds it for the
 life of the process; when the lock is held it does not queue — it reports <code>device busy</code> and runs the
@@ -281,15 +300,25 @@ rules make this work, and one of them is a bug we hit:</p>
 <h3 id="quantised-graphs-quark-a8w8-qdq">Quantised graphs (Quark A8W8 QDQ)<a class="anchor" href="#quantised-graphs-quark-a8w8-qdq" title="Permanent link">#</a></h3>
 <p>A Quark-quantised ONNX model is a <em>QDQ</em> graph (<code>DequantizeLinear</code> → <code>MatMul</code> → <code>QuantizeLinear</code> with
 int8 tensors and float32 scales), and the <code>MatMul</code> inside it is the same int8 × int8 → int32 product
-our device kernel already computes. Such a graph runs on the EP unchanged today — the EP takes that
-<code>MatMul</code> and the surrounding <code>DequantizeLinear</code>/<code>QuantizeLinear</code> stay on the CPU EP — and the folding
-that removes the intermediate float tensors is designed in
-<a href="onnx-pack.html#a8w8-qdq-the-shape-quark-emits">ONNX pack</a>. <code>ctest -R onebit_ep_qdq_proof</code> checks the
-pattern end to end and requires int8-identical output.</p>
+our device kernel already computes. The EP claims the whole group — both <code>DequantizeLinear</code> nodes, the
+<code>MatMul</code> and the <code>QuantizeLinear</code> — as ONE fused node, so the dequantised float tensors are never
+materialised: int8 activations and int8 weights go into the kernel, int8 output comes back with the
+scales folded into one multiply per element. Per-tensor scales, the two per-axis forms the epilogue
+can fold (<code>s_w[n]</code> along the weight's output axis, <code>s_x[m]</code> along the activation's row axis) and
+<strong>asymmetric zero points</strong> are all supported: <code>Σ_k (a−zx)(w−zw)</code> costs the GEMM's own sum plus a
+column sum of the weight (computed once per session), a row sum of the activation, and <code>K·zx·zw</code>, and
+the output zero point is added after the round. A per-axis scale or zero point along <strong>K</strong> cannot
+fold — it weights the products inside the sum — so such a graph is refused and stays on the per-node
+path (see <a href="onnx-pack.html#a8w8-qdq-the-shape-quark-emits">ONNX pack</a>). <code>ctest -R onebit_ep_qdq_proof</code>
+checks six cases end to end: per-tensor, per-axis, asymmetric and asymmetric-per-axis all
+int8-identical to the CPU EP (<code>worst |d| = 0</code> LSB, also on a 256×1024×1024 case), the per-K scale
+refused and correct anyway, and ~6-7 MB less peak RSS for the run, which is exactly the three float
+tensors it no longer allocates. The control, <code>ONEBIT_EP_QDQ=0</code>, runs the same graph through the
+per-node path and asserts that the float kernel — not the fused one — is what ran.</p>
 <h2 id="verifying">Verifying<a class="anchor" href="#verifying" title="Permanent link">#</a></h2>
 <pre><code class="language-bash">cmake -S . -B build -DONEBIT_ORT=ON &amp;&amp; cmake --build build -j &amp;&amp; ctest --test-dir build -R &quot;ort_info|onebit_ep&quot;
 </code></pre>
-<p>Three tests, each proving a different claim:</p>
+<p>Five tests, each proving a different claim:</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -310,10 +339,27 @@ pattern end to end and requires int8-identical output.</p>
 <td><code>onebit_ep_proof_cpu_fallback</code></td>
 <td>with <code>ONEBIT_EP_OPS=none</code> the same graph is partitioned to the CPU EP (<code>claimed=0</code>), so the match above cannot come from the CPU running both sessions</td>
 </tr>
+<tr>
+<td><code>onebit_ep_qdq_proof</code></td>
+<td>the four-node A8W8 QDQ group is claimed as one fused node: the trace has a <code>qdq</code> line and no <code>matmul</code> line, the int8 output is identical to the CPU EP's per-tensor, per-axis, asymmetric and asymmetric-per-axis (<code>worst |d| = 0</code> LSB), a per-axis scale along K is refused, and the run's peak RSS is ~6-7 MB smaller than the CPU EP's</td>
+</tr>
+<tr>
+<td><code>onebit_ep_qdq_proof_unfused</code></td>
+<td>with <code>ONEBIT_EP_QDQ=0</code> the same graph goes through the per-node path (a <code>matmul</code> line, no <code>qdq</code> line), so the numbers above can only come from the fused kernel</td>
+</tr>
+<tr>
+<td><code>onebit_ep_qdq_proof_qdq_only</code></td>
+<td>with <code>ONEBIT_EP_QDQ_ONLY=1</code> (the mode a quantised model is measured in) the fused groups are still claimed and no single-node float MatMul is</td>
+</tr>
 </tbody>
 </table></div>
-<p><code>onebit_npu_gemm_probe</code> (NPU builds only) is registered as a fourth test and <strong>skips</strong> when the
+<p><code>onebit_npu_gemm_probe</code> (NPU builds only) is registered as a sixth test and <strong>skips</strong> when the
 device is busy rather than failing someone else's run.</p>
+<p><code>ort-run --basic</code> keeps a quantised graph's <code>DequantizeLinear</code>/<code>QuantizeLinear</code> nodes instead of letting
+ORT's graph transformations fold them back into float ops, which is what a quantised EP needs to see;
+<code>ONEBIT_EP_QDQ_ONLY=1</code> restricts the EP to the fused groups so a measurement of a real quantised model
+is not distorted by float matmuls landing on the host kernel. <code>ONEBIT_EP_QDQ_DEBUG=1</code> makes
+<code>GetCapability</code> log why each <code>MatMul</code> was refused.</p>
 <h2 id="status">Status<a class="anchor" href="#status" title="Permanent link">#</a></h2>
 <p>The host path is done: it is what the tests assert, and it needs no hardware. The NPU path is
 proven on XDNA 2 as well — the ELF loads, ORT hands the EP the <code>MatMul</code>, the kernel runs on the
@@ -323,8 +369,11 @@ scale fit at <code>0.9999</code>. What is <em>not</em> done is coverage: an ELF 
 model the EP takes the shapes it has a kernel for and the CPU EP takes the rest (for Qwen3-0.6B that
 is q, k and v). The device backend is still off by default and is not part of any release, because
 enabling it on a box where another process owns the NPU must stay an explicit decision.</p>
-<p>The A8W8 QDQ pattern is claimed and proven (<code>ctest -R onebit_ep_qdq_proof</code>, exact int8 match); the
-<em>fused</em> form that skips the dequantise/quantise pairs is designed, not built.</p>
+<p>The A8W8 QDQ group is claimed as one fused node and proven (<code>ctest -R onebit_ep_qdq_proof</code>, exact int8
+match for per-tensor, per-axis and asymmetric zero points, ~6-7 MB less peak RSS per run). One thing
+is still open and stays documented as such: the device leg of the fused path — today its int8 GEMM
+runs on the host, so a real model's shapes are still a CPU-EP story until the NPU kernel takes int8
+activations straight into its input BO.</p>
 <p>The two-engine order is implemented and exercised with a single library; a <em>second</em> EP library was
 not available to try it against (this ORT build ships no ROCM/HIP EP and there is no gfx1201 HIP EP
 plugin on the box), so treat a real NPU+GPU session as designed but unmeasured.</p>

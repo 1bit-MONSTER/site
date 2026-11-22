@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-10-30">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/models.html#article", "headline": "Models measured on a Ryzen AI MAX+ 395", "description": "Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.", "url": "https://1bit.gg/models.html", "mainEntityOfPage": "https://1bit.gg/models.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-10-30", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/models.html#article", "headline": "Models measured on a Ryzen AI MAX+ 395", "description": "Models the 1bit engine is checked against, with the number each measured on Strix Halo: Qwen3.8-27B, Flash-Next, ZAYA1-8B, Bonsai, BitNet, gpt-oss-20b.", "url": "https://1bit.gg/models.html", "mainEntityOfPage": "https://1bit.gg/models.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -93,6 +92,12 @@
 <li><a href="kernel.html">Linux kernel</a></li>
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
 </ul>
 </nav></details>
 <article class="docs-page prose">
@@ -114,7 +119,7 @@ formats.</p>
 <tr>
 <td>Qwen3.8-27B</td>
 <td>UD-Q4_K_XL, HRX</td>
-<td>decode 36.0 tok/s with MTP on code prompts; 56.6 tok/s with the DFlash2 drafter</td>
+<td>decode 36.0 tok/s with MTP on code prompts; 56.6 tok/s with the DFlash2 drafter (<a href="https://1bit.gg/blog-qwen38-27b-dflash2-and-hadamard.html">post</a>)</td>
 </tr>
 <tr>
 <td>Qwen3.8-Flash-Next (MoE)</td>
@@ -129,12 +134,12 @@ formats.</p>
 <tr>
 <td>PrismML Ternary-Bonsai-2-27B</td>
 <td>PQ2_0, 6.7 GiB, HRX</td>
-<td>decode 43.3 tok/s with MTP</td>
+<td>decode 43.3 tok/s with MTP (<a href="https://1bit.gg/blog-ternary-bonsai-on-the-npu.html">NPU post</a>)</td>
 </tr>
 <tr>
 <td>Microsoft BitNet b1.58 2B-4T</td>
 <td>TQ2_0 ternary GGUF (TQ1_0 runs too), 1.11 GiB, 2.06 bits per weight, HRX</td>
-<td>end to end on the Radeon 8060S, no CPU fallback; decode tg128 123.4 tok/s after the TQ2_0 load-time repack onto the packed-ternary decode kernel (101.6 before it, same binary); perplexity 102.42 on HRX vs 102.56 on the CPU, same file</td>
+<td>end to end on the Radeon 8060S, no CPU fallback; decode tg128 123.4 tok/s after the TQ2_0 load-time repack onto the packed-ternary decode kernel (101.6 before it, same binary); perplexity 102.42 on HRX vs 102.56 on the CPU, same file (<a href="https://1bit.gg/blog-bitnet-b158-on-hrx.html">post</a>)</td>
 </tr>
 <tr>
 <td>Qwen3-0.6B</td>

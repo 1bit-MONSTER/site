@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="The hardware gate runs every HRX pin change and hw-gate PR on a Strix Halo box before merge: kernel tests, known answers, KLD against the release pin.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-10-16">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/hw-gate.html#article", "headline": "HRX hardware gate", "description": "The hardware gate runs every HRX pin change and hw-gate PR on a Strix Halo box before merge: kernel tests, known answers, KLD against the release pin.", "url": "https://1bit.gg/hw-gate.html", "mainEntityOfPage": "https://1bit.gg/hw-gate.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-10-16", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/hw-gate.html#article", "headline": "HRX hardware gate", "description": "The hardware gate runs every HRX pin change and hw-gate PR on a Strix Halo box before merge: kernel tests, known answers, KLD against the release pin.", "url": "https://1bit.gg/hw-gate.html", "mainEntityOfPage": "https://1bit.gg/hw-gate.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -93,6 +92,12 @@
 <li><a href="kernel.html">Linux kernel</a></li>
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
 </ul>
 </nav></details>
 <article class="docs-page prose">
@@ -279,9 +284,13 @@ loaded models of its own. Hyperloom's own token_take waits while a <code>scripts
 exists, so the two take turns. <code>HW_GATE_TOKEN=none</code> skips the token for a caller that already
 holds it.</p>
 <p>Each of those steps:
-- <strong>Lock.</strong> It holds <code>~/npu.lock</code> (flock) only while it runs, so other GPU work keeps its turn between steps.
+- <strong>No NPU lock.</strong> A GPU step takes no <code>~/npu.lock</code> at all (engine#682): the NPU and the GPU run at the same
+  time on this box by measurement, not by assumption — engine#673 measured a GPU-busy NPU stream keeping
+  ~87 % of its bandwidth (7.40 GB/s against 8.2–8.5 idle; 10.5–10.9 ms → 12.0 ms per launch; 160/160
+  byte-exact, zero resets). The lock is what the <strong>NPU phase</strong> takes, below, because an NPU dispatch must
+  not overlap another NPU dispatch.
 - <strong>Heat.</strong> It waits for Tctl to drop to 75 C, then runs under <code>~/lb/thermal-run.sh</code>, which freezes it at 78 C and kills it at 93 C.
-- <strong>Memory.</strong> It runs under <code>scripts/mem-guard.sh</code> (kills the step below 12 GB MemAvailable). Before a step starts, <code>tools/mem_budget.py</code> estimates it. A step that would take GTT to 95 GiB or more (the engine#315 fault zone), or past MemAvailable, is refused. The gate then releases the lock and retries every minute, up to ten times.
+- <strong>Memory.</strong> It runs under <code>scripts/mem-guard.sh</code> (kills the step below 12 GB MemAvailable). Before a step starts, <code>tools/mem_budget.py</code> estimates it. A step that would take GTT to 95 GiB or more (the engine#315 fault zone), or past MemAvailable, is refused. The gate then waits for memory to free up and retries every minute, up to ten times.
 - <strong>The PR-Agent model.</strong> coder-llm (Vulkan, :8090) loses its device when long HRX dispatches starve it. The gate runs on <code>strixhalo-engine</code>, the runner that also runs the pr-agent jobs, and a runner takes one job at a time, so no review is generating during the gate. Before each step the gate also waits for coder-llm's slots to be idle. Afterwards it reports any new <code>ring ... timeout</code> in the kernel log.</p>
 <p>The build runs under thermal-run too, and resumes after a thermal kill. Build trees and ccache
 persist under <code>~/.cache/hw-gate</code>, so a PR that does not move the pins rebuilds in seconds.</p>
@@ -388,9 +397,11 @@ the box could not run the gate (lock timeout, a model or base file missing, memo
 </tbody>
 </table></div>
 <p>363 s of GPU time in all; the MoE model, the IQ model and the ZAYA1 needle add about 77 s of it.
-Waiting for <code>~/npu.lock</code> costs more than the gate
+Waiting for <code>~/npu.lock</code> used to cost more than the gate
 itself: flock is not first-come-first-served, and with about ten jobs queueing, each acquisition
-waited 10 to 60 minutes. The summary reports both numbers (waiting, holding).</p>
+waited 10 to 60 minutes, twice cutting a candidate's gate short while an NPU serve held the lock.
+Since engine#682 a GPU step takes no NPU lock, so that wait is gone; the summary keeps reporting
+waiting (heat, memory) and the step's own time.</p>
 <p>What the goldens record at the release pin:
 - Qwen3-0.6B misses one short needle (<code>varied-720w</code>: "25"). The check holds that case to the golden's text instead of the answer.
 - On <code>varied-1620w</code>, the cached path answers differently from a fresh request at a near-tie: top-2 margin 0.19, a WARN.
@@ -431,9 +442,8 @@ Their HRX base logits against a CPU run of the same file (<code>--device none</c
 <p>That is the usual GPU-vs-CPU rounding gap of a 4-bit file, not a wrong kernel.</p>
 <h2 id="not-covered-yet">Not covered yet<a class="anchor" href="#not-covered-yet" title="Permanent link">#</a></h2>
 <ul>
-<li><strong>Lock fairness.</strong> <code>~/npu.lock</code> is a plain flock, so a job that re-queues quickly can starve the
-  gate for an hour. A first-come-first-served queue, or a reserved window for the gate, would bound
-  the wall time. The gate's own GPU time is 6 to 13 minutes.</li>
+<li><strong>Lock fairness.</strong> <code>~/npu.lock</code> is a plain flock, so a job that re-queues quickly can starve another
+  NPU job. GPU steps are no longer behind it (engine#682); the NPU phase and any NPU serve still are.</li>
 <li><strong>Not exercised:</strong> <code>1bit serve</code> itself (the gate talks to llama-server with serve's HRX flags),
   <code>--parallel</code>, <code>--mtp</code> / <code>--dflash</code>, vision, and contexts past 8K.</li>
 <li><strong>One copy of the KLD bases</strong> on the box. A spare copy of the release-pin set is on ryzen

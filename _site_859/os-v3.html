@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1bit OS v3 — the Puppy Linux appliance · 1bit engine</title>
+<meta name="description" content="Puppy is v3, and Puppy is 1bit OS. It is ResolutePup64, built with woof-CE on the Ubuntu 26.04 &quot;resolute&quot; base, with our kernel (7.3.0-rc4-1bit-perfopt…">
+<meta property="og:site_name" content="1bit engine">
+<meta property="og:title" content="1bit OS v3 — the Puppy Linux appliance · 1bit engine">
+<meta property="og:description" content="Puppy is v3, and Puppy is 1bit OS. It is ResolutePup64, built with woof-CE on the Ubuntu 26.04 &quot;resolute&quot; base, with our kernel (7.3.0-rc4-1bit-perfopt…">
+<link rel="canonical" href="https://1bit.gg/os-v3.html">
+<meta property="og:url" content="https://1bit.gg/os-v3.html">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://1bit.gg/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="1bit OS v3 — the Puppy Linux appliance · 1bit engine">
+<meta name="twitter:description" content="Puppy is v3, and Puppy is 1bit OS. It is ResolutePup64, built with woof-CE on the Ubuntu 26.04 &quot;resolute&quot; base, with our kernel (7.3.0-rc4-1bit-perfopt…">
+<meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
+<meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
+<meta property="article:published_time" content="2026-11-03">
+<meta property="article:modified_time" content="2026-11-03">
+<meta property="article:author" content="bong-water-water-bong">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/os-v3.html#article", "headline": "1bit OS v3 — the Puppy Linux appliance", "description": "Puppy is v3, and Puppy is 1bit OS. It is ResolutePup64, built with woof-CE on the Ubuntu 26.04 \"resolute\" base, with our kernel (7.3.0-rc4-1bit-perfopt…", "url": "https://1bit.gg/os-v3.html", "mainEntityOfPage": "https://1bit.gg/os-v3.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-03", "dateModified": "2026-11-03", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="alternate" type="application/atom+xml" title="1bit engine blog" href="feed.xml">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body class="doc">
+<header class="topnav">
+  <div class="container topnav-inner">
+    <a href="index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="relay r1" x="2" y="2" width="9" height="9" rx="2"/><rect class="relay r2" x="13" y="2" width="9" height="9" rx="2"/><rect class="relay r3" x="2" y="13" width="9" height="9" rx="2"/><rect class="relay r4" x="13" y="13" width="9" height="9" rx="2"/></svg>
+      <span>1bit engine</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="overview.html">Engine</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="blog.html">Blog</a>
+      <a href="models.html">Benchmarks</a>
+    </nav>
+    <span class="theme-switch" role="group" aria-label="Theme: light, auto, or dark">
+      <button type="button" class="ts-btn" data-choice="light" title="Light mode" aria-label="Light mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="auto" title="Auto (follow system)" aria-label="Auto (follow system)" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3Z" fill="currentColor"/><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button type="button" class="ts-btn" data-choice="dark" title="Dark mode" aria-label="Dark mode" aria-pressed="false"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 1 1 9.4 3.8 6.9 6.9 0 0 0 20.2 14.6Z"/></svg></button>
+    </span>
+    <a class="btn btn-ghost" href="https://github.com/1bit-MONSTER/engine">GitHub&nbsp;↗</a>
+  </div>
+</header>
+
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<div class="container docs">
+<details class="docs-side" open><summary>Contents</summary><nav aria-label="Documentation">
+<p class="group">Overview</p><ul>
+<li><a href="docs.html">All docs</a></li>
+<li><a href="overview.html">Meet the engine</a></li>
+</ul>
+<p class="group">Start</p><ul>
+<li><a href="serve.html">1bit serve</a></li>
+<li><a href="models.html">Models measured</a></li>
+<li><a href="lemonade.html">Lemonade</a></li>
+<li><a href="releases.html">Releases</a></li>
+<li><a href="bench.html">How we measure</a></li>
+<li><a href="recipes.html">Recipes</a></li>
+<li><a href="hw-gate.html">Hardware gate</a></li>
+</ul>
+<p class="group">Devices</p><ul>
+<li><a href="hrx.html">HRX</a></li>
+<li><a href="npu.html">NPU engine</a></li>
+<li><a href="hybrid.html">Hybrid</a></li>
+<li><a href="onnx.html">ONNX Runtime</a></li>
+<li><a href="onnx-pack.html">ONNX pack</a></li>
+</ul>
+<p class="group">Components</p><ul>
+<li><a href="laya.html">Laya router</a></li>
+<li><a href="pm.html">Project Manager</a></li>
+<li><a href="registry.html">Model registry</a></li>
+<li><a href="arch-gaps.html">Architecture gaps</a></li>
+<li><a href="moe-streaming.html">MoE streaming</a></li>
+<li><a href="tokenizers.html">Tokenizers</a></li>
+</ul>
+<p class="group">Project</p><ul>
+<li><a href="architecture.html">How the engine is built</a></li>
+<li><a href="kernel.html">Linux kernel</a></li>
+<li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
+<li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="clients.html">Connect a client</a></li>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="install.html">Install 1bit OS</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html" aria-current="page">1bit OS v3 — the Puppy Linux appliance</a></li>
+</ul>
+</nav></details>
+<article class="docs-page prose">
+<h1 id="1bit-os-v3-the-puppy-linux-appliance">1bit OS v3 — the Puppy Linux appliance<a class="anchor" href="#1bit-os-v3-the-puppy-linux-appliance" title="Permanent link">#</a></h1>
+<h2 id="which-plan-is-v3">Which plan is v3<a class="anchor" href="#which-plan-is-v3" title="Permanent link">#</a></h2>
+<p><strong>Puppy is v3, and Puppy is 1bit OS.</strong> It is <code>ResolutePup64</code>, built with woof-CE on the Ubuntu 26.04
+"resolute" base, with our kernel (<code>7.3.0-rc4-1bit-perfopt</code>, MOK-signed), our drivers, the engine and
+Lemonade inside it. The same image is the live/try stick and the frugal install, <code>/data</code> is Puppy's save
+layer on <code>1BIT-DATA</code>, the userland is <code>bash</code>, <code>sudo</code>, <code>apt</code> and <code>sshd</code>, and it boots <strong>headless by
+default</strong> - a console login, no X - with a second boot entry, <code>1bit OS (desktop)</code>, for Puppy's desktop.
+Secure Boot stays on: shim → our MOK-signed grub → our MOK-signed kernel → our signed modules.</p>
+<p>The evaluation - sizes, the glibc ceiling, the kernel config gap, the package inventory, the build recipe
+and the gates table - is <a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a>; the build recipe is
+<a href="https://github.com/1bit-MONSTER/engine/blob/main/os/v3/puppy/README.md"><code>os/v3/puppy/</code></a>; the page for what the appliance is, is
+<a href="https://github.com/1bit-MONSTER/engine/blob/main/os/README.md">os/README.md</a>.</p>
+<p>Where it stands, measured 2026-11-01 and 2026-11-02: every blocker of the evaluation is closed or
+answered - <code>kernel-puppy.fragment</code> is built into our kernel (G2 green, the initrd finds and layers the
+SFS), <code>amdxdna</code> and <code>ec_su_axb35</code> are present, signed and verify against the enrolled MOK (G3 green), the
+save layer persists across a reboot (G7 green, <code>PUPMODE=12</code> on <code>1BIT-DATA</code>), and <code>sudo</code>, <code>apt</code>, <code>sshd</code>
+and <code>mokutil</code> are in the image - and the appliance <strong>booted on the Max+ 395 with Secure Boot on</strong>: 20 of
+<code>puppy-check</code>'s 25 rows PASS (the 5 that do not are the cycle-12 list), Lemonade answers on <code>:13305</code>
+with its key, chat 70.49 tok/s, TTFT 1.30 s, 0 <code>amdxdna</code> errors. <strong>Nothing is published</strong>: the next
+release carries it.</p>
+<p><strong>The Ubuntu Server <code>autoinstall</code> plan below is the documented fallback</strong>, and it stays the
+reference for the parts both plans share. It is the fallback for two measured reasons: it has no
+dependency on a kernel rebuild (the Puppy plan needs <code>os/v3/puppy/kernel-puppy.fragment</code> built in, and
+that is one kernel gate away), and its userland brings sshd, apt, efivarfs, a normal user and
+<code>unattended-upgrades</code> for free, where the Puppy plan adds them as packages and runs as root by model.
+Neither plan is a redesign of the other; switching is a change of medium. Everything from
+<a href="#the-ubuntu-plan-the-fallback">The Ubuntu plan</a> to the end of the page is that plan.</p>
+<h2 id="the-ubuntu-plan-the-fallback">The Ubuntu plan (the fallback)<a class="anchor" href="#the-ubuntu-plan-the-fallback" title="Permanent link">#</a></h2>
+<p>This is the design for engine#712. Today one image serves both roles: the live stick and the disk it
+installs to are the same BusyBox initramfs, so the installed machine has no package manager, no users,
+no updates and an empty efivarfs (engine#712, engine#709). v3 keeps that image as the <em>live</em> medium and
+makes the <strong>installed</strong> machine a real OS: Ubuntu 26.04 LTS Server, installed unattended by <code>autoinstall</code>
+from the same stick, carrying our kernel, our drivers, our runtime, the engine, Lemonade and the
+appliance units as packages that <code>apt</code> updates.</p>
+<p>The first slice is <code>os/v3/pin.txt</code> (the pinned server ISO), <code>os/v3/seed.sh</code> and its <code>seed-selftest.sh</code>
+(<strong>PR #732</strong>, 32 checks, no device; not in this PR either, so this page stands alone at any merge
+order). Everything after the seed — <code>mkstick.sh</code>, <code>mkdebs.sh</code>,
+<code>postinstall</code>, <code>steps</code>, the vmtest scripts — is design. <code>os/mini</code> keeps shipping in v2026.44, and
+engine#712 says v3 is the next release, not the Sunday one. What <em>is</em> measured is in
+<a href="#what-is-measured-now">What is measured now</a> — most of it on the Strix Halo box this design was written
+on, which is itself the reference install: it runs Ubuntu 26.04.1 with our kernel, our out-of-tree
+modules, TheRock's ROCm, the distro's XRT, the engine and Lemonade, and it serves HRX and the NPU.</p>
+<h2 id="what-changes-and-what-stays">What changes, and what stays<a class="anchor" href="#what-changes-and-what-stays" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th>today (<code>os/mini</code>)</th>
+<th>v2 (<code>os/v2</code>, in tree, not shipped)</th>
+<th>v3 (Puppy, what ships)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>live medium</td>
+<td>BusyBox initramfs, everything in RAM</td>
+<td>Ubuntu rootfs squashfs + our debs</td>
+<td><strong>the Puppy SFS on the stick, with the save layer on <code>1BIT-DATA</code></strong></td>
+</tr>
+<tr>
+<td>installed system</td>
+<td>the same initramfs on the ESP + a <code>/data</code> partition</td>
+<td>squashfs unpacked to ext4, our debs preinstalled</td>
+<td><strong>a frugal install: the SFS on a partition, the save layer on <code>1BIT-DATA</code></strong></td>
+</tr>
+<tr>
+<td>updates</td>
+<td>reflash the stick</td>
+<td><code>apt</code> from <code>1bit.gg/apt</code></td>
+<td><strong><code>apt</code> and PETget are in the image; the OS itself is replaced by a new SFS, the save layer stays</strong></td>
+</tr>
+<tr>
+<td>users</td>
+<td>root only, keys from <code>/data/ssh</code></td>
+<td>root only, keys from <code>/data</code></td>
+<td><strong><code>root</code> with <code>sudo</code>, keys carried from the stick, <code>sshd</code> on</strong></td>
+</tr>
+<tr>
+<td>firmware entry</td>
+<td>none (engine#709)</td>
+<td><code>efibootmgr -c</code> when it exists</td>
+<td><strong>written during the install with <code>efibootmgr</code></strong> (engine#709)</td>
+</tr>
+<tr>
+<td>efivarfs</td>
+<td>absent (module never staged, engine#709)</td>
+<td>present (<code>CONFIG_EFIVAR_FS=m</code>, systemd loads it)</td>
+<td><strong>built in, mounted at boot</strong></td>
+</tr>
+<tr>
+<td>console</td>
+<td>BusyBox shell + <code>1bit-menu</code></td>
+<td><code>1bit-menu</code> on tty1, autologin</td>
+<td><strong>headless: a console login on tty1, no X; the <code>desktop</code> boot entry starts Puppy's JWM desktop</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The <code>os/mini</code> row is the BusyBox image, and it stays what it is: the CI/VM target of the QEMU gates,
+not 1bit OS. The rest of this page is the Ubuntu fallback's detail.</p>
+<h2 id="the-stick">The stick<a class="anchor" href="#the-stick" title="Permanent link">#</a></h2>
+<p>Three partitions, the same shape as v2's medium (<code>os/v2/mklive.sh</code>) so <code>1bit-install</code>'s refusals, the
+<code>prepare-stick.sh</code> checks and the gates keep working:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>size</th>
+<th>fs</th>
+<th>label</th>
+<th>what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>512 MiB</td>
+<td>FAT32</td>
+<td><code>1BIT-OS</code></td>
+<td>shim, our MOK-signed grub, <code>1bit-os.efi</code> (the live appliance, <code>os/mini</code> unchanged), <code>grub.cfg</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>ISO size + 1 GiB</code></td>
+<td>ext4</td>
+<td>the server ISO's own volume label</td>
+<td>the Ubuntu 26.04 Server ISO unpacked, plus <code>/1bit/</code> — the seed, our signed repo, the MOK, the install log</td>
+</tr>
+<tr>
+<td>3</td>
+<td>the rest</td>
+<td>ext4</td>
+<td><code>1BIT-DATA</code></td>
+<td>models, Lemonade's cache and config, <code>hrx-jit</code>, NPU sets, <code>ssh/</code> — copied to the target's <code>/data</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Partition 2 keeps the ISO's own volume label on purpose: that label is how casper finds its squashfs and
+mounts it as <code>/cdrom</code>, which is where our seed and our repository have to be visible. Renaming it (to
+<code>1BIT-INSTALL</code>, say) would mean a <code>findiso=</code>/<code>iso-scan</code> kernel option and a casper that ignores the medium
+— more moving parts for a cosmetic name. <code>os/v3/pin.txt</code> records the ISO's URL, size, sha256 and volume
+label next to the Ubuntu snapshot timestamp that <code>mkrootfs.sh</code> already pins, so the medium is
+reproducible from that file alone.</p>
+<p><code>/1bit/</code> on partition 2:</p>
+<pre><code>/1bit/autoinstall.yaml      the seed (generated at stick-write time, below)
+/1bit/repo/                 our signed apt repository: Release, Release.gpg, InRelease, *.deb
+/1bit/keys/1bit-archive-keyring.gpg
+/1bit/mok/MOK-Kernel.der    the key the kernel and the out-of-tree modules are signed with
+/1bit/identity              username, password hash, hostname, target disk serial, ssh keys (root 0600)
+/1bit/install.log           written by the install, on both media (#710)
+</code></pre>
+<h3 id="the-grub-menu">The grub menu<a class="anchor" href="#the-grub-menu" title="Permanent link">#</a></h3>
+<p>Two entries; the default is the live appliance, so a stick left in a machine still comes up as today.</p>
+<pre><code>menuentry &quot;1bit OS (live)&quot; {
+    linuxefi /1bit-os.efi
+}
+menuentry &quot;Install 1bit OS onto this machine&quot; {
+    search --no-floppy --label &quot;&lt;ISO label&gt;&quot; --set=root
+    linux  /casper/vmlinuz autoinstall &quot;ds=nocloud;s=/cdrom/1bit/&quot; \
+           --- console=tty1 console=ttyS0,115200
+    initrd /casper/initrd
+}
+</code></pre>
+<p><code>autoinstall</code> plus a NoCloud seed in the medium's own root (<code>s=/cdrom/1bit/</code>) is subiquity's documented
+unattended path; the <code>console=</code> pair is what puts the same transcript on the screen (#710) and on the
+serial line the QEMU gate reads. <code>1bit-os.efi</code> stays a single-file EFI stub, so the live entry is the
+byte-identical payload <code>os/mini/mkimage.sh</code> writes today.</p>
+<h3 id="prepare-sticksh-grows-an-identity"><code>prepare-stick.sh</code> grows an identity<a class="anchor" href="#prepare-sticksh-grows-an-identity" title="Permanent link">#</a></h3>
+<p>The seed is per-stick, not per-release: it names the machine's user, password hash, hostname and target
+disk. <code>prepare-stick.sh</code> (already the tool that writes <code>authorized_keys</code> and mints Lemonade's API key)
+gains:</p>
+<pre><code class="language-sh">prepare-stick.sh /dev/sdX --ssh-pubkey ~/.ssh/id_ed25519.pub \
+    --user onebit --hostname 1bit-strixhalo --disk-serial YMA62T0KA2417407NP \
+    --model ~/models/Qwen3-0.6B-Q4_K_M.gguf
+</code></pre>
+<p>It writes <code>/1bit/identity</code> (<code>0600</code>, root), hashes the password with <code>openssl passwd -6</code>, and renders
+<code>/1bit/autoinstall.yaml</code> from the template below, substituting the identity and the disk serial.
+<code>--disk-serial</code> is required for a destructive install: the storage config matches that serial, so a stick
+written for one machine cannot wipe another, and a re-run finds the same disk. <code>--any-disk</code> (largest disk)
+exists for the QEMU gate and prints a warning that the stick is not machine-bound.</p>
+<h2 id="the-installed-layout">The installed layout<a class="anchor" href="#the-installed-layout" title="Permanent link">#</a></h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>size</th>
+<th>fs</th>
+<th>label</th>
+<th>contents</th>
+<th>on v2 → v3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1 GiB</td>
+<td>FAT32</td>
+<td><code>1BIT-OS</code></td>
+<td>Ubuntu's shim + grub (Microsoft- and Canonical-signed), <code>grub.cfg</code>, <code>/boot/efi</code></td>
+<td>created</td>
+</tr>
+<tr>
+<td>2</td>
+<td>64 GiB</td>
+<td>ext4</td>
+<td><code>1BIT-ROOT</code></td>
+<td>the system, <code>/boot</code> (kernels and initramfs), <code>/var</code>, <code>/home</code>, an 8 GiB <code>/swap.img</code></td>
+<td>created</td>
+</tr>
+<tr>
+<td>3</td>
+<td>the rest</td>
+<td>ext4</td>
+<td><code>1BIT-DATA</code></td>
+<td>models, Lemonade's cache and config, <code>hrx-jit</code>, NPU sets, keys — <code>/data</code></td>
+<td><strong>adopted, never formatted</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Numbers: 1 GiB is the Ubuntu default and the measured size of this box's ESP (1.1 GiB, 6.4 MB used, so
+two kernels and their initramfs fit with room); 64 GiB for the root because a base Ubuntu 26.04 install
+plus the 180 MB runtime below, its journal and <code>/var</code> fit in a tenth of that, and because the rest of the
+disk belongs to the models — a fixed number, not a percentage, so the same seed gives the same table on
+any disk (<code>size: -1</code> on partition 3 takes the remainder). No swap <em>partition</em>: Ubuntu's own <code>/swap.img</code> on the root
+filesystem keeps the partition table to what the appliance needs, and it is the image <code>unattended-upgrades</code>
+and hibernate-free servers already run.</p>
+<p><code>/boot</code> is on the root filesystem, not its own partition: <code>update-initramfs</code> and <code>update-grub</code> then work
+on any kernel package without a size limit, and the ESP only holds the boot chain (v2's <code>install.sh</code>
+already does this, and its grub entry searches <code>1BIT-ROOT</code> for <code>/boot</code>).</p>
+<p><code>/data</code> as partition 3 is the one layout decision carried over from v2 unchanged, for the reason v2
+documents: models are hundreds of GiB and must outlive the OS. Here it also carries the machine's
+identity across a v2 → v3 reinstall (below).</p>
+<p><strong>fstab by UUID, not by label.</strong> v2 mounts <code>LABEL=1BIT-*</code> because its image is generic. That bit the
+installer: with the stick in the machine there are two <code>1BIT-DATA</code> partitions and <code>findfs</code> may answer
+with the wrong one (engine#539, measured). v3 generates the target's <code>/etc/fstab</code> at install time from the
+UUIDs it just created, and uses the labels only for the installer's own discovery.</p>
+<h2 id="the-autoinstall">The autoinstall<a class="anchor" href="#the-autoinstall" title="Permanent link">#</a></h2>
+<pre><code class="language-yaml">#cloud-config
+autoinstall:
+  version: 1
+  # Nothing is asked. The two questions that must not be silent - which disk, which user - are answered
+  # by /1bit/identity at stick-write time and shown on the install screen before anything is written.
+  interactive-sections: []
+  refresh-installer: {update: false}          # the medium is pinned; no network fetch of subiquity
+  locale: en_US.UTF-8
+  keyboard: {layout: us}
+  timezone: America/Halifax
+  identity:
+    hostname: &quot;@HOSTNAME@&quot;
+    username: &quot;@USER@&quot;
+    password: &quot;@PASSWORD_HASH@&quot;               # openssl passwd -6, generated on the build machine
+  ssh:
+    install-server: true
+    allow-pw: false                           # keys only; the password is for sudo and the console
+    authorized-keys: [&quot;@SSH_KEY@&quot;]            # from /data/ssh/authorized_keys on the stick
+  storage:
+    swap: {size: 0}
+    config:
+      - {type: disk, id: disk0, ptable: gpt, grub_device: true, preserve: false,
+         match: {serial: &quot;@DISK_SERIAL@&quot;}}    # a stick cannot wipe a machine it was not written for
+      - {type: partition, id: part-esp, device: disk0, number: 1, size: 1G, flag: boot, wipe: superblock}
+      - {type: format, id: fmt-esp, volume: part-esp, fstype: fat32, label: 1BIT-OS}
+      - {type: mount, id: mnt-esp, device: fmt-esp, path: /boot/efi}
+      - {type: partition, id: part-root, device: disk0, number: 2, size: 64G, wipe: superblock}
+      - {type: format, id: fmt-root, volume: part-root, fstype: ext4, label: 1BIT-ROOT}
+      - {type: mount, id: mnt-root, device: fmt-root, path: /}
+      # preserve: true is the v2 -&gt; v3 upgrade path in one key: an existing 1BIT-DATA is adopted with its
+      # contents, and on a fresh disk curtin creates it. No separate &quot;upgrade&quot; installer exists.
+      - {type: partition, id: part-data, device: disk0, number: 3, size: -1, preserve: true}
+      - {type: format, id: fmt-data, volume: part-data, fstype: ext4, label: 1BIT-DATA, preserve: true}
+      - {type: mount, id: mnt-data, device: fmt-data, path: /data}
+  apt:
+    geoip: false
+    preserve_sources_list: false
+    # The archive, for the stock packages only. Ours come from the medium in postinstall and are *not* a
+    # persistent source: a file:///cdrom URI left in the target's sources.list is a dead source the moment
+    # the stick is out, so the installed machine's one source is 1bit.gg/apt (written by 1bit-appliance, as
+    # v2 does), and postinstall installs the medium's repo through a temporary source file it removes.
+    primary:
+      - {uri: &quot;http://archive.ubuntu.com/ubuntu&quot;, arches: [amd64]}
+    fallback: offline-install
+  packages: [openssh-server, efibootmgr, mokutil, unattended-upgrades, ca-certificates, curl,
+             python3-minimal, rsync, zstd, pciutils, lm-sensors, ethtool]
+  early-commands:
+    - /cdrom/1bit/steps plan          # the whole step list, before subiquity draws (#710)
+  late-commands:
+    - curtin in-target -- /cdrom/1bit/postinstall   # the steps in the next section
+  error-commands:
+    - /cdrom/1bit/steps failed        # last step turns red, its output and the log path stay on screen
+  reporting:
+    builtin: {type: print}
+</code></pre>
+<p>What each part is for, and what it is not:</p>
+<ul>
+<li><strong><code>packages:</code> is only the archive side.</strong> <code>openssh-server</code> and <code>efibootmgr</code>/<code>mokutil</code> are the three
+  tools engine#709 found missing; <code>python3-minimal</code> turns <code>release-check</code>'s <code>sealed-sig</code> row from SKIP
+  into a real check (the c18 image SKIPs it for exactly that reason, measured in the gate log);
+  <code>unattended-upgrades</code> is the update path.</li>
+<li><strong>Our packages come from <code>/1bit/repo</code>, not from <code>packages:</code></strong>, in <code>postinstall</code>, because a deb install
+  must run <em>after</em> the base is unpacked and before the first boot, and because it must be visible in the
+  install screen's step list.</li>
+<li><strong><code>fallback: offline-install</code></strong> is what lets a machine with no network install at all: curtin then takes
+the stock packages from the ISO's own pool instead of aborting at <code>apt update</code>. Our own packages never
+depend on the network, because they are on the medium.</li>
+<li><strong><code>preserve: true</code> on partition 3</strong> is the v2 → v3 path (see <a href="#the-upgrade-path">Upgrade</a>). It is also
+  what makes the installer idempotent: a second run over a v3 machine keeps <code>/data</code>.</li>
+<li><strong>Not used, deliberately</strong>: <code>source:</code> (we install the stock server variant), <code>drivers:</code>/<code>codecs:</code>
+  (they pull third-party repositories and prompts), <code>kernel-crash-dumps:</code>, <code>snaps:</code>, <code>network:</code>
+  (netplan's DHCP default is right, and a fixed address belongs in the console menu, not the seed).</li>
+</ul>
+<h3 id="postinstall-our-steps"><code>postinstall</code> — our steps<a class="anchor" href="#postinstall-our-steps" title="Permanent link">#</a></h3>
+<p>Runs in the target chroot (<code>curtin in-target</code>), so every path is the target's except <code>/cdrom</code>. Its steps
+are the screen's steps 3–8, in this order (1 and 2 are the seed's identity line and curtin's own base
+install):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>screen step</th>
+<th>command</th>
+<th>what it writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td><code>apt-get install</code> our repo's debs (<code>1bit-kernel-&lt;kver&gt;</code>, <code>1bit-kernel-modules-&lt;kver&gt;</code>, <code>1bit-rocm</code>, <code>1bit-xrt</code>, <code>1bit-engine</code>, <code>1bit-lemonade</code>, <code>1bit-appliance</code>, <code>1bit-archive-keyring</code>)</td>
+<td><code>/opt/1bit</code>, <code>/opt/lemonade</code>, <code>/boot/vmlinuz-&lt;kver&gt;</code>, <code>/lib/modules/&lt;kver&gt;/updates/{amdxdna,ec_su_axb35}.ko</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>update-initramfs -u -k &lt;kver&gt;</code>, <code>update-grub</code></td>
+<td>an initramfs with <code>amdgpu</code>, <code>amdxdna</code>, <code>efivarfs</code>, and one grub entry per kernel in <code>/boot</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>mokutil --test-key /cdrom/1bit/mok/MOK-Kernel.der</code> else <code>mokutil --import</code> (password on stdin, twice)</td>
+<td>the MokNew efivars the next boot's MokManager reads</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>efibootmgr -c -d &lt;disk&gt; -p 1 -L "1bit OS" -l '\EFI\ubuntu\shimx64.efi'</code>, <code>-o</code> first, <code>-n</code> BootNext, delete entries whose loader is not on this ESP</td>
+<td>the firmware entry engine#709 asks for</td>
+</tr>
+<tr>
+<td>7</td>
+<td>adopt <code>/data</code>: <code>chown onebit</code>, <code>install -d models lemonade/cache lemonade/config cache/hrx-jit npu ssh</code>, copy <code>/data/ssh/host_ed25519</code> to <code>/etc/ssh/ssh_host_ed25519_key</code></td>
+<td>a machine whose SSH identity survives a reinstall</td>
+</tr>
+<tr>
+<td>8</td>
+<td>verify: <code>mount -o ro</code> both partitions, <code>sha256sum /boot/vmlinuz-&lt;kver&gt;</code>, <code>dpkg-query -W '1bit-*'</code>, <code>systemctl is-enabled</code> the unit set, <code>1bit-release-check</code></td>
+<td><code>/data/install.log</code> on both media, the screen, ttyS0</td>
+</tr>
+</tbody>
+</table></div>
+<p>The <code>1bit-appliance</code> postinst enables the unit set exactly as v2 does, including the measured
+<code>ssh.socket</code> rule (enabling <code>ssh.service</code> as well makes a connection hang at banner exchange) and
+<code>systemctl --root</code>-safe links for the chroot install.</p>
+<h2 id="the-install-screen-engine710">The install screen (engine#710)<a class="anchor" href="#the-install-screen-engine710" title="Permanent link">#</a></h2>
+<p>One renderer, the same one v2's <code>os/mini/tui.sh</code> work already implements: a full-screen step list on
+tty1 with a fixed log tail, one line per step that flips pending → running → done with its elapsed time,
+a determinate bar with MB/s and ETA for the steps that move bytes, and a red step that stops the screen
+with the failing command and its output. <code>[ -t 1 ]</code> false (the serial line, the QEMU harness) prints the
+same lines as plain text, byte-for-byte, which is what the gates assert.</p>
+<p>The screen covers the <em>whole</em> install, which for v3 means one list that spans both processes:</p>
+<pre><code> 1  target disk and identity          /dev/nvme0n1  YMTC PC41Q-2TB  1.9 TB   user onebit  host 1bit-strixhalo
+ 2  base system (Ubuntu 26.04 Server)   curtin: partitions, unpack, packages, bootloader
+ 3  our repository from the stick      8 debs: kernel, modules, rocm, xrt, engine, lemonade, appliance, keyring
+ 4  kernel and modules                 vmlinuz-7.3.0-rc4-1bit-perfopt+, amdxdna, ec_su_axb35, initramfs
+ 5  Secure Boot key                    already enrolled  |  queued for MokManager at the next boot
+ 6  firmware boot entry                1bit OS -&gt; \EFI\ubuntu\shimx64.efi   BootOrder 0000,...
+ 7  data partition                     adopted 1BIT-DATA (1.1 GB, 4 models)  |  created empty
+ 8  verification                       ESP listed, kernel sha256, 8 packages, units enabled
+ 9  done                               remove the stick; rebooting into the installed system in 10 s
+</code></pre>
+<p>Steps 1, 3–9 are ours (<code>early-commands</code>, <code>postinstall</code>, <code>error-commands</code>), step 2 is subiquity's and is
+shown by subiquity. The handoff is explicit and is the one thing in this design to prove in the gate:
+subiquity draws tty1 from the moment it starts, so our step lines are written to tty1 <strong>and</strong> ttyS0
+<strong>and</strong> <code>curtin</code>'s log (whose tail subiquity displays); if the tail does not show them, the renderer takes
+tty1 after curtin's postinstall stage instead, and the QEMU gate decides between the two by grepping the
+serial transcript — either way the transcript carries every step, which is what the gate asserts.</p>
+<p>Engine#710's other requirements map as: every step also to <code>/data/install.log</code> on the stick (<code>/cdrom/...</code>
+is read-only) and on the disk, plus ttyS0; errors never a bare exit; the final line and its countdown are
+ours, printed before subiquity's own "Installation complete" reboot — and because step 4 sets <code>BootNext</code>
+to the disk's entry, that reboot lands on the installed system <strong>with the stick still in</strong>, which is the
+part the owner actually needs after engine#709.</p>
+<h2 id="the-firmware-boot-entry-engine709">The firmware boot entry (engine#709)<a class="anchor" href="#the-firmware-boot-entry-engine709" title="Permanent link">#</a></h2>
+<p>The failure that motivated it, measured on this box: <code>efibootmgr -v</code> shows ten entries in <code>BootOrder</code>,
+<code>Boot0000</code> "Ubuntu" → <code>\EFI\ubuntu\shimx64.efi</code> on the current ESP, and a stale <code>Boot0002 "1bit OS USB"</code>
+that points at a <code>VenHw</code> device path with no file. After the first v2 install the firmware tried the wiped
+Ubuntu entry, failed, and fell through to the stick.</p>
+<p>Three fixes, all in the installed system rather than in a special-case installer:</p>
+<ol>
+<li><strong>efivarfs exists.</strong> Our kernel is built with <code>CONFIG_EFIVAR_FS=m</code> (measured in
+   <code>/boot/config-7.3.0-rc4-1bit-perfopt+</code>) and an Ubuntu base loads it, so <code>/sys/firmware/efi/efivars</code> is
+   populated (97 entries on this box). The v2 image never staged the module and BusyBox never loaded it,
+   which is why the live installer could not fix anything from <em>inside</em> the installed system either
+   (engine#709). v3 installs from a full Ubuntu session, where <code>efibootmgr</code> works, and asks for <code>=y</code>
+   in the kernel config anyway so the next BusyBox image cannot regress it.</li>
+<li><strong><code>efibootmgr</code> is in the image and in the target</strong> (<code>packages:</code> above), and the entry points at the
+   shim Ubuntu's bootloader step installed, not at a path we invented.</li>
+<li><strong>The entry is created, ordered and cleaned</strong>, and the resulting <code>BootOrder</code> is printed on the install
+   screen (step 6) and written to the log. Deleting entries whose loader does not exist on the target
+   disk is the part that stops a batch of dead entries from reordering future boots.</li>
+</ol>
+<p>The QEMU gate asserts the entry because OVMF has working efivars: after the install, with the same NVRAM
+copy, <code>efibootmgr -v</code> in the installed system must show <code>1bit OS</code> first in <code>BootOrder</code>.</p>
+<h2 id="the-package-set">The package set<a class="anchor" href="#the-package-set" title="Permanent link">#</a></h2>
+<p><code>1bit.gg/apt</code>, same names and layout as v2, with the pieces Ubuntu 26.04 or the release already provide
+not re-built:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>package</th>
+<th>what</th>
+<th>size (measured where noted)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1bit-kernel-image-&lt;kver&gt;</code></td>
+<td><code>/boot/vmlinuz</code>, config, <code>System.map</code>; postinst runs <code>update-initramfs</code>; versioned name = the rollback</td>
+<td>86 MB <code>.deb</code> (this box)</td>
+</tr>
+<tr>
+<td><code>1bit-kernel-headers-&lt;kver&gt;</code></td>
+<td>installed only when the out-of-tree modules must be rebuilt on a kernel bump; not in the seed's package list, so a fresh install has the eight below</td>
+<td>10 MB <code>.deb</code> (this box)</td>
+</tr>
+<tr>
+<td><code>1bit-kernel-modules-&lt;kver&gt;</code></td>
+<td><code>amdxdna.ko</code> (0.18.0 pin) and <code>ec_su_axb35.ko</code> in <code>/lib/modules/&lt;kver&gt;/updates/</code>, signed with our MOK (<code>strixhalo Secure Boot Kernel</code>, measured)</td>
+<td>34 KB + 450 KB loaded</td>
+</tr>
+<tr>
+<td><code>1bit-rocm</code></td>
+<td>the pinned TheRock user space the release was gated with, at its measured paths: <code>libhsa-runtime64.so.1</code>, <code>libamd_comgr.so.3</code>, <code>libamdhip64.so</code>, <code>librocblas</code>, <code>libhipblaslt</code>, <code>librocsolver</code>, <code>librocsparse</code>, <code>llvm/amdgcn/bitcode</code>; <code>/etc/1bit/libhsa.env</code> with the no-SVM trio</td>
+<td>173 MB + 3.5 MB bitcode</td>
+</tr>
+<tr>
+<td><code>1bit-xrt</code></td>
+<td><code>Depends:</code> the archive's <code>libxrt-npu2</code>, <code>libxrt-utils-npu</code>, <code>libxrt2</code> (measured 1:2.21.75+dfsg-4) — the device nodes and tools, not rebuilt</td>
+<td>from the archive</td>
+</tr>
+<tr>
+<td><code>1bit-engine</code></td>
+<td><code>/opt/1bit</code> as v2: <code>1bit</code>, the HRX <code>llama-server</code> and its libraries, <code>1bit-selftest</code>, <code>1bit-release-check</code>, <code>1bit-board</code>, sealed NPU sets, <code>/etc/1bit/engine.conf</code></td>
+<td>release tarball</td>
+</tr>
+<tr>
+<td><code>1bit-lemonade</code></td>
+<td>the release's own <code>lemond</code> + resources (the <code>onebit</code> recipe, one hop to <code>1bit serve</code>), <code>/opt/lemonade</code>, its unit</td>
+<td>39 MB <code>.tar.zst</code> (c18)</td>
+</tr>
+<tr>
+<td><code>1bit-appliance</code></td>
+<td>units (<code>1bit-console</code> on tty1, <code>data.mount</code>, <code>1bit-board</code>, <code>1bit-boost</code>, <code>1bit-first-boot</code>), banner, ssh socket, <code>unattended-upgrades</code> policy, <code>/etc/1bit/power</code>, <code>/data</code> tmpfiles</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>1bit-archive-keyring</code></td>
+<td>the public half of the key that signs <code>1bit.gg/apt</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>1bit-openwebui</code></td>
+<td>optional, as v2: published, installed by nobody, nothing depends on it</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two things v3 takes from the archive instead of building, because engine#712 is about the OS, not the
+supply chain: <strong><code>linux-firmware-amd-graphics</code> and <code>linux-firmware-amd-misc</code></strong> (26.04's split packages,
+on two revisions - measured here, <code>-amd-misc</code> <code>20260319.git217ca6e4-0ubuntu1.1</code> and <code>-amd-graphics</code>
+<code>20260319.git217ca6e4-0ubuntu3.1</code>; <code>-amd-misc</code> is "Firmware for AMD NPU accelerators", and it is
+what puts <code>amdnpu/17f0_11/npu.sbin.zst</code> under <code>/lib/firmware</code>), and <strong>XRT</strong>, as above. Both carry their
+own licences and land in <code>/usr/share/doc/&lt;package&gt;/copyright</code>, which is what <code>os/LICENSES.md</code> already
+records for the current image.</p>
+<p>The runtime is pinned by sha256, and the three runtimes that exist on a v3 box are the three engine#715
+measured:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>runtime</th>
+<th>sha256 (measured)</th>
+<th>v3's use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>release-gated <code>libhsa</code> (c18)</td>
+<td><code>f6ef689d…</code></td>
+<td>what <code>1bit-rocm</code> installs</td>
+</tr>
+<tr>
+<td>TheRock nightly at <code>/opt/rocm-therock</code></td>
+<td><code>21a66824…</code></td>
+<td>the same file on a box built from the SDK</td>
+</tr>
+<tr>
+<td>distro ROCm 7.1 <code>libhsa-runtime64.so.1</code></td>
+<td><code>5b113248…</code></td>
+<td>present because XRT pulls the distro stack — <strong>not</strong> what HRX loads</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>/etc/1bit/libhsa.env</code> (the <code>EnvironmentFile=-</code> hook v2's lemonade unit already has) carries the measured
+fault-free arm by default:</p>
+<pre><code>HSA_USE_SVM=0
+HSA_USERPTR_FOR_PAGED_MEM=0
+HRX_ALLOW_NO_SVM=1
+ONEBIT_HRX_LIBHSA=/opt/1bit/libhsa/libhsa-runtime64.so.1
+</code></pre>
+<p>This box reports <code>XNACK enabled: NO</code> and <code>Coherent Host Access: FALSE</code>; without the trio HRX page-faults
+on its first graph replay (#715, 58 fault lines, HTTP 500 in &lt;10 ms) and the release-tarball runtime
+refuses the device outright. <code>1bit serve --hrx-cwsr-placement</code> is the alternative knob; the doc sets the
+trio because it is the arm that was measured fault-free at 260.1 tok/s.</p>
+<p><strong>Kernel and modules move together.</strong> <code>1bit-kernel-image-&lt;kver&gt;</code> and <code>1bit-kernel-modules-&lt;kver&gt;</code> are
+the same upstream version and both versioned; the image <code>Depends:</code> the modules of its own <code>&lt;kver&gt;</code>, so no
+<code>apt</code> resolution can install one without the other, and <code>unattended-upgrades</code> upgrading the image pulls
+the modules in the same run. That is the v2 lesson (a module built for another kernel is a machine whose
+fans and NPU are gone) applied to the package graph instead of to <code>mkdebs.sh</code>'s checks alone.</p>
+<p><strong><code>unattended-upgrades</code> policy</strong>: security updates automatic; <code>1bit.gg/apt</code> automatic for everything
+except <code>1bit-kernel-*</code> and <code>1bit-rocm</code> (a kernel needs a reboot, a modules pair, and the gate; a ROCm
+move is a measured decision), which are <code>Package-Blacklist</code>ed and reported by <code>release-check</code>'s <code>updates</code>
+row; <code>Automatic-Reboot "false"</code>, and the console menu shows "reboot required" instead. That is the
+appliance's contract: it cannot silently become a machine nobody measured.</p>
+<p><strong>User and ssh</strong>: <code>onebit</code> in <code>sudo</code>, root locked, <code>ssh.socket</code> enabled with keys carried from the stick,
+<code>PasswordAuthentication no</code>, <code>PermitRootLogin no</code>. The account is <code>onebit</code> and not <code>1bit</code> because a Linux
+user name has to start with a letter — <code>adduser</code>'s default <code>NAME_REGEX</code> is <code>^[a-zA-Z][a-zA-Z0-9_-]*$</code>
+(measured in <code>/etc/adduser.conf</code> here) and the installer applies the same rule, so <code>1bit</code> is refused
+before the first byte is written; <code>seed.sh</code> refuses it too and its selftest pins that. Headless means the
+console is the fallback, not the other way round: <code>1bit-menu</code> on tty1 can drop to a shell as <code>onebit</code>
+(sudo), and ttyS0 gets a console unit so a serial cable works when ssh does not.</p>
+<p><strong><code>1bit-menu</code> on tty1</strong> is a unit (<code>1bit-console.service</code>, <code>Conflicts=getty@tty1.service</code>), not an
+autologin shell: it draws the banner (model, IP, API key hint, GPU/NPU state, pending updates), drives
+<code>1bit-release-check</code>, and its whole job after that is to be the screen the owner looks at. ssh and ttyS0
+stay plain, which is what keeps the gates unchanged.</p>
+<h2 id="the-upgrade-path">The upgrade path<a class="anchor" href="#the-upgrade-path" title="Permanent link">#</a></h2>
+<p><strong>v2 → v3 is a reinstall, not an upgrade, and the installer says so.</strong> v2's installed machine is a
+BusyBox initramfs on the ESP and one ext4 <code>/data</code>; there is no dpkg database, no user, no package for
+<code>apt</code> to upgrade. What carries is exactly what is on <code>/data</code>, because <code>preserve: true</code> keeps partition 3:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>carried</th>
+<th>how</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>models (<code>/data/models</code>)</td>
+<td>left in place; <code>/data</code> mounted by UUID in the new fstab</td>
+</tr>
+<tr>
+<td>Lemonade's config, cache and backends</td>
+<td>left in place; the unit's <code>HOME=/data/lemonade</code> is unchanged</td>
+</tr>
+<tr>
+<td><code>hrx-jit</code> kernel cache, sealed NPU sets (<code>/data/npu</code>)</td>
+<td>left in place; <code>GGML_HRX_JIT_CACHE_DIR</code> unchanged</td>
+</tr>
+<tr>
+<td>SSH host key and <code>authorized_keys</code></td>
+<td><code>/data/ssh/host_ed25519</code> → <code>/etc/ssh/ssh_host_ed25519_key</code>; <code>authorized_keys</code> → <code>/home/onebit/.ssh/</code></td>
+</tr>
+<tr>
+<td>Lemonade's API key</td>
+<td><code>/data/lemonade/lemond.conf</code> read as before</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table"><table>
+<thead>
+<tr>
+<th>not carried, by design</th>
+<th>why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v2's kernel and initramfs on the ESP</td>
+<td>v3 keeps its kernels in <code>/boot</code> and its boot chain in the ESP; the old files are removed with the partition table</td>
+</tr>
+<tr>
+<td><code>/data/.installed</code></td>
+<td>v3 has no live/installed marker; <code>release-check</code>'s <code>mode</code> row reads the mount, not the file</td>
+</tr>
+<tr>
+<td>root-only ssh</td>
+<td>replaced by the <code>onebit</code> user; the same keys work</td>
+</tr>
+</tbody>
+</table></div>
+<p>The stick for this is the v3 stick with the machine named: <code>prepare-stick.sh --disk-serial …</code>, then the
+install. The doc's rule is that a v2 machine can also be <strong>returned</strong> to v2 by writing the v2 image,
+because <code>/data</code> was never touched.</p>
+<p><strong>v3 → v3 is <code>apt</code></strong>: <code>apt update &amp;&amp; apt upgrade</code> from <code>1bit.gg/apt</code>, unattended for security and for our
+non-kernel packages, with the previous kernel kept installed (versioned package names) so the grub menu
+still has the entry to go back to. After any upgrade the machine's own <code>1bit-release-check</code> runs and its
+<code>updates</code>/<code>reboot-required</code> rows say what is pending. No <code>do-release-upgrade</code> is offered from v3: the next
+OS change is the next v3 installer, because the base snapshot moves with the release and the kernel is
+ours anyway.</p>
+<h2 id="the-gates">The gates<a class="anchor" href="#the-gates" title="Permanent link">#</a></h2>
+<p>Same four QEMU phases the release already runs (<code>gate-c18.sh</code>), retargeted at the v3 stick, plus one
+phase that is new because the install is new:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>phase</th>
+<th>what runs</th>
+<th>what must hold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A (stick)</td>
+<td>boot the stick's live entry</td>
+<td>unchanged from c18: banner, <code>1bit-selftest</code>, <code>llama-server</code> on HRX0</td>
+</tr>
+<tr>
+<td>R (release check)</td>
+<td><code>1bit-release-check</code> on the stick</td>
+<td>unchanged, plus <code>sealed-sig</code> is still SKIP (the live image has no python3)</td>
+</tr>
+<tr>
+<td>I (install)</td>
+<td>boot the install entry, unattended</td>
+<td>the serial transcript contains every step line 1–9, the <code>1bit OS</code> boot entry and the printed <code>BootOrder</code>, <code>postinstall</code> exit 0, the install log written to both media</td>
+</tr>
+<tr>
+<td>B (installed)</td>
+<td>boot the installed disk alone, same NVRAM</td>
+<td><code>efivarfs</code> mounted; <code>dpkg-query -W '1bit-*'</code> = 8 packages; <code>systemctl is-enabled</code> the unit set; <code>ssh.socket</code> listening; <code>getent passwd onebit</code> and <code>sudo -l</code>; <code>/data</code> mounted from partition 3 by UUID; <code>apt-get update</code> and <code>apt-cache policy</code> from <code>1bit.gg/apt</code>; <code>unattended-upgrades --dry-run</code> clean; <code>1bit-release-check</code> PASS with <code>sealed-sig</code> now checked (<code>python3</code> present); <code>1bit-console</code> active on tty1</td>
+</tr>
+<tr>
+<td><strong>V</strong> (v2 → v3)</td>
+<td>install a v2 image, then the v3 stick over it</td>
+<td><code>/data</code> contents identical before and after (manifest sha256), the ssh host key unchanged, the v2 ESP gone, the machine boots v3</td>
+</tr>
+</tbody>
+</table></div>
+<p>QEMU specifics, all measured as available on this box: <code>qemu-system-x86_64</code> with
+<code>-drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd</code> and a writable copy of
+<code>OVMF_VARS_4M.fd</code> (the efivar assertions need a NVRAM that survives a reboot), <code>-nographic</code> with
+<code>console=ttyS0,115200</code>, one NVMe disk with a fixed serial (<code>-device nvme,serial=1BITTEST…</code>) so the seed's
+<code>match: {serial:}</code> resolves, 8 GiB RAM, and a second NVMe/<code>-drive</code> for the v2 image in phase V. Secure
+Boot stays off in the VM (<code>OVMF_CODE_4M.fd</code>, not <code>…secboot.fd</code>), exactly as v2's <code>vmtest</code> documents: MOK
+enrolment is the machine's step, not a VM's.</p>
+<p><strong>Board gate</strong> (the owner, on the Strix Halo box, stick in hand): boot the stick live, <code>1bit-release-check</code>
+(every row PASS or SKIP with a reason — the VM run's 18-row transcript is the reference for what each row
+asserts), then the install entry, watch the screen, then — <strong>with the stick still in</strong> — confirm the reboot lands on the installed machine; then
+<code>efibootmgr -v</code> (<code>1bit OS</code> first), <code>systemctl status</code> the unit set, <code>1bit-menu</code> on the monitor, ssh from
+the build machine with the carried key, HRX chat and NPU chat from <code>1bit-menu</code>, fans/power units active,
+and <code>apt upgrade</code> on the installed box. Secure Boot is on: the install queues our MOK, so the very first
+boot after install stops in MokManager and needs one keyboard round trip; on a box that already has the
+key enrolled (<code>mokutil --test-key</code> true) there is none. That step is why the doc says the <em>install</em> needs
+a console; everything after it is headless.</p>
+<h2 id="what-is-measured-now">What is measured now<a class="anchor" href="#what-is-measured-now" title="Permanent link">#</a></h2>
+<p>Reference box (strixhalo, 2026-11-01, the machine this design was written on):</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>fact</th>
+<th>measured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>base</td>
+<td>Ubuntu 26.04.1 LTS, resolute</td>
+</tr>
+<tr>
+<td>our kernel</td>
+<td><code>7.3.0-rc4-1bit-perfopt+</code>, <code>linux-image-7.3.0-rc4-1bit-perfopt+</code> 7.3.0~rc4-4, <code>CONFIG_EFIVAR_FS=m</code></td>
+</tr>
+<tr>
+<td>out-of-tree modules</td>
+<td><code>amdxdna.ko</code>, <code>ec_su_axb35.ko</code> in <code>/lib/modules/&lt;kver&gt;/updates/</code>, both signed <code>strixhalo Secure Boot Kernel</code>, vermagic <code>&lt;kver&gt; SMP preempt mod_unload modversions</code></td>
+</tr>
+<tr>
+<td>MOK</td>
+<td><code>CN=strixhalo Secure Boot Kernel, O=1bit-MONSTER</code>, self-signed, EKU Code Signing; Secure Boot enabled</td>
+</tr>
+<tr>
+<td>firmware</td>
+<td><code>efibootmgr</code> 10 entries; <code>Boot0000 Ubuntu</code> → <code>\EFI\ubuntu\shimx64.efi</code>; stale <code>Boot0002 1bit OS USB</code>; 97 efivars</td>
+</tr>
+<tr>
+<td>firmware packages</td>
+<td><code>linux-firmware-amd-misc</code> 20260319.git217ca6e4-<strong>0ubuntu1.1</strong> and <code>linux-firmware-amd-graphics</code> 20260319.git217ca6e4-<strong>0ubuntu3.1</strong> (two revisions, measured; the first is what carries <code>amdnpu/17f0_11/npu.sbin.zst</code>)</td>
+</tr>
+<tr>
+<td>XRT</td>
+<td><code>libxrt-npu2</code>, <code>libxrt-utils-npu</code>, <code>libxrt2</code> 1:2.21.75+dfsg-4</td>
+</tr>
+<tr>
+<td>ROCm</td>
+<td><code>/opt/rocm-therock</code> 7.2 GB; the runtime subset 173 MB + 3.5 MB bitcode; <code>libhsa</code> <code>21a66824…</code></td>
+</tr>
+<tr>
+<td>the three libhsa</td>
+<td><code>f6ef689d…</code> (release), <code>21a66824…</code> (nightly), <code>5b113248…</code> (distro 7.1)</td>
+</tr>
+<tr>
+<td>packages</td>
+<td>kernel image 86 MB <code>.deb</code>, headers 10 MB; c18 <code>lemonade-onebit</code> 39 MB; live <code>.img.zst</code> 397 MB; live <code>.efi</code> 106 MB</td>
+</tr>
+<tr>
+<td>v2 in the field</td>
+<td>ESP 512 MiB + <code>1BIT-DATA</code>; <code>1bit-install</code> writes <code>/data/.installed</code>; no efivarfs, no <code>efibootmgr</code> (engine#709)</td>
+</tr>
+<tr>
+<td>c18 gate</td>
+<td>A/R/I/B green in QEMU, install writes ESP + <code>/data</code> (1.1 GB copied), the installed boot passes <code>1bit-release-check</code> 18 rows with <code>sealed-sig</code> SKIP for lack of python3</td>
+</tr>
+<tr>
+<td>the install medium</td>
+<td><code>ubuntu-26.04.1-live-server-amd64.iso</code>, 2,927,861,760 bytes, sha256 <code>cc8a95cd…</code>, last modified 2026-08-26, volume label <code>Ubuntu-Server 26.04.1 LTS amd64</code> — the label read from the ISO's own primary volume descriptor, which is what casper matches; all four in <code>os/v3/pin.txt</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Not measured, and therefore the risk list for the build:</p>
+<ul>
+<li><strong>the medium itself has never been booted</strong> — the pin is verified (size, sha256, label) but the QEMU
+  phase I run is what proves casper finds <code>/cdrom</code> and subiquity takes the seed;</li>
+<li><strong>subiquity's screen handoff</strong> — whether our step lines appear in the tail it displays, or whether the
+  renderer must take tty1 after curtin (the gate decides; both keep the serial transcript complete);</li>
+<li><strong><code>mokutil --import</code> reading its password from stdin</strong> in a curtin chroot — if it refuses, the fallback
+  is a first-boot oneshot that imports it with the console, and the doc's "no MOK" note for boxes whose
+  key is already enrolled stays valid;</li>
+<li><strong><code>preserve: true</code> over a v2 partition table</strong> — curtin's behaviour on a disk whose existing layout does
+  not match the config is the phase-V gate's job, and if it wipes, the fallback is <code>1bit-install
+  --adopt-data</code> grown from the live entry's v2 shell, which has <code>blkid</code> and <code>sfdisk</code> and can write the
+  seed's storage section with explicit ids after inspecting the disk);</li>
+<li><strong>the ROCm subset's completeness</strong> — 173 MB is what <code>ldd</code> on the release's <code>llama-server</code> and
+  <code>libggml-hrx.so</code> needs <em>here</em>, measured while the release still carried DwarfStar's <code>ds4</code> (removed 2026-11-02, out of
+  the shipped build since v2026.44, <a href="https://github.com/1bit-MONSTER/engine/pull/757">#757</a>), so today's
+  set is no larger; a box with a different GPU path may want more, so <code>mkdebs</code> derives the
+  list from those binaries rather than from a hand-written list;</li>
+<li><strong>the ISO repack</strong> (<code>os/v3/mkstick.sh</code>) — extracting a pinned ISO to a partition keeps casper working on
+  the media it was built for; the gate's phase I proves it, and if extraction is not enough the fallback
+  is <code>loopback</code> booting the ISO file, which needs <code>iso-scan/filename=</code> and a second labelled partition.</li>
+</ul>
+<h2 id="the-osv3-tree">The <code>os/v3</code> tree<a class="anchor" href="#the-osv3-tree" title="Permanent link">#</a></h2>
+<p>Everything in this table is what this page proposes; none of it lands in this PR. The two rows marked
+<strong>#732</strong> are that PR's files.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>file</th>
+<th>what</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pin.txt</code></td>
+<td>the server ISO exactly (url, size, sha256, volume label, date) and the series; the engine/kernel/ROCm pins stay the release's own</td>
+</tr>
+<tr>
+<td><code>mkstick.sh</code></td>
+<td><code>mkrootfs</code>'s replacement: extract the pinned ISO to partition 2, add <code>/1bit/</code>, write the ESP from <code>os/mini</code>'s payload, <code>prepare-stick</code>-style identity</td>
+</tr>
+<tr>
+<td><code>mkdebs.sh</code></td>
+<td>v2's <code>mkdebs.sh</code> plus <code>1bit-rocm</code> (subset derived from <code>ldd</code>), <code>1bit-xrt</code> (Depends), the kernel/modules pair, and the archive-keyring</td>
+</tr>
+<tr>
+<td><code>seed.sh</code></td>
+<td><strong>#732</strong>: renders <code>autoinstall.yaml</code> + <code>identity</code> from the stick's inputs, <code>check</code> validates a rendered seed (fields, mode, placeholders, and the YAML's structure with PyYAML), <code>selftest</code> proves both directions</td>
+</tr>
+<tr>
+<td><code>seed-selftest.sh</code></td>
+<td><strong>#732</strong>: the <code>selftest</code> target — good-seed acceptances, 15 refusals with their reasons, and seven structure regressions (no <code>preserve: true</code>, a <code>file://</code> apt source, an unsubstituted placeholder, a root size the identity does not have, a <code>/data</code> that is not <code>1BIT-DATA</code>, an md5 hash, an ESP without <code>grub_device</code>); 32 checks, no device</td>
+</tr>
+<tr>
+<td><code>postinstall</code></td>
+<td>the nine steps, <code>set -e</code> with the failure trap that keeps the screen</td>
+</tr>
+<tr>
+<td><code>steps</code></td>
+<td>the renderer entry points <code>plan</code>, <code>step</code>, <code>failed</code> (v2's <code>os/mini/tui.sh</code>, Apache-noticed copy)</td>
+</tr>
+<tr>
+<td><code>vmtest-v3.sh</code>, <code>vmtest-install-v3.sh</code></td>
+<td>phases A/B and I/V, transcripts in <code>/data</code> as v2's do — the host reads the guest's transcript, so no port forwarding decides a verdict</td>
+</tr>
+<tr>
+<td><code>diag-v3.sh</code></td>
+<td>boot the installed disk and ask the guest what failed; judges nothing</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="licence">Licence<a class="anchor" href="#licence" title="Permanent link">#</a></h2>
+<p>The scripts and this page are Apache-2.0, like the rest of the repository. What the packages carry is in
+<a href="https://github.com/1bit-MONSTER/engine/blob/main/os/LICENSES.md">os/LICENSES.md</a>; the Ubuntu base adds the archive's own licences, and the appliance
+package ships the aggregate under <code>/usr/share/licenses/1bit-os/</code> as v2's does.</p>
+<nav class="pager"><a class="prev" href="os-v3-live-puppy-eval.html"><span>Previous</span>Puppy as the base of 1bit OS v3: evaluation</a><span></span></nav>
+<p class="source meta"><a href="https://github.com/1bit-MONSTER/engine/blob/main/docs/os-v3.md">View this page's source on GitHub ↗</a></p>
+</article>
+</div>
+</main>
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span>© 2026 1bit engine · Apache-2.0</span>
+    <a class="meta" href="https://discord.gg/fa5m4Vawpa" target="_blank" rel="noopener">Join Discord ↗</a>
+    <a class="meta" href="https://github.com/1bit-MONSTER/engine">github.com/1bit-MONSTER/engine</a>
+  </div>
+  <div class="container">
+    <p class="place">Metepenagiag Mi’kmaq Nation, New Brunswick, Canada</p>
+    <p class="quote">"Sorry but not sorry." by bong-water-water-bong</p>
+  </div>
+</footer>
+<script>
+  // on a phone the docs contents start folded, so the page comes first
+  var side = document.querySelector("details.docs-side");
+  if (side && window.matchMedia("(max-width: 860px)").matches) side.open = false;
+</script>
+
+
+</body>
+</html>

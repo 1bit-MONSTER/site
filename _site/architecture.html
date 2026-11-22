@@ -21,10 +21,10 @@
 <meta name="twitter:description" content="The technical map: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, DwarfStar, Laya, the hardware gate and the kernel.">
 <meta name="twitter:image" content="https://1bit.gg/assets/og-card.png">
 <meta name="twitter:image:alt" content="1bit engine: local LLM inference on the AMD Ryzen AI MAX+ 395 inside Lemonade Server">
-<meta property="article:published_time" content="2026-10-30">
-<meta property="article:modified_time" content="2026-10-30">
+<meta property="article:published_time" content="2026-11-02">
+<meta property="article:modified_time" content="2026-11-02">
 <meta property="article:author" content="bong-water-water-bong">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/architecture.html#article", "headline": "How the engine is built", "description": "The technical map: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, DwarfStar, Laya, the hardware gate and the kernel.", "url": "https://1bit.gg/architecture.html", "mainEntityOfPage": "https://1bit.gg/architecture.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-10-30", "dateModified": "2026-10-30", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://1bit.gg/#organization", "name": "1bit engine", "url": "https://1bit.gg/", "logo": {"@type": "ImageObject", "url": "https://1bit.gg/assets/apple-touch-icon.png", "width": 180, "height": 180}, "sameAs": ["https://github.com/1bit-MONSTER/engine", "https://github.com/1bit-MONSTER", "https://discord.gg/fa5m4Vawpa"]}, {"@type": "WebSite", "@id": "https://1bit.gg/#website", "name": "1bit engine", "url": "https://1bit.gg/", "description": "1bit engine: model-agnostic local LLM inference on the AMD Ryzen AI MAX+ 395 (Strix Halo) inside Lemonade Server, on the Radeon 8060S iGPU and the XDNA 2 NPU. Boot a USB stick and it serves.", "inLanguage": "en", "publisher": {"@id": "https://1bit.gg/#organization"}}, {"@type": "TechArticle", "@id": "https://1bit.gg/architecture.html#article", "headline": "How the engine is built", "description": "The technical map: HRX with our HIP kernels, the NPU engine on our own runtime, hybrid, ONNX Runtime, DwarfStar, Laya, the hardware gate and the kernel.", "url": "https://1bit.gg/architecture.html", "mainEntityOfPage": "https://1bit.gg/architecture.html", "image": "https://1bit.gg/assets/og-card.png", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "inLanguage": "en", "author": {"@type": "Person", "name": "bong-water-water-bong", "url": "https://github.com/bong-water-water-bong"}, "publisher": {"@id": "https://1bit.gg/#organization"}, "isPartOf": {"@id": "https://1bit.gg/#website"}}]}</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -78,7 +78,6 @@
 <li><a href="hybrid.html">Hybrid</a></li>
 <li><a href="onnx.html">ONNX Runtime</a></li>
 <li><a href="onnx-pack.html">ONNX pack</a></li>
-<li><a href="dwarfstar.html">DwarfStar</a></li>
 </ul>
 <p class="group">Components</p><ul>
 <li><a href="laya.html">Laya router</a></li>
@@ -93,6 +92,12 @@
 <li><a href="kernel.html">Linux kernel</a></li>
 <li><a href="npu-leaderboard.html">NPU leaderboard</a></li>
 <li><a href="PORTING.html">Porting map</a></li>
+</ul>
+<p class="group">More</p><ul>
+<li><a href="determinism.html">Determinism and cross-route log-prob agreement</a></li>
+<li><a href="hetero-prefill.html">HeteroMosaic&#x27;s split prefill, checked on our stack</a></li>
+<li><a href="os-v3-live-puppy-eval.html">Puppy as the base of 1bit OS v3: evaluation</a></li>
+<li><a href="os-v3.html">1bit OS v3 — the installed machine is an Ubuntu 26.04 Server</a></li>
 </ul>
 </nav></details>
 <article class="docs-page prose">
@@ -123,8 +128,10 @@ the README is the short version.</p>
   stream is recorded there.</li>
 <li><strong>ONNX Runtime</strong>, linked in-process behind <code>-DONEBIT_ORT</code>, with our own execution provider that
   claims MatMul and runs it on the NPU runtime (<a href="onnx.html">ONNX Runtime</a>, <a href="onnx-pack.html">ONNX pack</a>).</li>
-<li><strong>DwarfStar</strong>, for DeepSeek V4 Flash, GLM 5.x and Qwen3.8-Flash-Next in its own GGUFs, with SSD
-  expert streaming (<a href="dwarfstar.html">DwarfStar</a>).</li>
+<li>~~<strong>DwarfStar</strong>~~ — <strong>removed</strong> (owner decision 2026-11-01, out of the tree 2026-11-02): its DeepSeek V4 Flash /
+  GLM 5.x / Qwen3.8-Flash-Next route was antirez's CUDA kernels through a HIP shim plus hipBLAS, not our HIP kernels.
+  Those models run on <strong>HRX</strong>, and the engine keeps no 1BP reader. The reference fork
+  <a href="https://github.com/1bit-MONSTER/ds4">1bit-MONSTER/ds4</a> stays in the open for the history.</li>
 <li><strong>Laya</strong>, opt-in, which picks where each request runs (<a href="laya.html">Laya router</a>), and <strong>the Project
   Manager</strong>, ZAYA1-8B delegating to expert models (<a href="pm.html">Project Manager</a>).</li>
 <li><strong>Every Hugging Face model architecture</strong>, mapped to a backend by a registry and kept current by
@@ -149,8 +156,8 @@ config, MOK-signed for Secure Boot, and gated like a pin bump. Moving it to the 
 a written step list (<a href="kernel.html">Linux kernel</a>).</p>
 <h2 id="pinned-sources">Pinned sources<a class="anchor" href="#pinned-sources" title="Permanent link">#</a></h2>
 <p>HRX is pinned to AMD's hrx-system and ggml-hrx with our commits on top, kept current by <code>bump-hrx</code>
-(<a href="hrx.html#pinned-sources-kept-current">HRX</a>); Lemonade, Laya, the tokenizers library and
-DwarfStar each have their own bump workflow (<a href="releases.html#bumps">Releases</a>). A hand-raised bump
+(<a href="hrx.html#pinned-sources-kept-current">HRX</a>); Lemonade, Laya and the tokenizers library
+each have their own bump workflow (<a href="releases.html#bumps">Releases</a>). A hand-raised bump
 carries the branch name and the derived data the checks expect (<a href="releases.html">Releases</a>).</p>
 <h2 id="direction">Direction<a class="anchor" href="#direction" title="Permanent link">#</a></h2>
 <p>HRX with our HIP kernels, plus the NPU engine, embedded into Lemonade rather than Lemonade embedded
