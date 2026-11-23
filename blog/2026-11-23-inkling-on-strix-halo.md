@@ -16,8 +16,8 @@ limitations under the License.
 -->
 draft: true
 tags: inkling, thinking-machines, strix-halo, ryzen-ai-max-395, local-llm, lemonade, hrx, loom, nvfp4, npu, xdna2, long-context, moe
-title: Inkling-2-Mini on Strix Halo: 80 tok/s on the GPU, 128K context
-summary: Thinking Machines' Inkling-2-Mini runs on the AMD Ryzen AI MAX+ 395 through the 1bit engine's Loom route: 79.9 tok/s code decode, 2,258 tok/s prefill at 16.8k tokens, needle recall at 128K.
+title: Inkling-2-Mini on Strix Halo: native NVFP4, 80 tok/s, 128K context
+summary: Thinking Machines' Inkling-2-Mini runs on the AMD Ryzen AI MAX+ 395 through the 1bit engine's Loom route, reading its published NVFP4 weights as they are: KLD 0.0046, 79.9 tok/s code decode, 2,258 tok/s prefill at 16.8k tokens, needle recall at 128K.
 
 # Inkling-2-Mini on Strix Halo, measured
 
@@ -33,6 +33,21 @@ The GPU route is Loom. We run Inkling-2-Mini from the
 prediction drafts three tokens ahead (d=3). Before a model is routed to Loom in a release, it passes our
 gate: its answers are compared against the CPU on the same prompts, and its speed against the fallback
 route.
+
+## NVFP4, read as published
+
+Inkling-2-Mini's mixture-of-experts weights are published in NVFP4, a 4-bit floating-point format with
+its own block scales. The route reads them byte for byte: nothing is converted to another 4-bit format
+on the way in. Against the reference weights over a fixed text corpus, the result is a mean KL divergence
+of 0.0046 and 98.0 percent agreement on the most likely next token.
+
+This is also why we treat a published NVFP4 checkpoint as the right file to run, and do not convert other
+models into NVFP4. The Radeon 8060S has no FP4 matrix units, so NVFP4 is unpacked in software and reads
+about the same number of bytes per token as other 4-bit formats; its decode speed is the same. Its value is
+accuracy when the model was trained or published in it. Where we measured a post-training NVFP4 file of a
+model released in BF16 (Qwen3.8-27B), it landed further from the original (KL divergence 0.032) than
+Unsloth's UD-Q4_K_XL of similar size (about 0.005). From here on, when a model publishes an NVFP4
+checkpoint, that is the file the 1bit engine runs by default.
 
 ## Speed
 
@@ -59,7 +74,8 @@ Balanced mode, the needle found in every run (18 of 18):
 | 63K tokens | 1,363 | 41.8 |
 | 128K tokens | 912 | 30.7 |
 
-Loading takes 15 s from cold to the first token, 9 s warm.
+In performance mode, prefill rises 13 to 20 percent (2,074, 1,631 and 1,045 tok/s at the same lengths)
+and decode stays the same. Loading takes 15 s from cold to the first token, 9 s warm.
 
 ## Accuracy
 
@@ -78,7 +94,11 @@ eight test prompts. That is correct but far slower than the GPU, so it stays a r
 ## Try it
 
 Inkling-2-Mini ships in the next 1bit engine test build, as a Loom-routed model in the Lemonade
-catalogue. The release page will link here.
+catalogue. The release page will link here. One caveat for that first build: on 23 November Unsloth
+reorganised the Inkling GGUF files, and the card these measurements used reads the previous layout. The
+test build therefore uses a card for the new layout that is about half as fast today (around 46 tok/s
+short decode, 1,035 tok/s prefill at 16.8k tokens), while our own card for the new layout, which matched
+the measured card token for token on our test prompts, finishes its accuracy gate for the next build.
 
 Thanks to Thinking Machines for the models, to Jeremy Fowers and Daniel Holanda for the loom-fun card,
 and to Arun Babu Neelicattu for publishing his numbers and his method.
