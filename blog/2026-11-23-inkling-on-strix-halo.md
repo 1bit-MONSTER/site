@@ -112,9 +112,9 @@ our test prompts at the same speed, has passed its accuracy check and is on its 
 **Does Inkling-2-Mini run on AMD hardware?** Yes. On the AMD Ryzen AI MAX+ 395 (Strix Halo, Radeon 8060S
 graphics, gfx1151) it runs on the GPU through the 1bit engine's Loom route, inside Lemonade, on Linux.
 
-**How much memory does Inkling-2-Mini need?** The 4-bit GGUF is 17.6 GB; with its drafter and a long
-context, plan on 24 GB or more of GPU-visible memory. Strix Halo machines with 64 GB or 128 GB of unified
-memory run it with room to spare.
+**How much memory does Inkling-2-Mini need?** The 4-bit GGUF is 17.6 GB. Served with its drafter and the
+default long-context preset we measured 26 to 33 GiB in use, so plan on 32 GB or more of GPU-visible memory;
+Strix Halo machines with 64 GB or 128 GB of unified memory run it with room to spare.
 
 **Which Inkling file should I use?** The one with the experts in their published NVFP4 format, read as
 published. Re-quantized 4-bit files are smaller in no useful way and land further from the original
@@ -129,8 +129,7 @@ needle found at 128K tokens.
 route; the GPU is the place to run it.
 
 **Is it in Lemonade?** It ships in the v2026.49 test build of the 1bit engine as a Loom-routed model in
-the Lemonade catalogue, on 1bit OS (a bootable live USB or an install) and as packages for an existing
-Linux.
+the Lemonade catalogue, on 1bit OS (a bootable live USB or an install to disk).
 
 ## Try it
 
