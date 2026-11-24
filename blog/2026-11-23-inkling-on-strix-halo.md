@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-draft: true
+draft: false
 tags: inkling, thinking-machines, strix-halo, ryzen-ai-max-395, local-llm, lemonade, hrx, loom, nvfp4, npu, xdna2, long-context, moe
 title: Inkling-2-Mini on Strix Halo: native NVFP4, 80 tok/s, 128K context
 summary: Thinking Machines' Inkling-2-Mini runs on the AMD Ryzen AI MAX+ 395 through the 1bit engine's Loom route, reading its published NVFP4 weights as they are: KLD 0.0046, 79.9 tok/s code decode, 2,258 tok/s prefill at 16.8k tokens, needle recall at 128K.
@@ -91,14 +91,29 @@ We also ran Inkling on the Ryzen AI NPU, with the native NVFP4 weights: 3.0 to 4
 Inkling-2-Mini and 3.7 to 4.8 tok/s for TML-d24, whose answers matched the CPU token for token on all
 eight test prompts. That is correct but far slower than the GPU, so it stays a research route.
 
+## Tested on the hardware
+
+The first test build with Inkling, v2026.49-rc1, passed on an AMD Ryzen AI MAX+ 395 on 24 November, both
+booted live from a USB stick and installed to the NVMe with `1bit-update` from v2026.48 (the previous
+release stays installed as a rollback):
+
+| check | live stick | installed |
+|---|---|---|
+| release check (image) | 30 pass, 12 skip, 0 fail | passes; 2 rows fail on this development machine's own leftovers, not on the image |
+| Inkling-2-Mini on the Loom route | loaded in 93 s, answered 17 x 23 = 391 | loaded in 154 s (first download), answered 391 |
+| Qwen3-0.6B on the GPU / NPU | - | 309 / 99 tok/s |
+
+That test build carries the card for Unsloth's new file layout described below, at about half the speed
+in the tables above; our own card for the new layout, which matched the measured card token for token on
+our test prompts at the same speed, has passed its accuracy check and is on its way to the next build.
+
 ## Try it
 
-Inkling-2-Mini ships in the next 1bit engine test build, as a Loom-routed model in the Lemonade
-catalogue. The release page will link here. One caveat for that first build: on 23 November Unsloth
-reorganised the Inkling GGUF files, and the card these measurements used reads the previous layout. The
-test build therefore uses a card for the new layout that is about half as fast today (around 46 tok/s
-short decode, 1,035 tok/s prefill at 16.8k tokens), while our own card for the new layout, which matched
-the measured card token for token on our test prompts, finishes its accuracy gate for the next build.
+Inkling-2-Mini ships as a Loom-routed model in the Lemonade catalogue in the v2026.49 test build; the
+release page will link here. On 23 November Unsloth reorganised the Inkling GGUF files, and the card the
+measurements above used reads the previous layout. The first test build therefore uses a card for the new
+layout that is about half as fast today (around 46 tok/s short decode, 1,035 tok/s prefill at 16.8k
+tokens) while our full-speed card for the new layout finishes its review.
 
 Thanks to Thinking Machines for the models, to Jeremy Fowers and Daniel Holanda for the loom-fun card,
 and to Arun Babu Neelicattu for publishing his numbers and his method.
