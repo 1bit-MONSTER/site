@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 draft: true
-tags: release, v2026.44, lemonade, hrx, npu, 1bit-os, puppy-linux, headless, strix-halo, ryzen-ai-max-395
+tags: release, v2026.44, lemonade, hrx, npu, 1bit-os, puppy-linux, headless, strix-halo, ryzen-ai-max-395, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, lemonade-server, live-usb, usb-boot, secure-boot, ubuntu, rocm, hip, one-binary, qwen3.8, zaya1, deepseek-v4.1
 title: v2026.44: one binary, boot a stick
-summary: The first published release of the 1bit engine. 1bit OS is a Puppy Linux appliance - Lemonade Server and the engine inside it, headless by default, apt and a persistent data partition - or one tarball for an Ubuntu that already runs ROCm. What ships, how it was tested on the hardware, and what is not in it.
+summary: v2026.44, the first release: one binary with no Python in it, and the same binary is the whole operating system when you want it to be.
 
 # v2026.44, the first release
 

@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: npu, xdna2, hrx, hybrid, strix-halo, measurement, amd-npu-linux
+tags: npu, xdna2, hrx, hybrid, strix-halo, measurement, amd-npu-linux, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, amd-npu, npu-inference, gpu-npu-hybrid, benchmarks
 title: GPU and NPU at once on Strix Halo, measured
 summary: Forty reps say the Radeon iGPU and the XDNA 2 NPU run together on Strix Halo with no hang and no corruption; a busy GPU costs the NPU about 13 % of its stream.
 

@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: bitnet, ternary, hrx, strix-halo, local-llm, quantization, amd-gpu, radeon-8060s
+tags: bitnet, ternary, hrx, strix-halo, local-llm, quantization, amd-gpu, radeon-8060s, 1bit-engine, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, tokens-per-second, benchmarks, gfx1151, bitnet-b1.58, tq2_0, gguf, perplexity, llama-cpp, bonsai
 title: BitNet b1.58 on an AMD GPU: ternary on HRX
 summary: Microsoft's BitNet b1.58 2B-4T TQ2_0 GGUF runs end to end on the Radeon 8060S through HRX: perplexity 102.42 vs 102.56 on the CPU, decode 123.4 tok/s.
 

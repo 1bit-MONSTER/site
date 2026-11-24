@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: laya, routing, serve
+tags: laya, routing, serve, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, hrx, rocm, vulkan, zinc, llm-routing, qwen3.8-27b, mtp, dflash, 1bit-serve
 summary: Asked for a device, Laya picked ZINC every time; asked what kind of request it is, it is right 95.5% of the time, and 1bit serve --laya routes by class.
 
 # Laya routing: ask the model what it knows

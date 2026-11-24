@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: 1bit-os, live-usb, lemonade, strix-halo, ryzen-ai-max-395, local-llm, getting-started
+tags: 1bit-os, live-usb, lemonade, strix-halo, ryzen-ai-max-395, local-llm, getting-started, 1bit-engine, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, lemonade-server, usb-boot, secure-boot, puppy-linux, ubuntu, hrx
 title: Boot a USB stick: local LLMs on Strix Halo
 summary: Write the 1bit OS image to a USB stick, boot a Ryzen AI MAX+ 395 with Secure Boot on, and Lemonade serves local LLMs on the GPU and NPU. One command installs.
 

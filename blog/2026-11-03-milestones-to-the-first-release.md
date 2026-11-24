@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 draft: true
-tags: milestones, release, v2026.44, strix-halo, ryzen-ai-max-395, local-llm, lemonade, hrx, npu, xdna2, bitnet, ternary, 1bit-os, puppy-linux, amd-npu-linux
+tags: milestones, release, v2026.44, strix-halo, ryzen-ai-max-395, local-llm, lemonade, hrx, npu, xdna2, bitnet, ternary, 1bit-os, puppy-linux, amd-npu-linux, 1bit-engine, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, amd-npu, npu-inference, benchmarks, lemonade-server, rocm, hip, qwen3, qwen3.8-27b, mtp, speculative-decoding, dflash, bonsai-2-27b, deepseek-v4.1, live-usb, secure-boot
 title: Strix Halo LLM engine: April to v2026.44
 summary: Seven months of the 1bit engine, from a 1-bit HIP kernel in April to v2026.44: local LLMs on the Ryzen AI MAX+ 395 GPU and NPU, inside Lemonade.
 

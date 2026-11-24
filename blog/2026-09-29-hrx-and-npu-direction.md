@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: milestone, hrx, npu, laya, rocm
+tags: milestone, hrx, npu, laya, rocm, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, tokens-per-second, benchmarks, loom, hip, gguf, moe, mixture-of-experts, w4a4, qwen3-coder, qwen2.5, glm, lemonade
 summary: Heading to HRX plus the NPU: Laya's scorer runs on HRX at 15-16 ms a decision, W4A4 reaches MoE experts, and six GGUF architectures answer on the NPU.
 
 # Where the engine is going: HRX and the NPU

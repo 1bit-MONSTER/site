@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: npu, xdna2, ternary, bonsai, ryzen-ai, work-in-progress, amd-npu-linux
+tags: npu, xdna2, ternary, bonsai, ryzen-ai, work-in-progress, amd-npu-linux, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-npu, npu-inference, bonsai-2-27b, quantization, benchmarks
 title: Ternary Bonsai-2-27B on the Ryzen AI NPU
 summary: PrismML's Ternary-Bonsai-2-27B answers correctly on the XDNA 2 NPU (cosine 0.9908, argmax identical); decode 13.3 to 4.1 s/token in a day, ceiling measured.
 

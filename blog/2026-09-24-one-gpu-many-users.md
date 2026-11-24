@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: serving, batching, vulkan, rocm
+tags: serving, batching, vulkan, rocm, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, hrx, qwen3, qwen3.8-27b, mtp, speculative-decoding, concurrency, multi-user, llm-serving
 summary: Qwen3.8-27B from 1 to 24 simultaneous requests: Vulkan peaks at 50.9 tok/s with 8, ROCm reaches 68.0 with 16, and serve now grows with the load.
 title: One GPU, many users: Qwen3.8-27B batching
 

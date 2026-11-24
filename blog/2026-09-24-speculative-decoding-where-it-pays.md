@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: speculative decoding, mtp, qwen3.8
+tags: speculative decoding, mtp, qwen3.8, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, hrx, rocm, vulkan, qwen3, qwen3.8-27b, qwen3-coder, moe, draft-model, unsloth
 summary: MTP takes Qwen3.8-27B to 42.0 tok/s on code on Strix Halo, 3.4x; on Qwen3-Coder-30B-A3B, already at 88 tok/s, every draft model we tried was slower.
 
 title: Speculative decoding: where it pays
