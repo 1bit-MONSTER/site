@@ -136,9 +136,9 @@ the Lemonade catalogue, on 1bit OS (a bootable live USB or an install to disk).
 Inkling-2-Mini ships as a Loom-routed model in the Lemonade catalogue in the
 [v2026.49-rc1 test build](https://github.com/1bit-MONSTER/engine/releases/tag/v2026.49-rc1): write the
 image to a USB stick of 16 GB or more and boot it, or, on 1bit OS already installed, run
-`1bit-update --check --channel test` and install it with `1bit-update` (your models and settings stay,
-and the previous release stays as a rollback). The release's SHA256SUMS is signed, and the updater checks
-the signature before it installs anything. On 23 November Unsloth reorganised the Inkling GGUF files, and the card the
+`1bit-update --check --channel test` to see it, download the image, and install it with
+`1bit-update <image>` (your models and settings stay, and the previous release stays as a rollback). The
+release's SHA256SUMS is signed with our release key. On 23 November Unsloth reorganised the Inkling GGUF files, and the card the
 measurements above used reads the previous layout. The first test build therefore uses a card for the new
 layout that is about half as fast today (around 46 tok/s short decode, 1,035 tok/s prefill at 16.8k
 tokens) while our full-speed card for the new layout finishes its review.
