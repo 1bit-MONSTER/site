@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: zyphra, models, moe, hrx, onnx
+tags: zyphra, models, moe, hrx, onnx, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, zaya1, zaya1-8b, zaya1-74b, mixture-of-experts, moe-streaming, vision-language, rocm, vulkan, qwen3-coder
 summary: Zyphra's whole family runs (ZAYA1-74B at 35.4 tok/s), four older architectures join, and MoE experts stream from the drive at 43-45 tok/s on Strix Halo.
 
 title: Zyphra family, older archs, experts from disk

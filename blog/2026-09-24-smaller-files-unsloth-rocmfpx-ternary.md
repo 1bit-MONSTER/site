@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: quantization, ternary, rocmfpx, unsloth
+tags: quantization, ternary, rocmfpx, unsloth, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, rocm, gguf, qwen3.8-27b, kld, bitnet, bonsai, tq2_0, llama-cpp, 4-bit
 summary: What smaller files cost: Unsloth UD-Q4_K_XL stays at KLD 0.008 (95.3% same top token); ROCmFPX formats trade more; ternary is effectively lossless vs F16.
 
 title: Smaller files: Unsloth, ROCmFPX, ternary 27B

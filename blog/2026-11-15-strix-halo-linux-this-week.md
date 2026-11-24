@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: weekly, strix-halo, ryzen-ai-max, linux, npu, hrx, bosgame
+tags: weekly, strix-halo, ryzen-ai-max, linux, npu, hrx, bosgame, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, lemonade, mtp, speculative-decoding, gguf, llama-cpp, ci, bosgame-m5, usb-c, udev, mini-pc
 title: Strix Halo Linux LLM engine: 31 Oct to 15 Nov
 summary: Two weeks of the 1bit engine, the local LLM inference engine for Strix Halo Linux: open issues from 30 to 6, an MTP crash fixed, new CI gates, Bosgame M5 USB.
 

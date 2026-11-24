@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: npu, speculative-decoding
+tags: npu, speculative-decoding, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, tokens-per-second, benchmarks, qwen3, qwen3-32b, draft-model, gpu-npu-hybrid, llama-cpp, vulkan
 summary: Speculative decoding on two processors of Strix Halo: Qwen3-0.6B on the XDNA 2 NPU drafts, the GPU checks, and Qwen3-32B goes from 10.7 to 23.4 tok/s, 2.19x.
 
 # The NPU drafts, the GPU checks

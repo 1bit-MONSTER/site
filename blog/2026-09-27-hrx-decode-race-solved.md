@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: hrx, milestone, kernels
+tags: hrx, milestone, kernels, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, hip, gpu-kernels, qwen3-coder, qwen3, moe, gguf, zaya1, llama-cpp
 summary: One barrier that fenced only shared memory caused HRX's NaNs and GPU faults; the fix took Qwen3-Coder-30B from 1 of 8 correct runs to 8 of 8.
 
 # Milestone: the HRX decode race is solved

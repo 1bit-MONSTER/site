@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: bosgame, strix-halo, ryzen-ai-max, linux, usb4
+tags: bosgame, strix-halo, ryzen-ai-max, linux, usb4, 1bit-engine, bosgame-m5, axb35, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, mini-pc, ai-pc, usb-c, usb-ports, xhci, udev, d3cold, thunderbolt, linux-fix, linux-kernel, bios, ubuntu, 1bit-os, live-usb, usb-boot
 title: Bosgame M5 USB-C not working on Linux: the fix
 summary: Bosgame M5 (AXB35-02) USB-C and rear USB not working on Linux? Three USB controllers sleep in D3cold. One udev rule wakes them, and every port works.
 

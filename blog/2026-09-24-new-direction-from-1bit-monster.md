@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: announcement, engine
+tags: announcement, engine, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, lemonade, lemonade-server, loom, hrx, rocm, vulkan, zinc, hip, llama-cpp, laya, apache-2.0
 summary: 1bit.MONSTER's inference engine is now its own Apache-2.0 project, 1bit engine: a clean repository, pinned upstreams and a backend inside AMD's Lemonade Server.
 
 title: 1bit.MONSTER becomes 1bit engine

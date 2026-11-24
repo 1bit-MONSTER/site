@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: qwen, speculative-decoding, quantization, rocm, vulkan
+tags: qwen, speculative-decoding, quantization, rocm, vulkan, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, hrx, qwen3, qwen3.8-27b, gguf, unsloth, dflash, dflash2, mtp, hadamard, w4a4, 4-bit, kld, 1bit-serve
 summary: The DFlash2 drafter decodes Qwen3.8-27B at 45.7 tok/s on code through 1bit serve --dflash, 44% faster than MTP, and 4-bit activations with a Hadamard rotation.
 
 title: Qwen3.8-27B at 45.7 tok/s with DFlash2

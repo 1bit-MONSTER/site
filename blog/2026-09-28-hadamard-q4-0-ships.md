@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: rocm, quantization, qwen, kernels
+tags: rocm, quantization, qwen, kernels, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, hrx, qwen3.8-27b, gguf, q4_0, hadamard, w4a4, 4-bit, kld, prefill, 1bit-serve
 summary: Hadamard-rotated Q4_0 with 4-bit activations reads Qwen3.8-27B prompts at 509 tok/s (from ~400) at KLD 0.055, and 1bit serve runs it by itself.
 
 title: Hadamard Q4_0 ships: 509 tok/s of prompt

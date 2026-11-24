@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: weekly, release, lemonade, hrx, npu, 1bit-os, strix-halo, ryzen-ai-max-395
+tags: weekly, release, lemonade, hrx, npu, 1bit-os, strix-halo, ryzen-ai-max-395, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, lemonade-server, live-usb, secure-boot, puppy-linux, deepseek, deepseek-v4.1, moe, onnx, llama-cpp, gpu-kernels
 title: Lemonade pin, 1bit OS, DeepSeek-V4.1 this week
 summary: This week: Lemonade's release is the pin, the 1bit OS live image passes 17 of 17 checks on the board with Secure Boot on, and the HRX pin carries DeepSeek-V4.1.
 

@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: milestones, npu, hrx, vulkan, zinc
+tags: milestones, npu, hrx, vulkan, zinc, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, tokens-per-second, benchmarks, lemonade, lemonade-server, qwen3, gguf, llama-cpp, laya, llm-routing
 summary: Three days in: the engine runs on the XDNA 2 NPU, HRX, Vulkan and ZINC inside Lemonade, each step verified on Strix Halo; HRX passes 791 backend-op tests.
 
 title: The first week: NPU, HRX, Vulkan, ZINC

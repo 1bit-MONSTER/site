@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: hrx, vulkan, zero-copy
+tags: hrx, vulkan, zero-copy, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, qwen2.5, prefill, decode, kv-cache, dma-buf, long-context, llama-cpp
 summary: HRX prefills, Vulkan decodes, one KV cache shared through a dma-buf with no copies: an 8,192-token request on Qwen2.5-7B finishes 26% sooner on Strix Halo.
 
 # Prefill on HRX, decode on Vulkan, one KV cache

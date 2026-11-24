@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: milestone, strix-halo, local-llm, hrx, lemonade, qwen, speculative-decoding, release
+tags: milestone, strix-halo, local-llm, hrx, lemonade, qwen, speculative-decoding, release, 1bit-engine, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, npu-inference, tokens-per-second, benchmarks, lemonade-server, rocm, hip, gpu-kernels, qwen3, qwen3.8-27b, mtp, 1bit-os, ubuntu, glm, zaya1
 image: og-every-node-on-hrx.png
 summary: On AMD Strix Halo, all 43 local LLM configurations we test run fully on the GPU with HRX and our HIP kernels, and Qwen3.8-27B decodes at 36 tok/s.
 

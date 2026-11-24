@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-tags: hrx, quantization, unsloth
+tags: hrx, quantization, unsloth, 1bit-engine, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, linux-ai, ai-pc, llm-inference, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, amd-gpu, radeon-8060s, gfx1151, tokens-per-second, benchmarks, rocm, vulkan, qwen3, qwen3-coder, gguf, unsloth-dynamic, kld, long-context, kv-cache, moe
 summary: HRX decoding was wrong once the KV cache passed 256 tokens, now fixed; and which Unsloth file to download: UD-Q4_K_XL for lean, UD-Q5_K_XL for accurate.
 
 title: HRX long prompts fixed; Unsloth sweet spots
