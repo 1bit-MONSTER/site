@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 draft: false
-tags: inkling, thinking-machines, strix-halo, ryzen-ai-max-395, local-llm, lemonade, hrx, loom, nvfp4, npu, xdna2, long-context, moe
+tags: inkling, inkling-2-mini, thinking-machines, tml-d24, nvfp4, mxfp8, fp4, native-fp4, strix-halo, ryzen-ai-max-395, ryzen-ai-max-plus-395, amd-ryzen-ai, radeon-8060s, gfx1151, xdna2, amd-npu, amd-npu-linux, local-llm, local-ai, on-device-ai, private-ai, self-hosted-ai, open-weights, open-source-ai, moe, mixture-of-experts, looped-transformer, long-context, 128k-context, multimodal, lemonade, lemonade-server, loom, hrx, rocm, amd-gpu, linux-ai, llama-cpp, gguf, unsloth, quantization, speculative-decoding, mtp, benchmarks, tokens-per-second, 1bit-os, live-usb, ai-pc, mini-pc, framework-desktop, gmktec-evo-x2
 title: Inkling-2-Mini on Strix Halo, native NVFP4
 summary: Inkling-2-Mini on the AMD Ryzen AI MAX+ 395: published NVFP4 weights read natively (KLD 0.0046), 79.9 tok/s code decode, 128K context, tested on hardware.
 
@@ -106,6 +106,31 @@ release stays installed as a rollback):
 That test build carries the card for Unsloth's new file layout described below, at about half the speed
 in the tables above; our own card for the new layout, which matched the measured card token for token on
 our test prompts at the same speed, has passed its accuracy check and is on its way to the next build.
+
+## Questions people ask
+
+**Does Inkling-2-Mini run on AMD hardware?** Yes. On the AMD Ryzen AI MAX+ 395 (Strix Halo, Radeon 8060S
+graphics, gfx1151) it runs on the GPU through the 1bit engine's Loom route, inside Lemonade, on Linux.
+
+**How much memory does Inkling-2-Mini need?** The 4-bit GGUF is 17.6 GB; with its drafter and a long
+context, plan on 24 GB or more of GPU-visible memory. Strix Halo machines with 64 GB or 128 GB of unified
+memory run it with room to spare.
+
+**Which Inkling file should I use?** The one with the experts in their published NVFP4 format, read as
+published. Re-quantized 4-bit files are smaller in no useful way and land further from the original
+(KL divergence 0.0095 for a re-quantized IQ4_NL against 0.0046 for the native NVFP4 route, on different
+test sets).
+
+**How fast is Inkling-2-Mini on Strix Halo?** 74.6 to 79.9 tok/s for code and 65.8 to 73.9 tok/s for
+reasoning with three-token drafting, 2,000 to 2,260 tok/s prompt processing at 16.8k tokens, and the
+needle found at 128K tokens.
+
+**Does it run on the Ryzen AI NPU?** Yes, correctly but slowly (3 to 5 tok/s), so it stays a research
+route; the GPU is the place to run it.
+
+**Is it in Lemonade?** It ships in the v2026.49 test build of the 1bit engine as a Loom-routed model in
+the Lemonade catalogue, on 1bit OS (a bootable live USB or an install) and as packages for an existing
+Linux.
 
 ## Try it
 
