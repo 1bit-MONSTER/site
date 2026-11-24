@@ -16,8 +16,8 @@ limitations under the License.
 -->
 draft: false
 tags: inkling, thinking-machines, strix-halo, ryzen-ai-max-395, local-llm, lemonade, hrx, loom, nvfp4, npu, xdna2, long-context, moe
-title: Inkling-2-Mini on Strix Halo: native NVFP4, 80 tok/s, 128K context
-summary: Thinking Machines' Inkling-2-Mini runs on the AMD Ryzen AI MAX+ 395 through the 1bit engine's Loom route, reading its published NVFP4 weights as they are: KLD 0.0046, 79.9 tok/s code decode, 2,258 tok/s prefill at 16.8k tokens, needle recall at 128K.
+title: Inkling-2-Mini on Strix Halo, native NVFP4
+summary: Inkling-2-Mini on the AMD Ryzen AI MAX+ 395: published NVFP4 weights read natively (KLD 0.0046), 79.9 tok/s code decode, 128K context, tested on hardware.
 
 # Inkling-2-Mini on Strix Halo, measured
 
