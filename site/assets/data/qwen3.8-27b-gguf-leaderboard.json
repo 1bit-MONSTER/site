@@ -109,9 +109,9 @@
    "pp6k": 186.8,
    "decode": 10.4,
    "decode_draft": 15.8,
-   "gsm8k_off": null,
+   "gsm8k_off": "39/40",
    "gsm8k_on": null,
-   "peak_gib": 19.56,
+   "peak_gib": 21.14,
    "hf_downloads": 2171142,
    "note": "largest file of the repo (no Q4_K_M published); llama-bench failed on HRX (engine#3585), so no pp512; long prompt = 7,286 tokens; drafter: MTP head"
   },

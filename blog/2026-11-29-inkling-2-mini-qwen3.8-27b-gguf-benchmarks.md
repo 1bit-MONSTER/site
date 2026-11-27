@@ -28,12 +28,34 @@ Which GGUF of Inkling-2-Mini or Qwen3.8-27B should you download for an AMD Ryzen
 every quant the main publishers ship (Unsloth Dynamic, ggml-org, bartowski, LM Studio and ours) on one
 Strix Halo machine, with one engine build, and put the numbers in two tables you can sort and download.
 
-<!-- TODO: "Which quant should I pick" summary per memory size, from the measured rows only. -->
+## Which Inkling-2-Mini file should I pick?
+
+On the AMD Ryzen AI MAX+ 395, the 1bit engine serves Inkling-2-Mini on its native NVFP4 + MXFP8 Loom route: the
+experts are read in the formats Thinking Machines published them in. It decodes at 52-60 tokens per second with
+its drafter and matches the original model's most likely next token 98.0 percent of the time. In Lemonade you pull
+Inkling-2-Mini as usual: the engine recognises Unsloth's `UD-Q4_K_XL` file and serves it on this route.
+
+If you run a GGUF yourself, for example on a machine with less memory, Unsloth's Dynamic files gave the lowest KL
+divergence at every size we measured:
+
+| memory for the weights | file | KL divergence | same top-1 |
+|---|---|---|---|
+| about 8 GB | `UD-IQ2_XXS` (7.9 GiB) | 0.064 | 91.0 % |
+| about 9 GB | `UD-Q2_K_XL` (8.5 GiB) | 0.050 | 92.1 % |
+| about 11 GB | `UD-IQ3_XXS` (10.9 GiB) | 0.021 | 94.8 % |
+| about 13 GB | `UD-Q3_K_XL` (12.7 GiB) | 0.012 | 96.3 % |
+| about 15 GB | `UD-IQ4_XS` (14.7 GiB) | 0.0051 | 97.4 % |
+| 16 GB or more | `UD-Q4_K_XL` (16.4 GiB) | 0.0040 | 97.9 % |
+
+Bigger files stop paying off at about 16 GB: `UD-Q8_K_XL` (0.0040), `Q6_K` (0.0044) and the NVFP4 GGUF (0.0045)
+land at the same level as `UD-Q4_K_XL`, and even the BF16 GGUF only reaches 0.0037. Our reading: Inkling's
+expert weights were published in a 4-bit format, so a larger file mostly stores the same 4-bit experts again.
+
 
 ## How we measured
 
 - **Hardware:** one AMD Ryzen AI MAX+ 395 with 128 GB of unified memory (Radeon 8060S iGPU, gfx1151), running
-  1bit OS. One engine build for every row: v2026.49-rc1 <!-- TODO: engine commit + llama.cpp build -->.
+  1bit OS. One engine build for every row: v2026.49-rc1 (engine `0a0e550a`, llama.cpp `5776842d`, loom-serve 0.3.0).
 - **Accuracy (KL divergence, top-1):** each file's next-token distribution is compared with a reference over a
   fixed text. Inkling-2-Mini's reference is the original Thinking Machines checkpoint; Qwen3.8-27B's is the
   BF16 GGUF. Lower KL divergence means closer to the original; "same top-1" is how often both pick the same
@@ -130,7 +152,7 @@ Strix Halo machine, with one engine build, and put the numbers in two tables you
 <tr><td><a href="https://huggingface.co/unsloth/Qwen3.8-27B-GGUF">UD-Q4_K_XL (Loom)</a></td><td>unsloth</td><td>Loom</td><td>16.44</td><td>5.17</td><td>0.00524</td><td>96.94</td><td></td><td>536.7</td><td></td><td>30.3</td><td>39/40</td><td></td><td>40.27</td><td>8,181,570</td><td>same GGUF on its Loom card; KLD measured on llama.cpp; long prompt = 7,286 tokens; Loom preset chat; drafts (depth 3)</td></tr>
 <tr><td><a href="https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF">abliterated-Q4_K</a></td><td>huihui-ai</td><td>llama.cpp HRX</td><td>15.66</td><td></td><td>0.02914</td><td>92.65</td><td></td><td>487.3</td><td>12.8</td><td>24.2</td><td>39/40</td><td></td><td>23.43</td><td>4,628,141</td><td>fine-tune: KLD = distance from base, not quality; llama-bench failed on HRX (Loom JIT bounds proof, engine#3585), so no pp512; llama-server speeds and GSM8K measured; long prompt = 7,286 tokens; drafter: MTP head</td></tr>
 <tr><td><a href="https://huggingface.co/cdiamond/Qwen3.8-27B-iMatrix-NVFP4-MTP-GGUF">iMatrix-NVFP4-MTP</a></td><td>cdiamond</td><td>llama.cpp HRX</td><td>15.94</td><td>5.01</td><td>0.03217</td><td>92.89</td><td>506.1</td><td>402.8</td><td>12.5</td><td>24.4</td><td>39/40</td><td></td><td>21.43</td><td>3,335,303</td><td>the repo&#x27;s only weights file; NVFP4 run as published; long prompt = 7,286 tokens; drafter: MTP head</td></tr>
-<tr><td><a href="https://huggingface.co/byteshape/Qwen3.8-27B-GGUF">IQ4_XS-3.84bpw</a></td><td>byteshape</td><td>llama.cpp HRX</td><td>12.18</td><td></td><td>0.04975</td><td>91.63</td><td></td><td>186.8</td><td>10.4</td><td>15.8</td><td></td><td></td><td>19.56</td><td>2,171,142</td><td>largest file of the repo (no Q4_K_M published); llama-bench failed on HRX (engine#3585), so no pp512; long prompt = 7,286 tokens; drafter: MTP head</td></tr>
+<tr><td><a href="https://huggingface.co/byteshape/Qwen3.8-27B-GGUF">IQ4_XS-3.84bpw</a></td><td>byteshape</td><td>llama.cpp HRX</td><td>12.18</td><td></td><td>0.04975</td><td>91.63</td><td></td><td>186.8</td><td>10.4</td><td>15.8</td><td>39/40</td><td></td><td>21.14</td><td>2,171,142</td><td>largest file of the repo (no Q4_K_M published); llama-bench failed on HRX (engine#3585), so no pp512; long prompt = 7,286 tokens; drafter: MTP head</td></tr>
 <tr><td><a href="https://huggingface.co/Qwen/Qwen3.8-27B-FP8">Qwen3.8-27B-FP8</a></td><td>Qwen</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>7,028,433</td><td>not runnable on this engine/platform: FP8 safetensors: the engine has no FP8 route yet</td></tr>
 <tr><td><a href="https://huggingface.co/lmstudio-community/Qwen3.8-27B-MLX-4bit">Qwen3.8-27B-MLX-4bit</a></td><td>lmstudio-community</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>2,554,128</td><td>not runnable on this engine/platform: MLX: Apple-only format</td></tr>
 <tr><td><a href="https://huggingface.co/lmstudio-community/Qwen3.8-27B-MLX-8bit">Qwen3.8-27B-MLX-8bit</a></td><td>lmstudio-community</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>2,401,990</td><td>not runnable on this engine/platform: MLX: Apple-only format</td></tr>
@@ -160,6 +182,7 @@ text. Speed is llama-bench on the Radeon 8060S (512-token prompt, 128 generated 
 <tr><td><a href="https://huggingface.co/QUASAR-QAT/gemma-4-E4B-it-QUASAR-Q4_0-GGUF">gemma-4-E4B-it: QUASAR Q4_0 (QAT)</a></td><td>QUASAR-QAT</td><td></td><td>4.86</td><td>5.59</td><td>0.14661</td><td>84.64</td><td>2727.4</td><td></td><td>52.76</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td><a href="https://huggingface.co/bartowski/google_gemma-4-E4B-it-GGUF">gemma-4-E4B-it: bartowski Q4_0 (RTN + imatrix, as published)</a></td><td>bartowski</td><td></td><td>4.85</td><td>5.54</td><td>0.33243</td><td>77.29</td><td>2697.3</td><td></td><td>53.23</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>gemma-4-E4B-it: Q4_0 --pure + imatrix (QUASAR&#x27;s layout, made by us)</td><td>ours</td><td></td><td>3.98</td><td>4.54</td><td>0.34654</td><td>76.79</td><td>2698.4</td><td></td><td>53.46</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><a href="https://huggingface.co/QUASAR-QAT/gemma-4-12B-it-QUASAR-Q4_0-GGUF">gemma-4-12B-it: QUASAR Q4_0 (QAT)</a></td><td>QUASAR-QAT</td><td></td><td>6.48</td><td>4.68</td><td>1.45943</td><td>57.19</td><td>1264.7</td><td></td><td>25.81</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 </tbody></table>
 <!-- END TABLE qat-gguf-leaderboard -->
 
@@ -177,7 +200,10 @@ Both tables as CSV and JSON, under the Apache-2.0 licence:
 
 ### Which Inkling-2-Mini GGUF should I use on Strix Halo?
 
-<!-- TODO from measured rows -->
+On Strix Halo the 1bit engine runs Inkling-2-Mini on its native NVFP4 + MXFP8 Loom route, which needs no choice of
+GGUF. For your own llama.cpp setup, `UD-Q4_K_XL` from Unsloth (16.4 GiB) is the smallest file that reaches the
+accuracy ceiling we measured (KL divergence 0.0040, 97.9 percent same top-1). Below 16 GB, pick the largest
+Unsloth Dynamic file that fits; the table above lists one per memory size.
 
 ### Which Qwen3.8-27B GGUF should I use on Strix Halo?
 

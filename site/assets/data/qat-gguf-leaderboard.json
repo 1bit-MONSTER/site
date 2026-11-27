@@ -133,6 +133,25 @@
    "peak_gib": null,
    "hf_downloads": null,
    "note": ""
+  },
+  {
+   "quant": "gemma-4-12B-it: QUASAR Q4_0 (QAT)",
+   "source": "QUASAR-QAT/gemma-4-12B-it-QUASAR-Q4_0-GGUF",
+   "file": "",
+   "route": "",
+   "size_gib": 6.48,
+   "bpw": 4.68,
+   "kld_mean": 1.45943,
+   "top1_pct": 57.19,
+   "pp512": 1264.7,
+   "pp6k": null,
+   "decode": 25.81,
+   "decode_draft": null,
+   "gsm8k_off": null,
+   "gsm8k_on": null,
+   "peak_gib": null,
+   "hf_downloads": null,
+   "note": ""
   }
  ]
 }
