@@ -1,0 +1,43 @@
+quant,source,route,size_gib,bpw,kld_mean,top1_pct,pp512,pp6k,decode,decode_draft,gsm8k_off,gsm8k_on,peak_gib,hf_downloads,note,file
+Our native NVFP4 + MXFP8 Loom route (the 1bit engine's Inkling route),1bit-MONSTER/Inkling-2-Mini-NVFP4-MXFP8-loom,,,,0.004583,97.99,,,,,,,,,"the card 1bit OS ships (#3553); experts read as Thinking Machines published them (NVFP4 layers 0-19 from the GGUF, MXFP8 layers 20-23); DSpark drafter, depth 3; measured from the identical box copy (same llm.loom 3d57c28a); KLD and top-1 from engine#3333 / #3158 (same machine, same reference)",
+"Native NVFP4 + MXFP8, attention and head re-quantized to NVFP4 (opt-in speed variant)",,,,,0.018259,95.07,,,,,,,,,"KLD and top-1 from engine#3333 (same machine, same reference)",
+Native NVFP4 + MXFP8 on unsloth's older file layout (superseded by the row above),,Loom,,,0.004583,97.99,,2064.3,,57.3,,,26.32,,"KLD and top-1 from engine#3333 (same machine, same reference); long prompt = 8,492 tokens; Loom preset ab",
+UD-Q4_K_XL,unsloth/Inkling-2-Mini-GGUF,,16.42,5.41,0.00402,97.89,,,,,,,,,"Loom arm (rc1 payload card r9700, no drafter) pending; accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491)",Inkling-2-Mini-UD-Q4_K_XL.gguf
+UD-IQ1_S,unsloth/Inkling-2-Mini-GGUF,,7.23,2.38,0.08392,89.41,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-IQ1_S.gguf
+UD-IQ1_M,unsloth/Inkling-2-Mini-GGUF,,7.47,2.46,0.07269,90.54,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-IQ1_M.gguf
+UD-IQ2_XXS,unsloth/Inkling-2-Mini-GGUF,,7.9,2.6,0.06424,91.0,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-IQ2_XXS.gguf
+UD-Q2_K_XL,unsloth/Inkling-2-Mini-GGUF,,8.51,2.8,0.0503,92.11,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-Q2_K_XL.gguf
+UD-IQ3_XXS,unsloth/Inkling-2-Mini-GGUF,,10.86,3.58,0.02104,94.83,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-IQ3_XXS.gguf
+UD-Q3_K_XL,unsloth/Inkling-2-Mini-GGUF,,12.7,4.18,0.01178,96.32,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-Q3_K_XL.gguf
+UD-IQ4_XS,unsloth/Inkling-2-Mini-GGUF,,14.65,4.83,0.00509,97.43,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-IQ4_XS.gguf
+UD-Q4_K_M,unsloth/Inkling-2-Mini-GGUF,,15.47,5.1,0.00415,97.84,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-Q4_K_M.gguf
+UD-Q8_K_XL,unsloth/Inkling-2-Mini-GGUF,,21.3,7.02,0.00403,97.82,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-UD-Q8_K_XL.gguf
+IQ2_XXS,bartowski/Inkling-2-Mini-GGUF,,9.61,3.17,0.05873,91.94,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ2_XXS.gguf
+IQ2_S,bartowski/Inkling-2-Mini-GGUF,,10.31,3.4,0.04322,92.92,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ2_S.gguf
+Q2_K,bartowski/Inkling-2-Mini-GGUF,,11.06,3.64,0.04505,92.45,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q2_K.gguf
+IQ2_M,bartowski/Inkling-2-Mini-GGUF,,11.12,3.66,0.03399,93.7,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ2_M.gguf
+IQ3_XXS,bartowski/Inkling-2-Mini-GGUF,,12.39,4.08,0.02067,95.12,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ3_XXS.gguf
+Q3_K_S,bartowski/Inkling-2-Mini-GGUF,,12.51,4.12,0.01835,95.22,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q3_K_S.gguf
+IQ3_XS,bartowski/Inkling-2-Mini-GGUF,,12.82,4.22,0.01997,94.95,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ3_XS.gguf
+Q3_K_M,bartowski/Inkling-2-Mini-GGUF,,13.56,4.47,0.01627,95.61,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q3_K_M.gguf
+Q4_0,bartowski/Inkling-2-Mini-GGUF,,14.03,4.62,0.0178,95.15,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q4_0.gguf
+IQ4_XS,bartowski/Inkling-2-Mini-GGUF,,14.05,4.63,0.00955,96.59,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ4_XS.gguf
+IQ3_M,bartowski/Inkling-2-Mini-GGUF,,14.21,4.68,0.01599,95.39,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ3_M.gguf
+Q3_K_L,bartowski/Inkling-2-Mini-GGUF,,14.21,4.68,0.01538,95.1,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q3_K_L.gguf
+IQ4_NL,bartowski/Inkling-2-Mini-GGUF,,15.0,4.94,0.00936,96.28,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ4_NL.gguf
+Q4_1,bartowski/Inkling-2-Mini-GGUF,,15.45,5.09,0.01486,95.71,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q4_1.gguf
+Q4_K_S,bartowski/Inkling-2-Mini-GGUF,,15.71,5.18,0.0087,96.64,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q4_K_S.gguf
+Q4_K_M,bartowski/Inkling-2-Mini-GGUF,,17.38,5.73,0.00836,96.3,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q4_K_M.gguf
+Q5_K_S,bartowski/Inkling-2-Mini-GGUF,,17.85,5.88,0.00611,97.03,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q5_K_S.gguf
+Q4_K_L,bartowski/Inkling-2-Mini-GGUF,,18.37,6.05,0.00747,96.52,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q4_K_L.gguf
+Q5_K_M,bartowski/Inkling-2-Mini-GGUF,,19.76,6.51,0.00581,97.62,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q5_K_M.gguf
+Q6_K_S,bartowski/Inkling-2-Mini-GGUF,,22.39,7.38,0.00466,97.77,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q6_K_S.gguf
+Q6_K,bartowski/Inkling-2-Mini-GGUF,,23.0,7.58,0.0044,97.4,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q6_K.gguf
+Q6_K_L,bartowski/Inkling-2-Mini-GGUF,,23.62,7.78,0.00501,97.28,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q6_K_L.gguf
+Q8_0,bartowski/Inkling-2-Mini-GGUF,,25.91,8.54,0.00472,97.3,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q8_0.gguf
+IQ4_NL,ggml-org/Inkling-2-Mini-GGUF,,16.42,5.41,0.00894,96.62,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-IQ4_NL.gguf
+NVFP4,ggml-org/Inkling-2-Mini-GGUF,,16.42,5.41,0.00445,97.75,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-NVFP4.gguf
+Q8_0,ggml-org/Inkling-2-Mini-GGUF,,25.91,8.54,0.00472,97.3,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q8_0.gguf
+BF16,ggml-org/Inkling-2-Mini-GGUF,,48.64,16.03,0.00369,98.04,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-BF16.gguf
+Q4_K_M,lmstudio-community/Inkling-2-Mini-GGUF,,16.28,5.36,0.01658,94.83,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q4_K_M.gguf
+Q6_K,lmstudio-community/Inkling-2-Mini-GGUF,,21.88,7.21,0.00644,97.11,,,,,,,,,accuracy on the CPU arbiter: no HRX fallback on rc1 (engine#3491),Inkling-2-Mini-Q6_K.gguf
