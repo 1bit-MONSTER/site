@@ -30,10 +30,11 @@ Strix Halo machine, with one engine build, and put the numbers in two tables you
 
 ## Which Inkling-2-Mini file should I pick?
 
-On the AMD Ryzen AI MAX+ 395, the 1bit engine serves Inkling-2-Mini on its native NVFP4 + MXFP8 Loom route: the
-experts are read in the formats Thinking Machines published them in. It decodes at 52-60 tokens per second with
-its drafter and matches the original model's most likely next token 98.0 percent of the time. In Lemonade you pull
-Inkling-2-Mini as usual: the engine recognises Unsloth's `UD-Q4_K_XL` file and serves it on this route.
+On the AMD Ryzen AI MAX+ 395, the 1bit engine's native NVFP4 + MXFP8 Loom route reads Inkling-2-Mini's experts in
+the formats Thinking Machines published them in. It decodes at 52-60 tokens per second with its drafter and matches
+the original model's most likely next token 98.0 percent of the time. It is the route the next 1bit OS build ships
+for Unsloth's `UD-Q4_K_XL` file; the v2026.49-rc1 build measured here serves that file on the earlier Loom card
+(41 tokens per second, the `UD-Q4_K_XL` row).
 
 If you run a GGUF yourself, for example on a machine with less memory, Unsloth's Dynamic files gave the lowest KL
 divergence at every size we measured:
@@ -200,8 +201,8 @@ Both tables as CSV and JSON, under the Apache-2.0 licence:
 
 ### Which Inkling-2-Mini GGUF should I use on Strix Halo?
 
-On Strix Halo the 1bit engine runs Inkling-2-Mini on its native NVFP4 + MXFP8 Loom route, which needs no choice of
-GGUF. For your own llama.cpp setup, `UD-Q4_K_XL` from Unsloth (16.4 GiB) is the smallest file that reaches the
+On Strix Halo, pull Unsloth's `UD-Q4_K_XL` in Lemonade: the 1bit engine serves that file on its Loom route (the native
+NVFP4 + MXFP8 card from the next 1bit OS build on). For your own llama.cpp setup, `UD-Q4_K_XL` from Unsloth (16.4 GiB) is the smallest file that reaches the
 accuracy ceiling we measured (KL divergence 0.0040, 97.9 percent same top-1). Below 16 GB, pick the largest
 Unsloth Dynamic file that fits; the table above lists one per memory size.
 
