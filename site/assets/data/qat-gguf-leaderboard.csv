@@ -1,0 +1,7 @@
+quant,source,route,size_gib,bpw,kld_mean,top1_pct,pp512,pp6k,decode,decode_draft,gsm8k_off,gsm8k_on,peak_gib,hf_downloads,note,file
+Qwen3.5-4B: QUASAR Q4_0 (QAT),QUASAR-QAT/Qwen3.5-4B-QUASAR-Q4_0-GGUF,,2.51,5.12,0.04088,91.36,3103.1,,62.0,,,,,,,
+"Qwen3.5-4B: bartowski Q4_0 (RTN + imatrix, as published)",bartowski/Qwen_Qwen3.5-4B-GGUF,,2.58,5.11,0.04777,90.35,3303.5,,63.67,,,,,,,
+"Qwen3.5-4B: Q4_0 --pure + imatrix (QUASAR's layout, made by us)",,,2.27,4.51,0.07432,87.2,3328.2,,66.78,,,,,,,
+gemma-4-E4B-it: QUASAR Q4_0 (QAT),QUASAR-QAT/gemma-4-E4B-it-QUASAR-Q4_0-GGUF,,4.86,5.59,0.14661,84.64,2727.4,,52.76,,,,,,,
+"gemma-4-E4B-it: bartowski Q4_0 (RTN + imatrix, as published)",bartowski/google_gemma-4-E4B-it-GGUF,,4.85,5.54,0.33243,77.29,2697.3,,53.23,,,,,,,
+"gemma-4-E4B-it: Q4_0 --pure + imatrix (QUASAR's layout, made by us)",,,3.98,4.54,0.34654,76.79,2698.4,,53.46,,,,,,,
