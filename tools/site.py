@@ -32,6 +32,10 @@
 # 1200x630 link-preview card in site/assets), a "title: short search title" (its <title> without
 # the " · 1bit engine" suffix, 46 characters at most; unset, the heading is cut to fit) and
 # "draft: true" (kept in blog/, not built) before its "# Title"; its first paragraph is its lead.
+# A post that publishes measured data carries one "dataset: <name>" line per data set: site/assets/data/<name>.json
+# and <name>.csv are the data, <name>.meta.json its name, description, keywords, measurementTechnique and
+# variableMeasured; the post's JSON-LD then carries a schema.org Dataset per line with both files as its
+# distribution (the build stops when one of the three files is missing).
 # A release post also carries "version: vYYYY.WW": its BlogPosting is then "about" the engine as a
 # SoftwareApplication of that version, and the newest published release post sets the home page's
 # softwareVersion (no published release post, no softwareVersion). A slug may hold dots (v2026.47).
@@ -634,13 +638,41 @@ def post_image(text):
     return SITE + "assets/" + m.group(1) if m else None
 
 
+def post_datasets(text):
+    """A post's "dataset: <name>" lines (see the header): the names, in order."""
+    return re.findall(r"^dataset:\s*(\S+)\s*$", strip_notice(text).split("\n# ", 1)[0], re.M)
+
+
+def dataset_node(name, post_name, modified):
+    """schema.org Dataset for site/assets/data/<name>.{json,csv} with <name>.meta.json, published by post_name."""
+    base = ROOT / "site" / "assets" / "data" / name
+    for ext in (".json", ".csv", ".meta.json"):
+        if not (base.parent / (name + ext)).exists():
+            sys.exit(f"dataset {name}: site/assets/data/{name}{ext} is missing")
+    meta = json.loads((base.parent / (name + ".meta.json")).read_text())
+    if len(meta["description"]) < 50:
+        sys.exit(f"dataset {name}: description under 50 characters (Google's Dataset minimum)")
+    url = SITE + "assets/data/" + name
+    node = {"@type": "Dataset", "@id": page_url(post_name) + "#dataset-" + name, "name": meta["name"],
+            "description": meta["description"], "url": page_url(post_name), "keywords": meta.get("keywords", []),
+            "license": "https://www.apache.org/licenses/LICENSE-2.0", "isAccessibleForFree": True,
+            "creator": {"@id": ORG_ID}, "publisher": {"@id": ORG_ID}, "dateModified": modified,
+            "subjectOf": {"@id": page_url(post_name) + "#article"}, "inLanguage": "en",
+            "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": url + ".json"},
+                             {"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": url + ".csv"}]}
+    for k in ("measurementTechnique", "variableMeasured", "temporalCoverage", "spatialCoverage"):
+        if meta.get(k):
+            node[k] = meta[k]
+    return node
+
+
 def split_post(text):
     """-> (tags, title, lead, the rest, summary or "", search title or "", draft) of a post. A post that
     starts with "draft: true" is kept in blog/ but not built (no page, no feed entry, no sitemap line)."""
     text = strip_notice(text)
     tags, summary, seo_title, draft = [], "", "", False
     while True:
-        m = re.match(r"\s*(tags|summary|image|title|draft|version):\s*(.+)\n", text)
+        m = re.match(r"\s*(tags|summary|image|title|draft|version|dataset):\s*(.+)\n", text)
         if not m:
             break
         if m.group(1) == "draft":
@@ -946,6 +978,7 @@ class Site:
                        lastmod=modified, image=image, image_alt=title, dates=(date, modified, tags),
                        jsonld=jsonld_graph(article,
                                            *([faq_node(name, faq)] if faq else []),
+                                           *[dataset_node(d, name, modified) for d in post_datasets(src.read_text())],
                                            breadcrumb(name, ("Blog", "blog"), (title, name))))
             self.modified[name] = modified
             rows.append((date, name, title, plain(lead), tags, self.md(lead + "\n\n" + body, src), summary))
