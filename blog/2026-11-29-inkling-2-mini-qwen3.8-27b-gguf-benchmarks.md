@@ -61,7 +61,10 @@ expert weights were published in a 4-bit format, so a larger file mostly stores 
   fixed text. Inkling-2-Mini's reference is the original Thinking Machines checkpoint; Qwen3.8-27B's is the
   BF16 GGUF. Lower KL divergence means closer to the original; "same top-1" is how often both pick the same
   most likely token. For a fine-tune, KL divergence measures how far it moved from the base model, not its
-  quality.
+  quality. Qwen3.8-27B is scored on the GPU. The engine's v2026.49-rc1 build cannot run Inkling-2-Mini GGUFs on
+  the GPU through llama.cpp, so those are scored with the same build's CPU backend. That number repeats exactly
+  run to run, but another llama.cpp build can land a few percent away on the same file, so compare Inkling rows with
+  each other, not with numbers measured elsewhere.
 - **Speed:** prompt tokens per second at 512 and about 6,000 tokens, and decode tokens per second, greedy,
   through the route the engine serves the file on (Loom or llama.cpp), with and without a draft model.
 - **GSM8K:** the first 40 problems of a fixed 200-problem sample, greedy, thinking off (Inkling-2-Mini also
