@@ -94,7 +94,7 @@
    "gsm8k_on": null,
    "peak_gib": null,
    "hf_downloads": null,
-   "note": ""
+   "note": "GPU and CPU arbiter agree within 1 % (KLD, top-1); the BF16 reference scores PPL 56.7 on this text"
   },
   {
    "quant": "gemma-4-E4B-it: bartowski Q4_0 (RTN + imatrix, as published)",
@@ -113,7 +113,7 @@
    "gsm8k_on": null,
    "peak_gib": null,
    "hf_downloads": null,
-   "note": ""
+   "note": "GPU and CPU arbiter agree within 1 % (KLD, top-1); the BF16 reference scores PPL 56.7 on this text"
   },
   {
    "quant": "gemma-4-E4B-it: Q4_0 --pure + imatrix (QUASAR's layout, made by us)",
@@ -132,26 +132,64 @@
    "gsm8k_on": null,
    "peak_gib": null,
    "hf_downloads": null,
-   "note": ""
+   "note": "GPU and CPU arbiter agree within 1 % (KLD, top-1); the BF16 reference scores PPL 56.7 on this text"
   },
   {
    "quant": "gemma-4-12B-it: QUASAR Q4_0 (QAT)",
    "source": "QUASAR-QAT/gemma-4-12B-it-QUASAR-Q4_0-GGUF",
    "file": "",
    "route": "",
-   "size_gib": 6.48,
-   "bpw": 4.68,
-   "kld_mean": 1.45943,
-   "top1_pct": 57.19,
-   "pp512": 1264.7,
+   "size_gib": null,
+   "bpw": null,
+   "kld_mean": null,
+   "top1_pct": null,
+   "pp512": null,
    "pp6k": null,
-   "decode": 25.81,
+   "decode": null,
    "decode_draft": null,
    "gsm8k_off": null,
    "gsm8k_on": null,
    "peak_gib": null,
    "hf_downloads": null,
-   "note": ""
+   "note": "left out: the BF16 reference itself scores perplexity 544 on this text in llama.cpp (GPU and CPU agree, 543.9 vs 543.5) and a Q4_0 scores better than it, so KL divergence against it does not measure quantization loss here"
+  },
+  {
+   "quant": "gemma-4-12B-it: bartowski Q4_0 (RTN + imatrix, as published)",
+   "source": "bartowski/gemma-4-12B-it-GGUF",
+   "file": "",
+   "route": "",
+   "size_gib": null,
+   "bpw": null,
+   "kld_mean": null,
+   "top1_pct": null,
+   "pp512": null,
+   "pp6k": null,
+   "decode": null,
+   "decode_draft": null,
+   "gsm8k_off": null,
+   "gsm8k_on": null,
+   "peak_gib": null,
+   "hf_downloads": null,
+   "note": "left out: the BF16 reference itself scores perplexity 544 on this text in llama.cpp (GPU and CPU agree, 543.9 vs 543.5) and a Q4_0 scores better than it, so KL divergence against it does not measure quantization loss here"
+  },
+  {
+   "quant": "gemma-4-12B-it: Q4_0 --pure + imatrix (QUASAR's layout, made by us)",
+   "source": "",
+   "file": "",
+   "route": "",
+   "size_gib": null,
+   "bpw": null,
+   "kld_mean": null,
+   "top1_pct": null,
+   "pp512": null,
+   "pp6k": null,
+   "decode": null,
+   "decode_draft": null,
+   "gsm8k_off": null,
+   "gsm8k_on": null,
+   "peak_gib": null,
+   "hf_downloads": null,
+   "note": "left out: the BF16 reference itself scores perplexity 544 on this text in llama.cpp (GPU and CPU agree, 543.9 vs 543.5) and a Q4_0 scores better than it, so KL divergence against it does not measure quantization loss here"
   }
  ]
 }
