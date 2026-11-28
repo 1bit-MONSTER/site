@@ -1,0 +1,27 @@
+{
+ "name": "Inkling-2-Mini GGUF and Loom leaderboard on AMD Strix Halo",
+ "description": "Every published Inkling-2-Mini GGUF (Unsloth Dynamic, ggml-org, bartowski, LM Studio, QUASAR-QAT, 1bit-MONSTER) and the native NVFP4 + MXFP8 Loom route, measured on one AMD Ryzen AI MAX+ 395: KL divergence and top-1 agreement vs the original checkpoint, prompt and decode tokens per second, GSM8K, peak memory.",
+ "keywords": [
+  "Inkling-2-Mini",
+  "GGUF",
+  "quantization",
+  "KL divergence",
+  "Unsloth Dynamic",
+  "NVFP4",
+  "MXFP8",
+  "Strix Halo",
+  "Ryzen AI MAX+ 395",
+  "Radeon 8060S",
+  "local LLM",
+  "benchmark"
+ ],
+ "measurementTechnique": "llama-perplexity --kl-divergence against a fixed reference; streamed greedy decode timing; GSM8K first 40 of a fixed 200-problem sample, greedy",
+ "variableMeasured": [
+  "KL divergence",
+  "same top-1 token rate",
+  "prompt tokens per second",
+  "decode tokens per second",
+  "GSM8K accuracy",
+  "peak GPU memory"
+ ]
+}

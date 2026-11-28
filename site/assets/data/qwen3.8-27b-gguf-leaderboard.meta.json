@@ -1,0 +1,28 @@
+{
+ "name": "Qwen3.8-27B GGUF leaderboard on AMD Strix Halo",
+ "description": "Every Unsloth Qwen3.8-27B GGUF plus the 25 most-downloaded Qwen3.8-27B quantizations on Hugging Face, measured on one AMD Ryzen AI MAX+ 395: KL divergence and top-1 agreement vs BF16, prompt and decode tokens per second (with MTP and DFlash drafters), GSM8K, peak memory.",
+ "keywords": [
+  "Qwen3.8-27B",
+  "GGUF",
+  "quantization",
+  "KL divergence",
+  "Unsloth Dynamic",
+  "UD-Q4_K_XL",
+  "MTP",
+  "DFlash",
+  "Strix Halo",
+  "Ryzen AI MAX+ 395",
+  "Radeon 8060S",
+  "local LLM",
+  "benchmark"
+ ],
+ "measurementTechnique": "llama-perplexity --kl-divergence against a fixed reference; streamed greedy decode timing; GSM8K first 40 of a fixed 200-problem sample, greedy",
+ "variableMeasured": [
+  "KL divergence",
+  "same top-1 token rate",
+  "prompt tokens per second",
+  "decode tokens per second",
+  "GSM8K accuracy",
+  "peak GPU memory"
+ ]
+}

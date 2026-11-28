@@ -1,0 +1,26 @@
+{
+ "name": "Q4_0 quantization-aware training (QUASAR) vs RTN Q4_0 on AMD Strix Halo",
+ "description": "QUASAR-QAT Q4_0 GGUFs of Qwen3.5-4B, gemma-4-E4B-it, gemma-4-12B-it and Muse-Glimmer-30B against plain round-to-nearest Q4_0 of the same models (bartowski's imatrix files and a --pure imatrix control), measured on one AMD Ryzen AI MAX+ 395: KL divergence and top-1 agreement vs BF16, prompt and decode tokens per second.",
+ "keywords": [
+  "QAT",
+  "quantization-aware training",
+  "QUASAR",
+  "Q4_0",
+  "GGUF",
+  "KL divergence",
+  "Qwen3.5-4B",
+  "gemma-4",
+  "Muse-Glimmer-30B",
+  "Strix Halo",
+  "benchmark"
+ ],
+ "measurementTechnique": "llama-perplexity --kl-divergence against a fixed reference; streamed greedy decode timing; GSM8K first 40 of a fixed 200-problem sample, greedy",
+ "variableMeasured": [
+  "KL divergence",
+  "same top-1 token rate",
+  "prompt tokens per second",
+  "decode tokens per second",
+  "GSM8K accuracy",
+  "peak GPU memory"
+ ]
+}
