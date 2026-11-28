@@ -50,7 +50,7 @@ Rules that hold for every page (also enforced or helped by `tools/site.py`):
 | 12 | GPU and NPU together | npu prefill gpu decode, heteromosaic strix halo, igpu npu split prefill | [hybrid.html](https://1bit.gg/hybrid.html) | hetero-prefill.html, blog-gpu-and-npu-at-the-same-time.html |
 | 13 | Questions | is 1bit engine open source, does lemonade use the npu on linux, does it need vulkan or rocm, how much ram for a local llm, 128gb local llm, does a local llm run on windows | [faq.html](https://1bit.gg/faq.html) (FAQPage JSON-LD) | overview.html, models.html, moe-streaming.html |
 | 14 | Brand | 1bit engine, 1bit.gg, 1bit-MONSTER engine | [index.html](https://1bit.gg/) | overview.html, docs.html, blog.html |
-| 15 | GGUF quant benchmarks per model | qwen3.8-27b gguf benchmark, best qwen3.8-27b gguf, inkling-2-mini gguf, inkling-2-mini quant, best gguf quant strix halo, unsloth ud quants kld, gguf kld leaderboard, ryzen ai max 395 tok/s | [blog-inkling-2-mini-qwen3.8-27b-gguf-benchmarks.html](https://1bit.gg/blog-inkling-2-mini-qwen3.8-27b-gguf-benchmarks.html) (draft until both boards are measured) | blog-inkling-on-strix-halo.html, models.html, cluster 10's primary |
+| 15 | GGUF quant benchmarks per model | qwen3.8-27b gguf benchmark, best qwen3.8-27b gguf, inkling-2-mini gguf, inkling-2-mini quant, best gguf quant strix halo, unsloth ud quants kld, gguf kld leaderboard, ryzen ai max 395 tok/s | [blog-inkling-2-mini-qwen3.8-27b-gguf-benchmarks.html](https://1bit.gg/blog-inkling-2-mini-qwen3.8-27b-gguf-benchmarks.html) (the Qwen3.8-27B board is still being filled) | blog-inkling-on-strix-halo.html, models.html, cluster 10's primary |
 
 ## Gaps, and what fills them
 
